@@ -9,16 +9,16 @@ import { mailto, CONTACT_EMAIL } from '../../lib/site';
 const all = await getCollection('resources');
 const sections = [
 	{
-		kind: 'method',
-		title: 'Methods',
-		intro:
-			'Software, analysis pipelines, and protocols for detecting and measuring CIN, shared openly on GitHub or elsewhere.',
-	},
-	{
 		kind: 'data',
 		title: 'Data',
 		intro:
 			'Public repositories of CIN-related data, including single-cell genomics and imaging, with their experimental and analytical metadata.',
+	},
+	{
+		kind: 'method',
+		title: 'Methods',
+		intro:
+			'Software, analysis pipelines, and protocols for detecting and measuring CIN, shared openly on GitHub or elsewhere.',
 	},
 ] as const;
 const hostName = { github: 'GitHub', website: 'Website', repository: 'Repository' } as const;
@@ -29,7 +29,7 @@ const hostName = { github: 'GitHub', website: 'Website', repository: 'Repository
 
 	{
 		sections.map((s) => (
-			<section class="section container">
+			<section class="container res-section">
 				<h2>{s.title}</h2>
 				<p class="intro">{s.intro}</p>
 				<div class="grid grid-3">
@@ -103,7 +103,14 @@ const hostName = { github: 'GitHub', website: 'Website', repository: 'Repository
 		text-align: left;
 		overflow-wrap: anywhere;
 	}
+	.res-section {
+		padding-top: 32px;
+	}
+	.res-section + .res-section {
+		padding-top: 48px;
+	}
 	.contribute {
+		padding-top: 48px;
 		padding-bottom: var(--section-y);
 	}
 	.contribute :global(a:not(.pill)) {
