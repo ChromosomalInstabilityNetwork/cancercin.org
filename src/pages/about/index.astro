@@ -1,6 +1,6 @@
 ---
 import SectionLayout from '../../layouts/SectionLayout.astro';
-import Eyebrow from '../../components/Eyebrow.astro';
+import Card from '../../components/Card.astro';
 import PillButton from '../../components/PillButton.astro';
 import { url } from '../../lib/url';
 ---
@@ -16,7 +16,20 @@ import { url } from '../../lib/url';
 	</p>
 
 	<section class="block">
-		<Eyebrow>Who we are</Eyebrow>
+		<h2>What is CIN?</h2>
+		<Card variant="feature">
+			<p class="quote">
+				Chromosomal instability is any process that causes repeated generation of karyotype
+				alterations from kilobase scale to whole chromosomes.
+			</p>
+		</Card>
+		<p class="after">
+			It is an ongoing <strong>rate of change</strong>, not a cell state, which sets it apart from
+			the genome complexity and aneuploidy left behind as its scars.
+		</p>
+	</section>
+
+	<section class="block">
 		<h2>Uniting cell biology, genomics, and the clinic</h2>
 		<p>
 			CIN drives cancer formation and therapy resistance, but it also offers a chance to transform
@@ -27,7 +40,6 @@ import { url } from '../../lib/url';
 	</section>
 
 	<section class="block">
-		<Eyebrow>What we are working on</Eyebrow>
 		<h2>Challenges and a shared roadmap</h2>
 		<p>
 			The network has identified three major challenges in CIN research and a roadmap for
@@ -37,7 +49,6 @@ import { url } from '../../lib/url';
 	</section>
 
 	<section class="block">
-		<Eyebrow>Governance and funding</Eyebrow>
 		<h2>[Governance]</h2>
 		<p>[Steering group, funders, and how to get involved to come.]</p>
 	</section>
@@ -46,5 +57,15 @@ import { url } from '../../lib/url';
 <style>
 	h2 {
 		font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
+	}
+	.quote {
+		font-family: var(--font-display);
+		font-size: clamp(1.3rem, 1.1rem + 0.8vw, 1.75rem);
+		line-height: 1.3;
+		margin: 0;
+	}
+	.after {
+		margin: 24px 0 0;
+		color: var(--muted);
 	}
 </style>

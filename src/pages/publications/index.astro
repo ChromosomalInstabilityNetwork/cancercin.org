@@ -2,7 +2,6 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import Eyebrow from '../../components/Eyebrow.astro';
 import Card from '../../components/Card.astro';
 
 const topics = {
@@ -20,7 +19,7 @@ const year = (y?: number) => (y ? String(y) : '[Year]');
 ---
 
 <BaseLayout title="Publications" description="Papers, perspectives, and resources from consortium laboratories.">
-	<PageHeader eyebrow="Publications" title="Research from the CIN community">
+	<PageHeader title="Research from the CIN community">
 		<p>
 			Papers, perspectives, and resources from consortium laboratories, organized around the
 			challenges of chromosomal instability research.
@@ -30,7 +29,6 @@ const year = (y?: number) => (y ? String(y) : '[Year]');
 	{
 		featured.length > 0 && (
 			<section class="section container">
-				<Eyebrow>Start here</Eyebrow>
 				<h2>Featured publication</h2>
 				{featured.map((p) => (
 					<Card variant="dark" class="feat">
@@ -47,7 +45,6 @@ const year = (y?: number) => (y ? String(y) : '[Year]');
 	}
 
 	<section class="section container">
-		<Eyebrow>Library</Eyebrow>
 		<h2>All publications</h2>
 		<div class="grid grid-2">
 			{

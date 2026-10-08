@@ -17,7 +17,7 @@ const when = date
 	: '[Date]';
 ---
 
-<SectionLayout title={title} eyebrow="News" description={summary}>
+<SectionLayout title={title} description={summary}>
 	<p slot="lead">
 		{date ? <time datetime={date.toISOString().slice(0, 10)}>{when}</time> : when}
 	</p>

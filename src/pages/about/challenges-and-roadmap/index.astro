@@ -1,6 +1,5 @@
 ---
 import SectionLayout from '../../../layouts/SectionLayout.astro';
-import Eyebrow from '../../../components/Eyebrow.astro';
 import Card from '../../../components/Card.astro';
 import { challengeGroups } from '../../../data/challenges';
 import { roadmap } from '../../../data/roadmap';
@@ -16,7 +15,6 @@ import { roadmap } from '../../../data/roadmap';
 	</p>
 
 	<section id="challenges" class="block">
-		<Eyebrow>The road ahead</Eyebrow>
 		<h2>Three major challenges</h2>
 		{
 			challengeGroups.map((g) => (
@@ -42,7 +40,6 @@ import { roadmap } from '../../../data/roadmap';
 	</section>
 
 	<section id="roadmap" class="block">
-		<Eyebrow>Where we go from here</Eyebrow>
 		<h2>A roadmap for future CIN research</h2>
 		<div class="roadmap">
 			{

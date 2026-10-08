@@ -1,16 +1,13 @@
 ---
-import Eyebrow from './Eyebrow.astro';
 
 interface Props {
-	eyebrow?: string;
 	title: string;
 }
-const { eyebrow, title } = Astro.props;
+const { title } = Astro.props;
 ---
 
 <header class="page-header on-dark">
 	<div class="container">
-		{eyebrow && <Eyebrow onDark>{eyebrow}</Eyebrow>}
 		<h1>{title}</h1>
 		<div class="lede"><slot /></div>
 	</div>

@@ -2,7 +2,6 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import Eyebrow from '../../components/Eyebrow.astro';
 import Card from '../../components/Card.astro';
 import PeopleMap from '../../components/PeopleMap.astro';
 import PillButton from '../../components/PillButton.astro';
@@ -14,7 +13,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 ---
 
 <BaseLayout title="People" description="The laboratories and investigators of the Cancer CIN Consortium.">
-	<PageHeader eyebrow="The consortium" title="The people behind the Cancer CIN Consortium">
+	<PageHeader title="The people behind the Cancer CIN Consortium">
 		<p>
 			Thirty-seven laboratories, working across disciplines and continents. Browse the directory
 			or select a pin to see where each investigator is based.
@@ -22,7 +21,6 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 	</PageHeader>
 
 	<section class="section container">
-		<Eyebrow>Directory and map</Eyebrow>
 		<h2>Where we work</h2>
 		<div class="dir-map">
 			<ul class="directory" aria-label="Directory" data-directory>
@@ -59,7 +57,6 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 	<section class="container pair">
 		<div class="grid grid-2">
 			<Card variant="feature">
-				<p class="eyebrow-accent">Get listed</p>
 				<h3>Would you like to be added?</h3>
 				<p>
 					If you would like to be added to the directory, email your name, institution, and
@@ -148,14 +145,6 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 	}
 	.map {
 		min-height: 0;
-	}
-	.eyebrow-accent {
-		margin: 0 0 12px;
-		font-size: 14px;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		color: var(--accent);
 	}
 	.pair {
 		padding-bottom: var(--section-y);

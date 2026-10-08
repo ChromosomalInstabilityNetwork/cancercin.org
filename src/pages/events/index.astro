@@ -1,6 +1,5 @@
 ---
 import SectionLayout from '../../layouts/SectionLayout.astro';
-import Eyebrow from '../../components/Eyebrow.astro';
 import EventCard from '../../components/EventCard.astro';
 import { getEvents } from '../../lib/events';
 
@@ -9,7 +8,6 @@ const { upcoming, past } = await getEvents();
 
 <SectionLayout
 	title="Events Calendar"
-	eyebrow="News & Events"
 	description="Lectures, meeting sessions, and workshops for the CIN community."
 >
 	<p slot="lead">
@@ -18,7 +16,6 @@ const { upcoming, past } = await getEvents();
 	</p>
 
 	<section class="block">
-		<Eyebrow>Coming up</Eyebrow>
 		<h2>Upcoming events</h2>
 		<div class="stack">
 			{
@@ -38,7 +35,6 @@ const { upcoming, past } = await getEvents();
 	</section>
 
 	<section class="block">
-		<Eyebrow>Archive</Eyebrow>
 		<h2>Past events</h2>
 		{
 			past.length ? (

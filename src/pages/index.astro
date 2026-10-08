@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Eyebrow from '../components/Eyebrow.astro';
 import Card from '../components/Card.astro';
 import PillButton from '../components/PillButton.astro';
 import { url } from '../lib/url';
@@ -9,7 +8,6 @@ import { url } from '../lib/url';
 <BaseLayout>
 	<section class="hero on-dark">
 		<div class="container">
-			<Eyebrow onDark>Chromosomal instability research community</Eyebrow>
 			<h1>
 				Chromosomal instability: cancer's oldest hallmark, and one of its biggest opportunities.
 			</h1>
@@ -30,7 +28,6 @@ import { url } from '../lib/url';
 	<section id="definition" class="section container">
 		<div class="def">
 			<div>
-				<Eyebrow>Our definition</Eyebrow>
 				<h2>What is CIN?</h2>
 			</div>
 			<div>
@@ -53,21 +50,22 @@ import { url } from '../lib/url';
 	.hero {
 		background: var(--ink);
 		color: var(--on-dark);
-		padding-block: clamp(56px, 9vw, 112px);
+		padding-block: clamp(32px, 5vw, 56px);
 	}
 	.hero h1 {
 		color: var(--on-dark-strong);
 		max-width: 940px;
+		font-size: clamp(2rem, 1.6rem + 1.6vw, 3.25rem);
 	}
 	.lead {
-		font-size: 1.25rem;
+		font-size: 1.125rem;
 		max-width: 720px;
 	}
 	.actions {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 16px;
-		margin-top: 32px;
+		margin-top: 24px;
 	}
 	.def {
 		display: grid;

@@ -6,18 +6,17 @@ import { groupFor, isCurrent } from '../lib/nav';
 
 interface Props {
 	title: string;
-	eyebrow?: string;
 	/** Page <title>; defaults to `title`. */
 	pageTitle?: string;
 	description?: string;
 }
-const { title, eyebrow, pageTitle, description } = Astro.props;
+const { title, pageTitle, description } = Astro.props;
 const path = Astro.url.pathname;
 const group = groupFor(path);
 ---
 
 <BaseLayout title={pageTitle ?? title} description={description}>
-	<PageHeader eyebrow={eyebrow ?? group?.label} title={title}>
+	<PageHeader title={title}>
 		<slot name="lead" />
 	</PageHeader>
 
