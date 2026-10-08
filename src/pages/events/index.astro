@@ -22,6 +22,8 @@ const { upcoming, past } = await getEvents();
 						end={e.data.end}
 						location={e.data.location}
 						link={e.data.link}
+						image={e.data.image}
+						imageAlt={e.data.image_alt}
 					>
 						<p>{e.body}</p>
 					</EventCard>
@@ -42,6 +44,8 @@ const { upcoming, past } = await getEvents();
 							end={e.data.end}
 							location={e.data.location}
 							link={e.data.link}
+						image={e.data.image}
+						imageAlt={e.data.image_alt}
 						>
 							<p>{e.body}</p>
 						</EventCard>

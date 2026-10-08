@@ -1,5 +1,6 @@
 ---
 import Card from './Card.astro';
+import { url } from '../lib/url';
 
 interface Props {
 	title: string;
@@ -7,8 +8,10 @@ interface Props {
 	end?: Date;
 	location: string;
 	link?: string;
+	image?: string;
+	imageAlt?: string;
 }
-const { title, start, end, location, link } = Astro.props;
+const { title, start, end, location, link, image, imageAlt = '' } = Astro.props;
 
 const fmt = new Intl.DateTimeFormat('en-US', {
 	month: 'short',
@@ -40,6 +43,7 @@ const when = start
 			</p>
 			<slot />
 		</div>
+		{image && <img class="thumb" src={url(image)} alt={imageAlt} width="96" height="96" loading="lazy" />}
 	</div>
 </Card>
 
@@ -76,6 +80,21 @@ const when = start
 	}
 	.body {
 		min-width: 0;
+		flex: 1;
+	}
+	.thumb {
+		flex: none;
+		width: 96px;
+		height: 96px;
+		object-fit: cover;
+		border-radius: 12px;
+		background: var(--border);
+	}
+	@media (max-width: 520px) {
+		.thumb {
+			width: 64px;
+			height: 64px;
+		}
 	}
 	h3 {
 		margin-bottom: 6px;

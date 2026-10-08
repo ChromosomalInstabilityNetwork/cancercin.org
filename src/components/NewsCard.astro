@@ -1,13 +1,16 @@
 ---
 import Card from './Card.astro';
+import { url } from '../lib/url';
 
 interface Props {
 	title: string;
 	date?: Date;
 	summary: string;
 	link?: string;
+	image?: string;
+	imageAlt?: string;
 }
-const { title, date, summary, link } = Astro.props;
+const { title, date, summary, link, image, imageAlt = '' } = Astro.props;
 const label = date
 	? new Intl.DateTimeFormat('en-US', {
 			month: 'long',
@@ -19,14 +22,45 @@ const label = date
 ---
 
 <Card>
-	<p class="date">
-		{date ? <time datetime={date.toISOString().slice(0, 10)}>{label}</time> : label}
-	</p>
-	<h3>{link ? <a href={link}>{title}</a> : title}</h3>
-	<p>{summary}</p>
+	<div class="row">
+		<div class="body">
+			<p class="date">
+				{date ? <time datetime={date.toISOString().slice(0, 10)}>{label}</time> : label}
+			</p>
+			<h3>{link ? <a href={link}>{title}</a> : title}</h3>
+			<p>{summary}</p>
+		</div>
+		{image && <img class="thumb" src={url(image)} alt={imageAlt} width="96" height="96" loading="lazy" />}
+	</div>
 </Card>
 
 <style>
+	.row {
+		display: flex;
+		gap: 20px;
+		align-items: flex-start;
+	}
+	.body {
+		min-width: 0;
+		flex: 1;
+	}
+	.body > :global(p:last-child) {
+		margin-bottom: 0;
+	}
+	.thumb {
+		flex: none;
+		width: 96px;
+		height: 96px;
+		object-fit: cover;
+		border-radius: 12px;
+		background: var(--border);
+	}
+	@media (max-width: 520px) {
+		.thumb {
+			width: 64px;
+			height: 64px;
+		}
+	}
 	.date {
 		margin: 0 0 8px;
 		color: var(--accent);

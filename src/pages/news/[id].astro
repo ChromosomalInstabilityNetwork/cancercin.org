@@ -11,7 +11,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
-const { title, date, summary, link } = entry.data;
+const { title, date, summary, link, image, image_alt } = entry.data;
 const when = date
 	? new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' }).format(date)
 	: '[Date]';
@@ -20,6 +20,7 @@ const when = date
 <SectionLayout title={title} description={summary}>
 
 	<article class="post">
+		{image && <img class="hero" src={url(image)} alt={image_alt} loading="lazy" />}
 		<p class="date">
 			{date ? <time datetime={date.toISOString().slice(0, 10)}>{when}</time> : when}
 		</p>
@@ -41,6 +42,13 @@ const when = date
 <style>
 	.post {
 		max-width: 720px;
+	}
+	.hero {
+		width: 100%;
+		max-height: 360px;
+		object-fit: cover;
+		border-radius: var(--radius-card);
+		margin-bottom: 20px;
 	}
 	.date {
 		margin: 0 0 8px;

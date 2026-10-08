@@ -20,6 +20,8 @@ const news = await getNews();
 					date={n.data.date}
 					summary={n.data.summary}
 					link={url(`news/${n.id}/`)}
+					image={n.data.image}
+					imageAlt={n.data.image_alt}
 				/>
 			))
 		}

@@ -28,6 +28,8 @@ const events = defineCollection({
 		location: z.string(),
 		type: z.enum(['lecture', 'session', 'workshop']),
 		link: z.url().optional(),
+		image: z.string().optional(), // path under public/, e.g. images/news/launch.jpg
+		image_alt: z.string().default(''), // leave empty if purely decorative
 	}),
 });
 
@@ -38,6 +40,8 @@ const news = defineCollection({
 		date: z.coerce.date().optional(),
 		summary: z.string(),
 		link: z.url().optional(),
+		image: z.string().optional(), // path under public/, e.g. images/news/launch.jpg
+		image_alt: z.string().default(''), // leave empty if purely decorative
 	}),
 });
 
