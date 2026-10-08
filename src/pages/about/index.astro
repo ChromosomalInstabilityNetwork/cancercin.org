@@ -1,6 +1,5 @@
 ---
 import SectionLayout from '../../layouts/SectionLayout.astro';
-import Card from '../../components/Card.astro';
 import PillButton from '../../components/PillButton.astro';
 import { url } from '../../lib/url';
 ---
@@ -10,18 +9,13 @@ import { url } from '../../lib/url';
 	pageTitle="About the Network"
 	description="A community of thirty-seven laboratories advancing chromosomal instability research from the bench to the clinic."
 >
-
 	<section class="block">
 		<h2>What is CIN?</h2>
-		<Card variant="feature">
-			<p class="quote">
-				Chromosomal instability is any process that causes repeated generation of karyotype
-				alterations from kilobase scale to whole chromosomes.
-			</p>
-		</Card>
-		<p class="after">
-			It is an ongoing <strong>rate of change</strong>, not a cell state, which sets it apart from
-			the genome complexity and aneuploidy left behind as its scars.
+		<p>
+			Chromosomal instability is any process that causes repeated generation of karyotype
+			alterations from kilobase scale to whole chromosomes. It is an ongoing
+			<strong>rate of change</strong>, not a cell state, which sets it apart from the genome
+			complexity and aneuploidy left behind as its scars.
 		</p>
 	</section>
 
@@ -50,15 +44,3 @@ import { url } from '../../lib/url';
 	</section>
 </SectionLayout>
 
-<style>
-	.quote {
-		font-family: var(--font-display);
-		font-size: clamp(1.3rem, 1.1rem + 0.8vw, 1.75rem);
-		line-height: 1.3;
-		margin: 0;
-	}
-	.after {
-		margin: 24px 0 0;
-		color: var(--muted);
-	}
-</style>
