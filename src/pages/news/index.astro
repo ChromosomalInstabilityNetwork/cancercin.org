@@ -11,20 +11,17 @@ const news = await getNews();
 	title="News"
 	description="News and updates from the Cancer CIN Consortium community."
 >
-
 	<div class="stack">
-		{
-			news.map((n) => (
-				<NewsCard
-					title={n.data.title}
-					date={n.data.date}
-					summary={n.data.summary}
-					link={url(`news/${n.id}/`)}
-					image={n.data.image}
-					imageAlt={n.data.image_alt}
-				/>
-			))
-		}
+		{news.map((n) => (
+			<NewsCard
+				title={n.data.title}
+				date={n.data.date}
+				summary={n.data.summary}
+				link={url(`news/${n.id}/`)}
+				image={n.data.image}
+				imageAlt={n.data.image_alt}
+			/>
+		))}
 	</div>
 </SectionLayout>
 

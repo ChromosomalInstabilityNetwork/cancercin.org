@@ -2,7 +2,9 @@
 import { url } from '../lib/url';
 ---
 
-<a class="skip-map visually-hidden" href="#after-map">Skip map</a>
+<a class="skip-map visually-hidden" href="#after-map">
+	Skip map
+</a>
 <div
 	class="map-wrap"
 	id="people-map"
@@ -36,10 +38,11 @@ import { url } from '../lib/url';
 	let map: any;
 	let popup: any;
 	let lib: typeof import('maplibre-gl');
-	let features = new Map<string, { coords: [number, number]; props: Record<string, string> }>();
+	const features = new Map<string, { coords: [number, number]; props: Record<string, string> }>();
 
 	function setSelected(id: string | null, opts: { scroll?: boolean } = {}) {
-		if (map && selected) map.setFeatureState({ source: 'people', id: selected }, { selected: false });
+		if (map && selected)
+			map.setFeatureState({ source: 'people', id: selected }, { selected: false });
 		popup?.remove();
 		selected = id;
 		for (const c of cards) {
@@ -52,7 +55,10 @@ import { url } from '../lib/url';
 			const l = list.getBoundingClientRect();
 			const r = card.getBoundingClientRect();
 			if (r.top < l.top || r.bottom > l.bottom) {
-				card.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+				card.scrollIntoView({
+					block: 'nearest',
+					behavior: reduceMotion.matches ? 'auto' : 'smooth',
+				});
 			}
 		}
 
@@ -166,8 +172,18 @@ import { url } from '../lib/url';
 					filter: ['!', ['has', 'point_count']],
 					paint: {
 						'circle-radius': ['case', ['boolean', ['feature-state', 'selected'], false], 11, 7],
-						'circle-color': ['case', ['boolean', ['feature-state', 'selected'], false], C.accent, C.pink],
-						'circle-stroke-color': ['case', ['boolean', ['feature-state', 'selected'], false], C.light, C.ocean],
+						'circle-color': [
+							'case',
+							['boolean', ['feature-state', 'selected'], false],
+							C.accent,
+							C.pink,
+						],
+						'circle-stroke-color': [
+							'case',
+							['boolean', ['feature-state', 'selected'], false],
+							C.light,
+							C.ocean,
+						],
 						'circle-stroke-width': 2,
 					},
 				});
@@ -186,7 +202,9 @@ import { url } from '../lib/url';
 				});
 				map.on('click', 'clusters', async (e: any) => {
 					const f = e.features[0];
-					const zoom = await map.getSource('people').getClusterExpansionZoom(f.properties.cluster_id);
+					const zoom = await map
+						.getSource('people')
+						.getClusterExpansionZoom(f.properties.cluster_id);
 					const t = { center: f.geometry.coordinates, zoom };
 					if (reduceMotion.matches) map.jumpTo(t);
 					else map.easeTo(t);

@@ -6,7 +6,13 @@ interface Props {
 	headingLevel?: 'h2' | 'h3' | 'h4';
 	class?: string;
 }
-const { variant = 'default', title, as: Tag = 'article', headingLevel: H = 'h3', class: className } = Astro.props;
+const {
+	variant = 'default',
+	title,
+	as: Tag = 'article',
+	headingLevel: H = 'h3',
+	class: className,
+} = Astro.props;
 ---
 
 <Tag class:list={['card', variant, className]}>

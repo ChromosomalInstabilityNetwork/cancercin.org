@@ -9,7 +9,9 @@ const activeGroup = groupFor(path)?.label;
 
 <header class="nav on-dark">
 	<div class="container bar">
-		<a class="brand" href={url('')}>{SITE_NAME}</a>
+		<a class="brand" href={url('')}>
+			{SITE_NAME}
+		</a>
 		<button
 			class="toggle"
 			type="button"
@@ -18,55 +20,72 @@ const activeGroup = groupFor(path)?.label;
 			data-nav-toggle
 		>
 			<span class="visually-hidden">Menu</span>
-			<svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+			<svg
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				aria-hidden="true"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+			>
 				<path d="M3 6h18M3 12h18M3 18h18"></path>
 			</svg>
 		</button>
 		<nav id="site-menu" aria-label="Main" data-nav-menu>
 			<ul class="top">
-				{
-					NAV.map((item, i) =>
-						isGroup(item) ? (
-							<li class="has-menu" data-group>
-								<button
-									class="group-btn"
-									type="button"
-									aria-expanded="false"
-									aria-controls={`menu-${i}`}
-									data-current={activeGroup === item.label ? 'true' : undefined}
+				{NAV.map((item, i) =>
+					isGroup(item) ? (
+						<li class="has-menu" data-group>
+							<button
+								class="group-btn"
+								type="button"
+								aria-expanded="false"
+								aria-controls={`menu-${i}`}
+								data-current={activeGroup === item.label ? 'true' : undefined}
+							>
+								{item.label}
+								<svg
+									width="12"
+									height="12"
+									viewBox="0 0 12 12"
+									aria-hidden="true"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
 								>
-									{item.label}
-									<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-										<path d="M2 4l4 4 4-4" />
-									</svg>
-								</button>
-								<span class="group-label">{item.label}</span>
-								<ul class="menu" id={`menu-${i}`}>
-									{item.children.map((c) => (
-										<li>
-											<a
-												href={url(c.href)}
-												aria-current={isCurrent(path, c.href) ? 'page' : undefined}
-											>
-												{c.label}
-											</a>
-										</li>
-									))}
-								</ul>
-							</li>
-						) : (
-							<li>
-								<a
-									class="link"
-									href={url(item.href)}
-									aria-current={isCurrent(path, item.href) ? 'page' : undefined}
-								>
-									{item.label}
-								</a>
-							</li>
-						),
-					)
-				}
+									<path d="M2 4l4 4 4-4" />
+								</svg>
+							</button>
+							<span class="group-label">{item.label}</span>
+							<ul class="menu" id={`menu-${i}`}>
+								{item.children.map((c) => (
+									<li>
+										<a
+											href={url(c.href)}
+											aria-current={isCurrent(path, c.href) ? 'page' : undefined}
+										>
+											{c.label}
+										</a>
+									</li>
+								))}
+							</ul>
+						</li>
+					) : (
+						<li>
+							<a
+								class="link"
+								href={url(item.href)}
+								aria-current={isCurrent(path, item.href) ? 'page' : undefined}
+							>
+								{item.label}
+							</a>
+						</li>
+					),
+				)}
 			</ul>
 		</nav>
 	</div>
@@ -100,9 +119,7 @@ const activeGroup = groupFor(path)?.label;
 			toggle.setAttribute('aria-expanded', String(open));
 			menu.toggleAttribute('data-open', open);
 		};
-		toggle.addEventListener('click', () =>
-			set(toggle.getAttribute('aria-expanded') !== 'true'),
-		);
+		toggle.addEventListener('click', () => set(toggle.getAttribute('aria-expanded') !== 'true'));
 		document.addEventListener('keydown', (e) => {
 			if (e.key !== 'Escape') return;
 			const openGroup = groups.find((g) => g.hasAttribute('data-open'));

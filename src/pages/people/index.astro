@@ -12,7 +12,10 @@ const people = (await getCollection('people')).sort((a, b) =>
 const addBody = 'Name:\nInstitution:\nAddress:\n';
 ---
 
-<BaseLayout title="People" description="The laboratories and investigators of the Cancer CIN Consortium.">
+<BaseLayout
+	title="People"
+	description="The laboratories and investigators of the Cancer CIN Consortium."
+>
 	<div class="container people">
 		<div class="left">
 			<h1>People</h1>
@@ -23,12 +26,18 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 				</p>
 			</Card>
 			<ul class="directory" aria-label="Directory" data-directory>
-			{
-				people.map((p) => (
+				{people.map((p) => (
 					<li>
 						<button type="button" class="person" data-person-id={p.id} aria-pressed="false">
 							{p.data.photo ? (
-								<img class="avatar" src={url(p.data.photo)} alt="" width="64" height="64" loading="lazy" />
+								<img
+									class="avatar"
+									src={url(p.data.photo)}
+									alt=""
+									width="64"
+									height="64"
+									loading="lazy"
+								/>
 							) : (
 								<span class="avatar placeholder" aria-hidden="true">
 									<svg viewBox="0 0 24 24" fill="currentColor">
@@ -44,9 +53,8 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 							</span>
 						</button>
 					</li>
-				))
-			}
-		</ul>
+				))}
+			</ul>
 		</div>
 		<div class="map">
 			<PeopleMap />

@@ -14,14 +14,21 @@ const all = await getCollection('publications');
 const featured = all.find((p) => p.data.featured);
 const rows = all
 	.filter((p) => !p.data.featured)
-	.sort((a, b) => (b.data.year ?? 0) - (a.data.year ?? 0) || a.data.title.localeCompare(b.data.title));
+	.sort(
+		(a, b) => (b.data.year ?? 0) - (a.data.year ?? 0) || a.data.title.localeCompare(b.data.title),
+	);
 
-const years = [...new Set(rows.map((p) => p.data.year).filter((y): y is number => !!y))].sort((a, b) => b - a);
+const years = [...new Set(rows.map((p) => p.data.year).filter((y): y is number => !!y))].sort(
+	(a, b) => b - a,
+);
 const journals = [...new Set(rows.map((p) => p.data.journal))].sort();
 const yearLabel = (y?: number) => (y ? String(y) : '[Year]');
 ---
 
-<BaseLayout title="Publications" description="Papers, perspectives, and resources from consortium laboratories.">
+<BaseLayout
+	title="Publications"
+	description="Papers, perspectives, and resources from consortium laboratories."
+>
 	<PageHeader title="Publications" />
 
 	<div class="container top">
@@ -31,20 +38,22 @@ const yearLabel = (y?: number) => (y ? String(y) : '[Year]');
 				challenges of chromosomal instability research.
 			</p>
 		</div>
-		{
-			featured && (
-				<Card variant="dark" class="feat" as="article">
-					<p class="feat-label">Featured · {yearLabel(featured.data.year)}</p>
-					<h2>
-						{featured.data.url ? <a href={featured.data.url}>{featured.data.title}</a> : featured.data.title}
-					</h2>
-					{featured.data.summary && <p>{featured.data.summary}</p>}
-					<p class="cite">
-						{featured.data.authors} · {featured.data.journal}
-					</p>
-				</Card>
-			)
-		}
+		{featured && (
+			<Card variant="dark" class="feat" as="article">
+				<p class="feat-label">Featured · {yearLabel(featured.data.year)}</p>
+				<h2>
+					{featured.data.url ? (
+						<a href={featured.data.url}>{featured.data.title}</a>
+					) : (
+						featured.data.title
+					)}
+				</h2>
+				{featured.data.summary && <p>{featured.data.summary}</p>}
+				<p class="cite">
+					{featured.data.authors} · {featured.data.journal}
+				</p>
+			</Card>
+		)}
 	</div>
 
 	<section class="container library" aria-labelledby="lib-title">
@@ -59,24 +68,32 @@ const yearLabel = (y?: number) => (y ? String(y) : '[Year]');
 				<label for="f-topic">Topic</label>
 				<select id="f-topic">
 					<option value="">All topics</option>
-					{Object.entries(topics).map(([k, v]) => <option value={k}>{v}</option>)}
+					{Object.entries(topics).map(([k, v]) => (
+						<option value={k}>{v}</option>
+					))}
 				</select>
 			</div>
 			<div class="field">
 				<label for="f-year">Year</label>
 				<select id="f-year">
 					<option value="">All years</option>
-					{years.map((y) => <option value={String(y)}>{y}</option>)}
+					{years.map((y) => (
+						<option value={String(y)}>{y}</option>
+					))}
 				</select>
 			</div>
 			<div class="field">
 				<label for="f-journal">Journal</label>
 				<select id="f-journal">
 					<option value="">All journals</option>
-					{journals.map((j) => <option value={j}>{j}</option>)}
+					{journals.map((j) => (
+						<option value={j}>{j}</option>
+					))}
 				</select>
 			</div>
-			<button type="reset" class="clear" data-clear>Clear</button>
+			<button type="reset" class="clear" data-clear>
+				Clear
+			</button>
 		</form>
 		<p class="count" aria-live="polite" data-count hidden></p>
 
@@ -93,27 +110,27 @@ const yearLabel = (y?: number) => (y ? String(y) : '[Year]');
 					</tr>
 				</thead>
 				<tbody>
-					{
-						rows.map((p) => (
-							<tr
-								data-topic={p.data.topic}
-								data-year={p.data.year ?? ''}
-								data-journal={p.data.journal}
-								data-text={`${p.data.title} ${p.data.authors} ${p.data.journal}`.toLowerCase()}
-							>
-								<td data-label="Year">{yearLabel(p.data.year)}</td>
-								<td data-label="Title" class="title">
-									{p.data.url ? <a href={p.data.url}>{p.data.title}</a> : p.data.title}
-								</td>
-								<td data-label="Authors">{p.data.authors}</td>
-								<td data-label="Journal">{p.data.journal}</td>
-								<td data-label="Topic">{topics[p.data.topic]}</td>
-							</tr>
-						))
-					}
+					{rows.map((p) => (
+						<tr
+							data-topic={p.data.topic}
+							data-year={p.data.year ?? ''}
+							data-journal={p.data.journal}
+							data-text={`${p.data.title} ${p.data.authors} ${p.data.journal}`.toLowerCase()}
+						>
+							<td data-label="Year">{yearLabel(p.data.year)}</td>
+							<td data-label="Title" class="title">
+								{p.data.url ? <a href={p.data.url}>{p.data.title}</a> : p.data.title}
+							</td>
+							<td data-label="Authors">{p.data.authors}</td>
+							<td data-label="Journal">{p.data.journal}</td>
+							<td data-label="Topic">{topics[p.data.topic]}</td>
+						</tr>
+					))}
 				</tbody>
 			</table>
-			<p class="empty" data-empty hidden>No publications match these filters.</p>
+			<p class="empty" data-empty hidden>
+				No publications match these filters.
+			</p>
 		</div>
 	</section>
 </BaseLayout>

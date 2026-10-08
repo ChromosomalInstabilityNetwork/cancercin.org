@@ -23,5 +23,7 @@ export async function getEvents(): Promise<{ upcoming: EventEntry[]; past: Event
 
 export async function getNews() {
 	const all = await getCollection('news');
-	return all.sort((a, b) => (b.data.date?.getTime() ?? Infinity) - (a.data.date?.getTime() ?? Infinity));
+	return all.sort(
+		(a, b) => (b.data.date?.getTime() ?? Infinity) - (a.data.date?.getTime() ?? Infinity),
+	);
 }

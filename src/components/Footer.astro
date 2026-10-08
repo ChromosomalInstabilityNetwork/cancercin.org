@@ -17,27 +17,30 @@ columns.push({ heading: 'Community', links: community });
 		<div class="top">
 			<div class="brand">
 				<p class="name">{SITE_NAME}</p>
-				<p>A community of laboratories advancing chromosomal instability research from the bench to the clinic.</p>
+				<p>
+					A community of laboratories advancing chromosomal instability research from the bench to
+					the clinic.
+				</p>
 			</div>
 			<nav aria-label="Site map" class="map">
-				{
-					columns.map((col) => (
-						<div>
-							<h2>{col.heading}</h2>
-							<ul>
-								{col.links.map((l) => (
-									<li>
-										<a href={url(l.href)}>{l.label}</a>
-									</li>
-								))}
-							</ul>
-						</div>
-					))
-				}
+				{columns.map((col) => (
+					<div>
+						<h2>{col.heading}</h2>
+						<ul>
+							{col.links.map((l) => (
+								<li>
+									<a href={url(l.href)}>{l.label}</a>
+								</li>
+							))}
+						</ul>
+					</div>
+				))}
 			</nav>
 		</div>
 		<hr />
-		<p class="legal">{SITE_NAME} · {SITE_DOMAIN}</p>
+		<p class="legal">
+			{SITE_NAME} · {SITE_DOMAIN}
+		</p>
 	</div>
 </footer>
 

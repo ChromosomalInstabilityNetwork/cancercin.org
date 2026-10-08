@@ -39,11 +39,14 @@ const when = start
 		<div class="body">
 			<h3>{link ? <a href={link}>{title}</a> : title}</h3>
 			<p class="meta">
-				{start ? <time datetime={start.toISOString().slice(0, 10)}>{when}</time> : when} · {location}
+				{start ? <time datetime={start.toISOString().slice(0, 10)}>{when}</time> : when} ·{' '}
+				{location}
 			</p>
 			<slot />
 		</div>
-		{image && <img class="thumb" src={url(image)} alt={imageAlt} width="96" height="96" loading="lazy" />}
+		{image && (
+			<img class="thumb" src={url(image)} alt={imageAlt} width="96" height="96" loading="lazy" />
+		)}
 	</div>
 </Card>
 

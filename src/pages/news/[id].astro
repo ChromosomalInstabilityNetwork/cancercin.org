@@ -18,7 +18,6 @@ const when = date
 ---
 
 <SectionLayout title={title} description={summary}>
-
 	<article class="post">
 		{image && <img class="hero" src={url(image)} alt={image_alt} loading="lazy" />}
 		<p class="date">
@@ -26,16 +25,16 @@ const when = date
 		</p>
 		<p class="summary">{summary}</p>
 		<Content />
-		{
-			link && (
-				<p>
-					<PillButton href={link} external>
-						Read more
-					</PillButton>
-				</p>
-			)
-		}
-		<p><a href={url('news/')}>← All news</a></p>
+		{link && (
+			<p>
+				<PillButton href={link} external>
+					Read more
+				</PillButton>
+			</p>
+		)}
+		<p>
+			<a href={url('news/')}>← All news</a>
+		</p>
 	</article>
 </SectionLayout>
 

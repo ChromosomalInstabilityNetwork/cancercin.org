@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 // SITE_URL / BASE_PATH let the same code serve a project page
 // (https://user.github.io/repo, BASE_PATH=/repo) or a custom domain
@@ -7,6 +8,7 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
 	site: process.env.SITE_URL || 'https://cancercin.org',
 	base: process.env.BASE_PATH || '/',
+	integrations: [sitemap()],
 	vite: {
 		// maplibre-gl resolves its web worker relative to its own files, which breaks
 		// when Vite pre-bundles it in dev.

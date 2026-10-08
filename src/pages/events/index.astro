@@ -10,12 +10,30 @@ const { upcoming, past } = await getEvents();
 	title="Events Calendar"
 	description="Lectures, meeting sessions, and workshops for the CIN community."
 >
-
 	<section class="block">
 		<h2>Upcoming events</h2>
 		<div class="stack">
-			{
-				upcoming.map((e) => (
+			{upcoming.map((e) => (
+				<EventCard
+					title={e.data.title}
+					start={e.data.start}
+					end={e.data.end}
+					location={e.data.location}
+					link={e.data.link}
+					image={e.data.image}
+					imageAlt={e.data.image_alt}
+				>
+					<p>{e.body}</p>
+				</EventCard>
+			))}
+		</div>
+	</section>
+
+	<section class="block">
+		<h2>Past events</h2>
+		{past.length ? (
+			<div class="stack">
+				{past.map((e) => (
 					<EventCard
 						title={e.data.title}
 						start={e.data.start}
@@ -27,34 +45,11 @@ const { upcoming, past } = await getEvents();
 					>
 						<p>{e.body}</p>
 					</EventCard>
-				))
-			}
-		</div>
-	</section>
-
-	<section class="block">
-		<h2>Past events</h2>
-		{
-			past.length ? (
-				<div class="stack">
-					{past.map((e) => (
-						<EventCard
-							title={e.data.title}
-							start={e.data.start}
-							end={e.data.end}
-							location={e.data.location}
-							link={e.data.link}
-						image={e.data.image}
-						imageAlt={e.data.image_alt}
-						>
-							<p>{e.body}</p>
-						</EventCard>
-					))}
-				</div>
-			) : (
-				<p>No past events yet.</p>
-			)
-		}
+				))}
+			</div>
+		) : (
+			<p>No past events yet.</p>
+		)}
 	</section>
 </SectionLayout>
 

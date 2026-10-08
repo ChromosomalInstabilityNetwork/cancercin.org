@@ -1,27 +1,46 @@
 {
-  "name": "cancercin.org",
-  "type": "module",
-  "version": "0.0.1",
-  "engines": {
-    "node": ">=22.12.0"
-  },
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro",
-    "geocode": "node scripts/geocode.mjs"
-  },
-  "dependencies": {
-    "@fontsource/fraunces": "^5.3.0",
-    "@fontsource/instrument-sans": "^5.3.0",
-    "astro": "^7.3.7",
-    "maplibre-gl": "^6.13.0"
-  },
-  "allowScripts": {
-    "esbuild": true
-  },
-  "devDependencies": {
-    "yaml": "^2.9.1"
-  }
+	"name": "cancercin.org",
+	"type": "module",
+	"version": "0.0.1",
+	"engines": {
+		"node": ">=22.12.0"
+	},
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro",
+		"geocode": "node scripts/geocode.mjs",
+		"lint": "eslint .",
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
+		"check": "astro check",
+		"test:links": "node scripts/check-links.mjs",
+		"test:a11y": "node scripts/a11y.mjs",
+		"og": "node scripts/make-og.mjs"
+	},
+	"dependencies": {
+		"@astrojs/sitemap": "^3.7.4",
+		"@fontsource/fraunces": "^5.3.0",
+		"@fontsource/instrument-sans": "^5.3.0",
+		"astro": "^7.3.7",
+		"maplibre-gl": "^6.13.0"
+	},
+	"allowScripts": {
+		"esbuild": true
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.10",
+		"@eslint/js": "^10.0.1",
+		"axe-core": "^4.14.0",
+		"eslint": "^10.12.0",
+		"eslint-plugin-astro": "^1.7.0",
+		"globals": "^17.13.0",
+		"prettier": "^3.9.9",
+		"prettier-plugin-astro": "^1.1.0",
+		"puppeteer-core": "^25.12.0",
+		"typescript": "^6.0.3",
+		"typescript-eslint": "^8.71.1",
+		"yaml": "^2.9.1"
+	}
 }

@@ -33,7 +33,9 @@ const nominatim = {
 		});
 		if (!res.ok) throw new Error(`Nominatim HTTP ${res.status}`);
 		const [hit] = await res.json();
-		return hit ? { lat: +(+hit.lat).toFixed(5), lng: +(+hit.lon).toFixed(5), display: hit.display_name } : null;
+		return hit
+			? { lat: +(+hit.lat).toFixed(5), lng: +(+hit.lon).toFixed(5), display: hit.display_name }
+			: null;
 	},
 };
 const provider = nominatim; // swap here for MapTiler/Geoapify/Mapbox (read keys from env only)
@@ -48,7 +50,10 @@ for (const item of doc.contents.items) {
 	const get = (k) => item.get(k);
 	if (get('lat') !== undefined && get('lng') !== undefined) continue;
 
-	const queries = [get('address'), [get('institution'), get('city'), get('country')].filter(Boolean).join(', ')];
+	const queries = [
+		get('address'),
+		[get('institution'), get('city'), get('country')].filter(Boolean).join(', '),
+	];
 	let result = null;
 	let usedQuery = '';
 	for (const q of queries.filter(Boolean)) {
@@ -83,7 +88,9 @@ if (!rows.length) {
 	console.log('Nothing to geocode: every entry already has lat/lng.');
 } else {
 	console.table(rows);
-	console.log('Review the "matched" column for bad matches. Fix by setting lat/lng by hand in the data file.');
+	console.log(
+		'Review the "matched" column for bad matches. Fix by setting lat/lng by hand in the data file.',
+	);
 	if (dryRun) console.log('Dry run: no files written.');
 	else writeFileSync(FILE, String(doc));
 }

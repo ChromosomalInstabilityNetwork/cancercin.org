@@ -21,10 +21,10 @@ Deployment runs from `.github/workflows/deploy.yml` on every push to `main`.
 `astro.config.mjs` reads two environment variables, set in the workflow from repository variables
 (Settings → Secrets and variables → Actions → Variables):
 
-| Variable | Project page | Custom domain |
-|---|---|---|
-| `SITE_URL` | `https://<user>.github.io` | `https://cancercin.org` |
-| `BASE_PATH` | `/<repo>` | *(unset)* |
+| Variable    | Project page               | Custom domain           |
+| ----------- | -------------------------- | ----------------------- |
+| `SITE_URL`  | `https://<user>.github.io` | `https://cancercin.org` |
+| `BASE_PATH` | `/<repo>`                  | _(unset)_               |
 
 For a custom domain also add a `public/CNAME` file containing the domain.
 All internal links and assets must go through `url()` in `src/lib/url.ts`.

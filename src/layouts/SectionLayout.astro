@@ -19,22 +19,20 @@ const group = groupFor(path);
 	<PageHeader title={title} />
 
 	<div class="container layout">
-		{
-			group && (
-				<nav class="side" aria-label={`${group.label} pages`}>
-					<p class="side-title">{group.label}</p>
-					<ul>
-						{group.children.map((c) => (
-							<li>
-								<a href={url(c.href)} aria-current={isCurrent(path, c.href) ? 'page' : undefined}>
-									{c.label}
-								</a>
-							</li>
-						))}
-					</ul>
-				</nav>
-			)
-		}
+		{group && (
+			<nav class="side" aria-label={`${group.label} pages`}>
+				<p class="side-title">{group.label}</p>
+				<ul>
+					{group.children.map((c) => (
+						<li>
+							<a href={url(c.href)} aria-current={isCurrent(path, c.href) ? 'page' : undefined}>
+								{c.label}
+							</a>
+						</li>
+					))}
+				</ul>
+			</nav>
+		)}
 		<div class="content">
 			<slot />
 		</div>

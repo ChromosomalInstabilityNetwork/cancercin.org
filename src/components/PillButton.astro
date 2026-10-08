@@ -10,7 +10,7 @@ const { href, variant = 'primary', external = false } = Astro.props;
 <a
 	class={`pill ${variant}`}
 	href={href}
-	{...external ? { target: '_blank', rel: 'noopener noreferrer' } : {}}
+	{...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
 >
 	<slot />
 </a>
@@ -28,7 +28,10 @@ const { href, variant = 'primary', external = false } = Astro.props;
 		font-weight: 600;
 		font-size: 1rem;
 		text-decoration: none;
-		transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+		transition:
+			background-color 0.15s,
+			color 0.15s,
+			border-color 0.15s;
 	}
 	.primary {
 		background: var(--accent);
