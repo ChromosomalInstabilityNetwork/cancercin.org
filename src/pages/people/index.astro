@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
 import Card from '../../components/Card.astro';
+import PeopleMap from '../../components/PeopleMap.astro';
 import PillButton from '../../components/PillButton.astro';
 import { mailto, CONTACT_EMAIL } from '../../lib/site';
 
@@ -23,11 +24,11 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		<Eyebrow>Directory and map</Eyebrow>
 		<h2>Where we work</h2>
 		<div class="dir-map">
-			<ul class="directory" aria-label="Directory">
+			<ul class="directory" aria-label="Directory" data-directory>
 				{
 					people.map((p) => (
 						<li>
-							<button type="button" class="person" data-person-id={p.id}>
+							<button type="button" class="person" data-person-id={p.id} aria-pressed="false">
 								<span class="name">{p.data.name}</span>
 								<span class="inst">{p.data.institution}</span>
 								<span class="addr">{p.data.address}</span>
@@ -36,8 +37,8 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 					))
 				}
 			</ul>
-			<div class="map" id="map" role="region" aria-label="Map of consortium laboratories">
-				<p class="map-note">The interactive map is added in Phase 4.</p>
+			<div class="map">
+				<PeopleMap />
 			</div>
 		</div>
 	</section>
@@ -109,11 +110,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		color: var(--muted);
 	}
 	.map {
-		background: var(--ink);
-		border-radius: var(--radius-feature);
-		display: grid;
-		place-items: center;
-		color: var(--on-dark);
+		min-height: 0;
 	}
 	.eyebrow-accent {
 		margin: 0 0 12px;
@@ -135,7 +132,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 			max-height: 360px;
 		}
 		.map {
-			min-height: 360px;
+			height: 400px;
 		}
 	}
 </style>

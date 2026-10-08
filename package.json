@@ -9,14 +9,19 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "geocode": "node scripts/geocode.mjs"
   },
   "dependencies": {
     "@fontsource/fraunces": "^5.3.0",
     "@fontsource/instrument-sans": "^5.3.0",
-    "astro": "^7.3.7"
+    "astro": "^7.3.7",
+    "maplibre-gl": "^6.13.0"
   },
   "allowScripts": {
     "esbuild": true
+  },
+  "devDependencies": {
+    "yaml": "^2.9.1"
   }
 }

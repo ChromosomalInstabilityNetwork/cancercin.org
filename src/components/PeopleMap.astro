@@ -1,0 +1,260 @@
+---
+import { url } from '../lib/url';
+---
+
+<a class="skip-map visually-hidden" href="#after-map">Skip map</a>
+<div
+	class="map-wrap"
+	id="people-map"
+	role="region"
+	aria-label="Map of consortium laboratories. The directory lists the same people."
+	data-geojson={url('people.geojson')}
+>
+	<div class="map-canvas" data-map-canvas></div>
+	<p class="map-status" data-map-status>
+		<noscript>The interactive map needs JavaScript; use the directory.</noscript>
+		<span data-map-loading>Loading map…</span>
+	</p>
+</div>
+<div id="after-map" tabindex="-1"></div>
+
+<script>
+	import { loadDarkStyle } from '../lib/mapStyle';
+	import { MAP_COLORS as C } from '../lib/mapConfig';
+
+	const wrap = document.getElementById('people-map')!;
+	const canvas = wrap.querySelector<HTMLElement>('[data-map-canvas]')!;
+	const status = wrap.querySelector<HTMLElement>('[data-map-status]')!;
+	const list = document.querySelector<HTMLElement>('[data-directory]');
+	const cards = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-person-id]'));
+	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+	const CLUSTER_MAX_ZOOM = 5;
+
+	let selected: string | null = null;
+	let map: any;
+	let popup: any;
+	let lib: typeof import('maplibre-gl');
+	let features = new Map<string, { coords: [number, number]; props: Record<string, string> }>();
+
+	function setSelected(id: string | null, opts: { scroll?: boolean } = {}) {
+		if (map && selected) map.setFeatureState({ source: 'people', id: selected }, { selected: false });
+		popup?.remove();
+		selected = id;
+		for (const c of cards) {
+			c.setAttribute('aria-pressed', String(c.dataset.personId === id));
+		}
+		if (!id) return;
+
+		const card = cards.find((c) => c.dataset.personId === id);
+		if (opts.scroll && card && list) {
+			const l = list.getBoundingClientRect();
+			const r = card.getBoundingClientRect();
+			if (r.top < l.top || r.bottom > l.bottom) {
+				card.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+			}
+		}
+
+		const f = features.get(id);
+		if (!map || !f) return;
+		map.setFeatureState({ source: 'people', id }, { selected: true });
+		const target = { center: f.coords, zoom: Math.max(map.getZoom(), CLUSTER_MAX_ZOOM + 1) };
+		if (reduceMotion.matches) map.jumpTo(target);
+		else map.flyTo({ ...target, speed: 0.8, essential: false });
+
+		const el = document.createElement('div');
+		const name = document.createElement('strong');
+		name.textContent = f.props.name;
+		const inst = document.createElement('div');
+		inst.textContent = f.props.institution;
+		const addr = document.createElement('div');
+		addr.textContent = f.props.address;
+		addr.style.opacity = '0.75';
+		el.append(name, inst, addr);
+		popup = new lib.Popup({ offset: 14, maxWidth: '260px', closeButton: false })
+			.setLngLat(f.coords)
+			.setDOMContent(el)
+			.addTo(map);
+	}
+
+	function toggle(id: string, scroll: boolean) {
+		setSelected(selected === id ? null : id, { scroll });
+	}
+
+	// Directory works even if the map never loads.
+	for (const c of cards) {
+		c.addEventListener('click', () => toggle(c.dataset.personId!, false));
+	}
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape' && selected) setSelected(null);
+	});
+
+	async function init() {
+		try {
+			const [maplibre, style, data] = await Promise.all([
+				import('maplibre-gl'),
+				loadDarkStyle(),
+				fetch(wrap.dataset.geojson!).then((r) => r.json()),
+				import('maplibre-gl/dist/maplibre-gl.css'),
+			]);
+			lib = maplibre;
+			for (const f of data.features) {
+				features.set(f.properties.id, { coords: f.geometry.coordinates, props: f.properties });
+			}
+
+			map = new lib.Map({
+				container: canvas,
+				style,
+				center: [10, 25],
+				zoom: 1,
+				maxZoom: 9,
+				minZoom: 0.5,
+				pitchWithRotate: false,
+				dragRotate: false,
+				attributionControl: { compact: false },
+			});
+			map.touchZoomRotate.disableRotation();
+			map.addControl(new lib.NavigationControl({ showCompass: false }), 'top-right');
+
+			map.on('load', () => {
+				status.hidden = true;
+				map.addSource('people', {
+					type: 'geojson',
+					data,
+					promoteId: 'id',
+					cluster: true,
+					clusterRadius: 36,
+					clusterMaxZoom: CLUSTER_MAX_ZOOM,
+				});
+				map.addLayer({
+					id: 'clusters',
+					type: 'circle',
+					source: 'people',
+					filter: ['has', 'point_count'],
+					paint: {
+						'circle-color': C.pink,
+						'circle-stroke-color': C.ocean,
+						'circle-stroke-width': 2,
+						'circle-radius': ['step', ['get', 'point_count'], 14, 5, 18, 15, 22],
+					},
+				});
+				map.addLayer({
+					id: 'cluster-count',
+					type: 'symbol',
+					source: 'people',
+					filter: ['has', 'point_count'],
+					layout: {
+						'text-field': ['get', 'point_count_abbreviated'],
+						'text-font': ['Noto Sans Bold'],
+						'text-size': 13,
+					},
+					paint: { 'text-color': C.ocean },
+				});
+				map.addLayer({
+					id: 'pins',
+					type: 'circle',
+					source: 'people',
+					filter: ['!', ['has', 'point_count']],
+					paint: {
+						'circle-radius': ['case', ['boolean', ['feature-state', 'selected'], false], 11, 7],
+						'circle-color': ['case', ['boolean', ['feature-state', 'selected'], false], C.accent, C.pink],
+						'circle-stroke-color': ['case', ['boolean', ['feature-state', 'selected'], false], C.light, C.ocean],
+						'circle-stroke-width': 2,
+					},
+				});
+
+				if (features.size) {
+					const b = new lib.LngLatBounds();
+					for (const f of features.values()) b.extend(f.coords);
+					map.fitBounds(b, { padding: 50, maxZoom: 4, animate: false });
+				}
+				if (selected) setSelected(selected);
+
+				map.on('click', 'pins', (e: any) => {
+					const id = e.features?.[0]?.properties?.id;
+					if (id) toggle(id, true);
+				});
+				map.on('click', 'clusters', async (e: any) => {
+					const f = e.features[0];
+					const zoom = await map.getSource('people').getClusterExpansionZoom(f.properties.cluster_id);
+					const t = { center: f.geometry.coordinates, zoom };
+					if (reduceMotion.matches) map.jumpTo(t);
+					else map.easeTo(t);
+				});
+				for (const layer of ['pins', 'clusters']) {
+					map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'));
+					map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''));
+				}
+			});
+			map.on('error', (e: any) => console.warn('Map error', e?.error ?? e));
+		} catch (err) {
+			console.warn(err);
+			status.hidden = false;
+			status.textContent = 'The map could not be loaded. Use the directory instead.';
+		}
+	}
+
+	// Lazy-load the map once it nears the viewport.
+	if ('IntersectionObserver' in window) {
+		const io = new IntersectionObserver(
+			(entries) => {
+				if (entries.some((e) => e.isIntersecting)) {
+					io.disconnect();
+					init();
+				}
+			},
+			{ rootMargin: '300px' },
+		);
+		io.observe(wrap);
+	} else {
+		init();
+	}
+</script>
+
+<style>
+	.map-wrap {
+		position: relative;
+		height: 100%;
+		min-height: 360px;
+		border-radius: var(--radius-feature);
+		overflow: hidden;
+		background: var(--map-land);
+	}
+	.map-canvas {
+		position: absolute;
+		inset: 0;
+	}
+	.map-status {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		margin: 0;
+		padding: 24px;
+		text-align: center;
+		color: var(--on-dark);
+		pointer-events: none;
+	}
+	.skip-map:focus {
+		position: static;
+		width: auto;
+		height: auto;
+		margin: 0 0 8px;
+		clip: auto;
+		display: inline-block;
+		padding: 8px 16px;
+		background: var(--pink);
+		color: var(--ink);
+		border-radius: var(--radius-pill);
+		font-weight: 600;
+	}
+	:global(.maplibregl-popup-content) {
+		font-family: var(--font-body);
+		font-size: 14px;
+		color: var(--ink);
+		border-radius: 12px;
+		padding: 12px 16px;
+	}
+	:global(.maplibregl-ctrl-attrib) {
+		font-size: 12px;
+	}
+</style>
