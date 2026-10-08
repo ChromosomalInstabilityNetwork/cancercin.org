@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      # Build under a sub-path so a broken base-path link fails the checks.
+      BASE_PATH: /ci-base
+      SITE_URL: https://example.org
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run check
+      - run: npm run build
+      - run: npm run test:links
+      - uses: browser-actions/setup-chrome@v1
+        id: chrome
+      - run: npm run test:a11y
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}

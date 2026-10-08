@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PillButton from '../components/PillButton.astro';
+import { url } from '../lib/url';
+---
+
+<BaseLayout title="Page not found" description="That page could not be found.">
+	<PageHeader title="Page not found" />
+	<div class="container body">
+		<p>The page you are looking for does not exist or has moved.</p>
+		<PillButton href={url('')}>Back to the home page</PillButton>
+	</div>
+</BaseLayout>
+
+<style>
+	.body {
+		padding-block: 24px var(--section-y);
+	}
+</style>

@@ -17,6 +17,7 @@ const news = await getNews();
 				title={n.data.title}
 				date={n.data.date}
 				summary={n.data.summary}
+				headingLevel="h2"
 				link={url(`news/${n.id}/`)}
 				image={n.data.image}
 				imageAlt={n.data.image_alt}

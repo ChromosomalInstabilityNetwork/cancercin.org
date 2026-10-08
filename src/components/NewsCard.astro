@@ -9,8 +9,9 @@ interface Props {
 	link?: string;
 	image?: string;
 	imageAlt?: string;
+	headingLevel?: 'h2' | 'h3';
 }
-const { title, date, summary, link, image, imageAlt = '' } = Astro.props;
+const { title, date, summary, link, image, imageAlt = '', headingLevel: H = 'h3' } = Astro.props;
 const label = date
 	? new Intl.DateTimeFormat('en-US', {
 			month: 'long',
@@ -27,7 +28,7 @@ const label = date
 			<p class="date">
 				{date ? <time datetime={date.toISOString().slice(0, 10)}>{label}</time> : label}
 			</p>
-			<h3>{link ? <a href={link}>{title}</a> : title}</h3>
+			<H class="title">{link ? <a href={link}>{title}</a> : title}</H>
 			<p>{summary}</p>
 		</div>
 		{image && (
@@ -71,7 +72,11 @@ const label = date
 		text-transform: uppercase;
 		letter-spacing: 0.12em;
 	}
-	h3 a {
+	.title {
+		font-size: var(--fs-card-title);
+		line-height: 1.2;
+	}
+	.title a {
 		color: inherit;
 		text-decoration-color: var(--pink);
 		text-underline-offset: 4px;
