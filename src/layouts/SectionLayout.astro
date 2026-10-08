@@ -16,9 +16,7 @@ const group = groupFor(path);
 ---
 
 <BaseLayout title={pageTitle ?? title} description={description}>
-	<PageHeader title={title}>
-		<slot name="lead" />
-	</PageHeader>
+	<PageHeader title={title} />
 
 	<div class="container layout">
 		{
@@ -48,7 +46,7 @@ const group = groupFor(path);
 		display: grid;
 		grid-template-columns: 20% minmax(0, 1fr);
 		gap: 48px;
-		padding-block: clamp(32px, 5vw, 64px) var(--section-y);
+		padding-block: clamp(24px, 4vw, 40px) var(--section-y);
 	}
 	.side {
 		align-self: start;

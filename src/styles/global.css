@@ -176,3 +176,8 @@ svg {
 		transition-duration: 0.01ms !important;
 	}
 }
+
+/* Section directly under a plain page title needs less top space. */
+.page-header + .section {
+	padding-top: clamp(20px, 3vw, 32px);
+}

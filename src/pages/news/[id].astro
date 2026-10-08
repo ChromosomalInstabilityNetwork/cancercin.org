@@ -18,11 +18,11 @@ const when = date
 ---
 
 <SectionLayout title={title} description={summary}>
-	<p slot="lead">
-		{date ? <time datetime={date.toISOString().slice(0, 10)}>{when}</time> : when}
-	</p>
 
 	<article class="post">
+		<p class="date">
+			{date ? <time datetime={date.toISOString().slice(0, 10)}>{when}</time> : when}
+		</p>
 		<p class="summary">{summary}</p>
 		<Content />
 		{
@@ -41,6 +41,10 @@ const when = date
 <style>
 	.post {
 		max-width: 720px;
+	}
+	.date {
+		margin: 0 0 8px;
+		color: var(--muted);
 	}
 	.summary {
 		font-size: 1.25rem;
