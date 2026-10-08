@@ -11,80 +11,310 @@ const topics = {
 } as const;
 
 const all = await getCollection('publications');
-const featured = all.filter((p) => p.data.featured);
-const rest = all
+const featured = all.find((p) => p.data.featured);
+const rows = all
 	.filter((p) => !p.data.featured)
-	.sort((a, b) => (b.data.year ?? 0) - (a.data.year ?? 0));
-const year = (y?: number) => (y ? String(y) : '[Year]');
+	.sort((a, b) => (b.data.year ?? 0) - (a.data.year ?? 0) || a.data.title.localeCompare(b.data.title));
+
+const years = [...new Set(rows.map((p) => p.data.year).filter((y): y is number => !!y))].sort((a, b) => b - a);
+const journals = [...new Set(rows.map((p) => p.data.journal))].sort();
+const yearLabel = (y?: number) => (y ? String(y) : '[Year]');
 ---
 
 <BaseLayout title="Publications" description="Papers, perspectives, and resources from consortium laboratories.">
 	<PageHeader title="Publications" />
 
-	{
-		featured.length > 0 && (
-			<section class="section container">
-				<h2>Featured publication</h2>
-				{featured.map((p) => (
-					<Card variant="dark" class="feat">
-						<p class="feat-label">Featured · {year(p.data.year)}</p>
-						<h3>{p.data.url ? <a href={p.data.url}>{p.data.title}</a> : p.data.title}</h3>
-						{p.data.summary && <p>{p.data.summary}</p>}
-						<p class="cite">
-							{p.data.authors} · {p.data.journal}
-						</p>
-					</Card>
-				))}
-			</section>
-		)
-	}
+	<div class="container top">
+		<div class="intro">
+			<p>
+				Papers, perspectives, and resources from consortium laboratories, organized around the
+				challenges of chromosomal instability research.
+			</p>
+		</div>
+		{
+			featured && (
+				<Card variant="dark" class="feat" as="article">
+					<p class="feat-label">Featured · {yearLabel(featured.data.year)}</p>
+					<h2>
+						{featured.data.url ? <a href={featured.data.url}>{featured.data.title}</a> : featured.data.title}
+					</h2>
+					{featured.data.summary && <p>{featured.data.summary}</p>}
+					<p class="cite">
+						{featured.data.authors} · {featured.data.journal}
+					</p>
+				</Card>
+			)
+		}
+	</div>
 
-	<section class="section container">
-		<h2>All publications</h2>
-		<div class="grid grid-2">
-			{
-				rest.map((p) => (
-					<Card>
-						<p class="label">
-							{topics[p.data.topic]} · {year(p.data.year)}
-						</p>
-						<h3>{p.data.url ? <a href={p.data.url}>{p.data.title}</a> : p.data.title}</h3>
-						<p>{p.data.authors}</p>
-						<p class="journal">{p.data.journal}</p>
-					</Card>
-				))
-			}
+	<section class="container library" aria-labelledby="lib-title">
+		<h2 id="lib-title">All publications</h2>
+
+		<form class="filters" data-filters hidden onsubmit="return false">
+			<div class="field search">
+				<label for="f-q">Search</label>
+				<input id="f-q" type="search" placeholder="Title, author, or journal" autocomplete="off" />
+			</div>
+			<div class="field">
+				<label for="f-topic">Topic</label>
+				<select id="f-topic">
+					<option value="">All topics</option>
+					{Object.entries(topics).map(([k, v]) => <option value={k}>{v}</option>)}
+				</select>
+			</div>
+			<div class="field">
+				<label for="f-year">Year</label>
+				<select id="f-year">
+					<option value="">All years</option>
+					{years.map((y) => <option value={String(y)}>{y}</option>)}
+				</select>
+			</div>
+			<div class="field">
+				<label for="f-journal">Journal</label>
+				<select id="f-journal">
+					<option value="">All journals</option>
+					{journals.map((j) => <option value={j}>{j}</option>)}
+				</select>
+			</div>
+			<button type="reset" class="clear" data-clear>Clear</button>
+		</form>
+		<p class="count" aria-live="polite" data-count hidden></p>
+
+		<div class="table-wrap">
+			<table>
+				<caption class="visually-hidden">Publications from the consortium</caption>
+				<thead>
+					<tr>
+						<th scope="col">Year</th>
+						<th scope="col">Title</th>
+						<th scope="col">Authors</th>
+						<th scope="col">Journal</th>
+						<th scope="col">Topic</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						rows.map((p) => (
+							<tr
+								data-topic={p.data.topic}
+								data-year={p.data.year ?? ''}
+								data-journal={p.data.journal}
+								data-text={`${p.data.title} ${p.data.authors} ${p.data.journal}`.toLowerCase()}
+							>
+								<td data-label="Year">{yearLabel(p.data.year)}</td>
+								<td data-label="Title" class="title">
+									{p.data.url ? <a href={p.data.url}>{p.data.title}</a> : p.data.title}
+								</td>
+								<td data-label="Authors">{p.data.authors}</td>
+								<td data-label="Journal">{p.data.journal}</td>
+								<td data-label="Topic">{topics[p.data.topic]}</td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+			<p class="empty" data-empty hidden>No publications match these filters.</p>
 		</div>
 	</section>
 </BaseLayout>
 
+<script>
+	// Filters are an enhancement: without JS the full table is shown.
+	const form = document.querySelector<HTMLFormElement>('[data-filters]');
+	if (form) {
+		form.hidden = false;
+		const q = form.querySelector<HTMLInputElement>('#f-q')!;
+		const topic = form.querySelector<HTMLSelectElement>('#f-topic')!;
+		const year = form.querySelector<HTMLSelectElement>('#f-year')!;
+		const journal = form.querySelector<HTMLSelectElement>('#f-journal')!;
+		const rows = Array.from(document.querySelectorAll<HTMLTableRowElement>('tbody tr'));
+		const count = document.querySelector<HTMLElement>('[data-count]')!;
+		const empty = document.querySelector<HTMLElement>('[data-empty]')!;
+		count.hidden = false;
+
+		const apply = () => {
+			const text = q.value.trim().toLowerCase();
+			let shown = 0;
+			for (const r of rows) {
+				const ok =
+					(!text || r.dataset.text!.includes(text)) &&
+					(!topic.value || r.dataset.topic === topic.value) &&
+					(!year.value || r.dataset.year === year.value) &&
+					(!journal.value || r.dataset.journal === journal.value);
+				r.hidden = !ok;
+				if (ok) shown++;
+			}
+			count.textContent = `Showing ${shown} of ${rows.length} publications`;
+			empty.hidden = shown > 0;
+		};
+		form.addEventListener('input', apply);
+		form.addEventListener('reset', () => setTimeout(apply));
+		apply();
+	}
+</script>
+
 <style>
-	.feat :global(h3) {
+	.top {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: 40px;
+		align-items: start;
+		padding-top: 24px;
+	}
+	.intro p {
+		font-size: 1.1875rem;
+		max-width: 52ch;
+		margin: 0;
+	}
+	.feat :global(h2) {
 		font-size: clamp(1.35rem, 1.2rem + 0.6vw, 1.75rem);
 	}
-	.feat :global(a),
-	h3 a {
+	.feat :global(a) {
 		color: inherit;
 		text-decoration-color: var(--pink);
 		text-underline-offset: 4px;
 	}
-	.feat-label,
-	.label {
+	.feat-label {
 		margin: 0 0 8px;
 		font-size: 13px;
 		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.12em;
-		color: var(--accent);
-	}
-	.feat-label {
 		color: var(--pink);
 	}
 	.cite {
-		margin-top: 20px;
+		margin: 16px 0 0;
 		color: var(--on-dark-strong);
 	}
-	.journal {
+	.library {
+		padding-block: 48px var(--section-y);
+	}
+	.filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+		align-items: flex-end;
+		margin: 16px 0;
+		padding: 16px 20px;
+		background: #f8f8fa;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-card);
+	}
+	.filters[hidden],
+	[data-count][hidden],
+	[data-empty][hidden],
+	tr[hidden] {
+		display: none;
+	}
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+	.field.search {
+		flex: 1 1 240px;
+	}
+	label {
+		font-size: 13px;
+		font-weight: 600;
 		color: var(--muted);
+	}
+	input,
+	select {
+		min-height: 44px;
+		padding: 0 12px;
+		font: inherit;
+		color: var(--ink);
+		background: #fff;
+		border: 1px solid #b9b5c4;
+		border-radius: 10px;
+	}
+	.clear {
+		min-height: 44px;
+		padding: 0 20px;
+		font: inherit;
+		font-weight: 600;
+		color: var(--accent);
+		background: none;
+		border: 2px solid var(--accent);
+		border-radius: var(--radius-pill);
+		cursor: pointer;
+	}
+	.count {
+		margin: 0 0 8px;
+		color: var(--muted);
+		font-size: 0.9375rem;
+	}
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.9375rem;
+	}
+	th {
+		text-align: left;
+		padding: 10px 12px;
+		font-size: 13px;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--muted);
+		border-bottom: 2px solid var(--ink);
+	}
+	td {
+		padding: 14px 12px;
+		vertical-align: top;
+		border-bottom: 1px solid var(--border);
+	}
+	td.title {
+		font-weight: 600;
+		min-width: 18ch;
+	}
+	td.title a {
+		color: var(--ink);
+		text-decoration-color: var(--accent);
+		text-underline-offset: 3px;
+	}
+	tbody tr:hover {
+		background: #faf9fc;
+	}
+	.empty {
+		padding: 24px 12px;
+		color: var(--muted);
+	}
+	@media (max-width: 900px) {
+		.top {
+			grid-template-columns: 1fr;
+			gap: 24px;
+		}
+	}
+	@media (max-width: 700px) {
+		thead {
+			display: none;
+		}
+		table,
+		tbody,
+		tr,
+		td {
+			display: block;
+		}
+		tr {
+			padding: 12px 0;
+			border-bottom: 1px solid var(--border);
+		}
+		td {
+			display: flex;
+			gap: 12px;
+			padding: 2px 0;
+			border: 0;
+		}
+		td::before {
+			content: attr(data-label);
+			flex: none;
+			width: 72px;
+			font-size: 12px;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			color: var(--muted);
+		}
 	}
 </style>
