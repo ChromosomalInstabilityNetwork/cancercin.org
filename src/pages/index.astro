@@ -2,16 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Eyebrow from '../components/Eyebrow.astro';
 import Card from '../components/Card.astro';
-import EventCard from '../components/EventCard.astro';
-import NewsCard from '../components/NewsCard.astro';
 import PillButton from '../components/PillButton.astro';
 import { url } from '../lib/url';
-import { challengeGroups } from '../data/challenges';
-import { roadmap } from '../data/roadmap';
-import { getEvents, getNews } from '../lib/events';
-
-const { upcoming } = await getEvents();
-const news = await getNews();
 ---
 
 <BaseLayout>
@@ -27,8 +19,10 @@ const news = await getNews();
 				clinic to turn that potential into patient benefit.
 			</p>
 			<div class="actions">
-				<PillButton href="#challenges" variant="light">Explore the challenges</PillButton>
-				<PillButton href="#events" variant="ghost">See upcoming events</PillButton>
+				<PillButton href={url('about/challenges-and-roadmap/')} variant="light">
+					Explore the challenges
+				</PillButton>
+				<PillButton href={url('events/')} variant="ghost">See upcoming events</PillButton>
 			</div>
 		</div>
 	</section>
@@ -50,95 +44,6 @@ const news = await getNews();
 					It is an ongoing <strong>rate of change</strong>, not a cell state, which sets it apart
 					from the genome complexity and aneuploidy left behind as its scars.
 				</p>
-			</div>
-		</div>
-	</section>
-
-	<section id="challenges" class="section container">
-		<Eyebrow>The road ahead</Eyebrow>
-		<h2>Three major challenges</h2>
-		{
-			challengeGroups.map((g) => (
-				<div class="group">
-					<div class="group-head">
-						<span class="num" aria-hidden="true">
-							{g.number}
-						</span>
-						<h3>{g.title}</h3>
-					</div>
-					<div class={`grid grid-${g.columns}`}>
-						{g.items.map((c) => (
-							<Card>
-								<p class="label">Challenge {c.id}</p>
-								<h4>{c.title}</h4>
-								<p>{c.text}</p>
-							</Card>
-						))}
-					</div>
-				</div>
-			))
-		}
-	</section>
-
-	<section id="roadmap" class="section container">
-		<Eyebrow>Where we go from here</Eyebrow>
-		<h2>A roadmap for future CIN research</h2>
-		<div class="roadmap">
-			{
-				roadmap.map((r, i) => (
-					<Card variant="dark" class="rm">
-						<p class="rm-num" aria-hidden="true">
-							{String(i + 1).padStart(2, '0')}
-						</p>
-						<h4>{r.title}</h4>
-						<p>{r.text}</p>
-					</Card>
-				))
-			}
-		</div>
-	</section>
-
-	<section id="events" class="section container">
-		<div class="two-col">
-			<div>
-				<Eyebrow>Mark your calendar</Eyebrow>
-				<h2>Upcoming events</h2>
-				<div class="stack">
-					{
-						upcoming
-							.slice(0, 3)
-							.map((e) => (
-								<EventCard
-									title={e.data.title}
-									start={e.data.start}
-									end={e.data.end}
-									location={e.data.location}
-									link={e.data.link}
-								>
-									<p>{e.body}</p>
-								</EventCard>
-							))
-					}
-				</div>
-				<p class="more"><a href={url('events/')}>View all events →</a></p>
-			</div>
-			<div>
-				<Eyebrow>From the community</Eyebrow>
-				<h2>News</h2>
-				<div class="stack">
-					{
-						news
-							.slice(0, 3)
-							.map((n) => (
-								<NewsCard
-									title={n.data.title}
-									date={n.data.date}
-									summary={n.data.summary}
-									link={n.data.link}
-								/>
-							))
-					}
-				</div>
 			</div>
 		</div>
 	</section>
@@ -179,74 +84,9 @@ const news = await getNews();
 		margin: 24px 0 0;
 		color: var(--muted);
 	}
-	.group {
-		margin-top: 56px;
-	}
-	.group-head {
-		display: flex;
-		align-items: center;
-		gap: 20px;
-		margin-bottom: 24px;
-	}
-	.group-head h3 {
-		margin: 0;
-		font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
-	}
-	.num {
-		font-family: var(--font-display);
-		font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem);
-		line-height: 1;
-		color: var(--accent);
-	}
-	.label {
-		margin: 0 0 8px;
-		font-size: 13px;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		color: var(--accent);
-	}
-	.roadmap {
-		display: grid;
-		grid-template-columns: repeat(6, 1fr);
-		gap: 24px;
-		margin-top: 32px;
-	}
-	.roadmap :global(.rm) {
-		grid-column: span 2;
-	}
-	.roadmap :global(.rm:nth-child(n + 4)) {
-		grid-column: span 3;
-	}
-	.rm-num {
-		font-family: var(--font-display);
-		font-size: 2.5rem;
-		line-height: 1;
-		color: var(--pink);
-		margin: 0 0 16px;
-	}
-	.two-col {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 48px;
-	}
-	.stack {
-		display: grid;
-		gap: 20px;
-	}
-	.more {
-		margin: 24px 0 0;
-		font-weight: 600;
-	}
 	@media (max-width: 900px) {
-		.def,
-		.two-col,
-		.roadmap {
+		.def {
 			grid-template-columns: 1fr;
-		}
-		.roadmap :global(.rm),
-		.roadmap :global(.rm:nth-child(n + 4)) {
-			grid-column: auto;
 		}
 	}
 </style>

@@ -1,0 +1,50 @@
+---
+import SectionLayout from '../../layouts/SectionLayout.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import PillButton from '../../components/PillButton.astro';
+import { url } from '../../lib/url';
+---
+
+<SectionLayout
+	title="About the Chromosomal Instability Network"
+	pageTitle="About the Network"
+	description="A community of thirty-seven laboratories advancing chromosomal instability research from the bench to the clinic."
+>
+	<p slot="lead">
+		A community of thirty-seven laboratories advancing chromosomal instability research from the
+		bench to the clinic.
+	</p>
+
+	<section class="block">
+		<Eyebrow>Who we are</Eyebrow>
+		<h2>Uniting cell biology, genomics, and the clinic</h2>
+		<p>
+			CIN drives cancer formation and therapy resistance, but it also offers a chance to transform
+			how we treat and prevent cancer. We are uniting cell biology, genomics, and the clinic to
+			turn that potential into patient benefit.
+		</p>
+		<p>[Mission, history, and how the network is organized to come.]</p>
+	</section>
+
+	<section class="block">
+		<Eyebrow>What we are working on</Eyebrow>
+		<h2>Challenges and a shared roadmap</h2>
+		<p>
+			The network has identified three major challenges in CIN research and a roadmap for
+			addressing them.
+		</p>
+		<PillButton href={url('about/challenges-and-roadmap/')}>See challenges and roadmap</PillButton>
+	</section>
+
+	<section class="block">
+		<Eyebrow>Governance and funding</Eyebrow>
+		<h2>[Governance]</h2>
+		<p>[Steering group, funders, and how to get involved to come.]</p>
+	</section>
+</SectionLayout>
+
+<style>
+	h2 {
+		font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem);
+	}
+</style>

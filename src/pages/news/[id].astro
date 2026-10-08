@@ -1,0 +1,49 @@
+---
+import { getCollection, render } from 'astro:content';
+import SectionLayout from '../../layouts/SectionLayout.astro';
+import PillButton from '../../components/PillButton.astro';
+import { url } from '../../lib/url';
+
+export async function getStaticPaths() {
+	const news = await getCollection('news');
+	return news.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, date, summary, link } = entry.data;
+const when = date
+	? new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' }).format(date)
+	: '[Date]';
+---
+
+<SectionLayout title={title} eyebrow="News" description={summary}>
+	<p slot="lead">
+		{date ? <time datetime={date.toISOString().slice(0, 10)}>{when}</time> : when}
+	</p>
+
+	<article class="post">
+		<p class="summary">{summary}</p>
+		<Content />
+		{
+			link && (
+				<p>
+					<PillButton href={link} external>
+						Read more
+					</PillButton>
+				</p>
+			)
+		}
+		<p><a href={url('news/')}>← All news</a></p>
+	</article>
+</SectionLayout>
+
+<style>
+	.post {
+		max-width: 720px;
+	}
+	.summary {
+		font-size: 1.25rem;
+		font-family: var(--font-display);
+	}
+</style>

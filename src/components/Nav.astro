@@ -1,25 +1,15 @@
 ---
 import { url } from '../lib/url';
-import { SITE_NAME, PAGE_LINKS, HOME_ANCHORS } from '../lib/site';
+import { isCurrent, groupFor } from '../lib/nav';
+import { SITE_NAME, NAV, isGroup } from '../lib/site';
 
-const base = url('');
 const path = Astro.url.pathname;
-const normalize = (p: string) => p.replace(/\/+$/, '') || '/';
-const isHome = normalize(path) === normalize(base);
-
-const links = isHome
-	? [...HOME_ANCHORS.map((l) => ({ ...l, href: l.href, current: false })),
-		...PAGE_LINKS.map((l) => ({ ...l, href: url(l.href), current: false }))]
-	: [{ href: base, label: 'Home', current: false },
-		...PAGE_LINKS.map((l) => ({ ...l, href: url(l.href) }))].map((l) => ({
-			...l,
-			current: normalize(l.href) === normalize(path),
-		}));
+const activeGroup = groupFor(path)?.label;
 ---
 
 <header class="nav on-dark">
 	<div class="container bar">
-		<a class="brand" href={base}>{SITE_NAME}</a>
+		<a class="brand" href={url('')}>{SITE_NAME}</a>
 		<button
 			class="toggle"
 			type="button"
@@ -33,15 +23,49 @@ const links = isHome
 			</svg>
 		</button>
 		<nav id="site-menu" aria-label="Main" data-nav-menu>
-			<ul>
+			<ul class="top">
 				{
-					links.map((l) => (
-						<li>
-							<a href={l.href} aria-current={l.current ? 'page' : undefined}>
-								{l.label}
-							</a>
-						</li>
-					))
+					NAV.map((item, i) =>
+						isGroup(item) ? (
+							<li class="has-menu" data-group>
+								<button
+									class="group-btn"
+									type="button"
+									aria-expanded="false"
+									aria-controls={`menu-${i}`}
+									data-current={activeGroup === item.label ? 'true' : undefined}
+								>
+									{item.label}
+									<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M2 4l4 4 4-4" />
+									</svg>
+								</button>
+								<span class="group-label">{item.label}</span>
+								<ul class="menu" id={`menu-${i}`}>
+									{item.children.map((c) => (
+										<li>
+											<a
+												href={url(c.href)}
+												aria-current={isCurrent(path, c.href) ? 'page' : undefined}
+											>
+												{c.label}
+											</a>
+										</li>
+									))}
+								</ul>
+							</li>
+						) : (
+							<li>
+								<a
+									class="link"
+									href={url(item.href)}
+									aria-current={isCurrent(path, item.href) ? 'page' : undefined}
+								>
+									{item.label}
+								</a>
+							</li>
+						),
+					)
 				}
 			</ul>
 		</nav>
@@ -51,6 +75,26 @@ const links = isHome
 <script>
 	const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
 	const menu = document.querySelector<HTMLElement>('[data-nav-menu]');
+	const groups = Array.from(document.querySelectorAll<HTMLElement>('[data-group]'));
+
+	const setGroup = (g: HTMLElement, open: boolean) => {
+		g.toggleAttribute('data-open', open);
+		g.querySelector('.group-btn')?.setAttribute('aria-expanded', String(open));
+	};
+	const closeGroups = (except?: HTMLElement) =>
+		groups.forEach((g) => g !== except && setGroup(g, false));
+
+	groups.forEach((g) => {
+		g.querySelector('.group-btn')?.addEventListener('click', () => {
+			const open = !g.hasAttribute('data-open');
+			closeGroups(g);
+			setGroup(g, open);
+		});
+	});
+	document.addEventListener('click', (e) => {
+		if (!(e.target as HTMLElement).closest('[data-group]')) closeGroups();
+	});
+
 	if (toggle && menu) {
 		const set = (open: boolean) => {
 			toggle.setAttribute('aria-expanded', String(open));
@@ -60,7 +104,12 @@ const links = isHome
 			set(toggle.getAttribute('aria-expanded') !== 'true'),
 		);
 		document.addEventListener('keydown', (e) => {
-			if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+			if (e.key !== 'Escape') return;
+			const openGroup = groups.find((g) => g.hasAttribute('data-open'));
+			if (openGroup) {
+				closeGroups();
+				openGroup.querySelector<HTMLElement>('.group-btn')?.focus();
+			} else if (toggle.getAttribute('aria-expanded') === 'true') {
 				set(false);
 				toggle.focus();
 			}
@@ -101,27 +150,81 @@ const links = isHome
 		list-style: none;
 		margin: 0;
 		padding: 0;
+	}
+	.top {
 		display: flex;
 		gap: 8px;
 	}
-	nav a {
+	.top > li {
+		position: relative;
+	}
+	nav a,
+	.group-btn {
 		display: inline-flex;
 		align-items: center;
+		gap: 6px;
 		min-height: 44px;
 		padding: 0 12px;
 		color: var(--on-dark);
 		text-decoration: none;
+		font: inherit;
 		font-weight: 500;
+		background: none;
+		border: 0;
+		cursor: pointer;
 	}
-	nav a:hover {
+	nav a:hover,
+	.group-btn:hover {
 		color: var(--on-dark-strong);
 	}
-	nav a[aria-current='page'] {
+	.link[aria-current='page'],
+	.group-btn[data-current='true'] {
 		color: var(--on-dark-strong);
 		text-decoration: underline;
 		text-decoration-color: var(--pink);
 		text-decoration-thickness: 3px;
 		text-underline-offset: 8px;
+	}
+	.group-btn svg {
+		transition: transform 0.15s;
+	}
+	[data-open] > .group-btn svg {
+		transform: rotate(180deg);
+	}
+	.group-label {
+		display: none;
+	}
+	.menu {
+		display: none;
+		position: absolute;
+		top: 100%;
+		left: 0;
+		min-width: 260px;
+		padding: 8px;
+		background: var(--ink);
+		border: 1px solid var(--divider-dark);
+		border-radius: var(--radius-card);
+		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+	}
+	[data-open] > .menu {
+		display: block;
+	}
+	@media (hover: hover) and (min-width: 901px) {
+		.has-menu:hover > .menu {
+			display: block;
+		}
+	}
+	.menu a {
+		width: 100%;
+		border-radius: 10px;
+		padding: 0 14px;
+	}
+	.menu a:hover {
+		background: var(--divider-dark);
+	}
+	.menu a[aria-current='page'] {
+		color: var(--on-dark-strong);
+		box-shadow: inset 3px 0 0 var(--pink);
 	}
 	.toggle {
 		display: none;
@@ -152,13 +255,41 @@ const links = isHome
 		nav[data-open] {
 			display: block;
 		}
-		ul {
+		.top {
 			flex-direction: column;
 			gap: 0;
 		}
 		nav a {
 			width: 100%;
 			padding: 0;
+		}
+		/* Groups are shown expanded inside the mobile menu. */
+		.group-btn {
+			display: none;
+		}
+		.group-label {
+			display: block;
+			margin-top: 12px;
+			font-size: 13px;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.12em;
+			color: var(--pink);
+		}
+		.menu {
+			display: block;
+			position: static;
+			min-width: 0;
+			padding: 0 0 0 12px;
+			border: 0;
+			box-shadow: none;
+		}
+		.menu a {
+			padding: 0;
+			border-radius: 0;
+		}
+		.menu a:hover {
+			background: none;
 		}
 	}
 </style>

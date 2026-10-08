@@ -1,0 +1,36 @@
+---
+import SectionLayout from '../../layouts/SectionLayout.astro';
+import NewsCard from '../../components/NewsCard.astro';
+import { getNews } from '../../lib/events';
+import { url } from '../../lib/url';
+
+const news = await getNews();
+---
+
+<SectionLayout
+	title="News"
+	description="News and updates from the Cancer CIN Consortium community."
+>
+	<p slot="lead">Announcements and updates from the CIN community.</p>
+
+	<div class="stack">
+		{
+			news.map((n) => (
+				<NewsCard
+					title={n.data.title}
+					date={n.data.date}
+					summary={n.data.summary}
+					link={url(`news/${n.id}/`)}
+				/>
+			))
+		}
+	</div>
+</SectionLayout>
+
+<style>
+	.stack {
+		display: grid;
+		gap: 20px;
+		max-width: 760px;
+	}
+</style>
