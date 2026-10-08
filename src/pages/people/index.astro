@@ -69,7 +69,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 <style>
 	.dir-map {
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
 		gap: 32px;
 		height: 520px;
 		margin-top: 32px;
@@ -146,15 +146,48 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		padding-bottom: var(--section-y);
 	}
 	@media (max-width: 900px) {
+		/* Map on top (~30% of the screen), compact directory below (~60%). */
 		.dir-map {
 			grid-template-columns: 1fr;
+			grid-template-rows: auto auto;
+			gap: 16px;
 			height: auto;
-		}
-		.directory {
-			max-height: 360px;
+			margin-top: 16px;
 		}
 		.map {
-			height: 400px;
+			order: -1;
+			height: 30dvh;
+			min-height: 200px;
+		}
+		.directory {
+			height: 60dvh;
+			min-height: 240px;
+			gap: 8px;
+		}
+		.person {
+			gap: 12px;
+			padding: 8px 12px;
+			border-radius: 12px;
+		}
+		.text {
+			gap: 0;
+			line-height: 1.25;
+		}
+		.avatar {
+			width: 40px;
+			height: 40px;
+		}
+		.name {
+			font-size: 1rem;
+		}
+		.inst {
+			font-size: 13px;
+		}
+		.addr {
+			font-size: 12px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 	}
 </style>
