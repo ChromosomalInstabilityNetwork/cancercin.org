@@ -1,0 +1,51 @@
+---
+import Card from './Card.astro';
+
+interface Props {
+	title: string;
+	start: Date;
+	end?: Date;
+	location: string;
+	type: 'lecture' | 'session' | 'workshop';
+	link?: string;
+}
+const { title, start, end, location, type, link } = Astro.props;
+
+const fmt = new Intl.DateTimeFormat('en-US', {
+	month: 'short',
+	day: 'numeric',
+	year: 'numeric',
+	timeZone: 'UTC',
+});
+const when = end ? `${fmt.format(start)} – ${fmt.format(end)}` : fmt.format(start);
+---
+
+<Card>
+	<p class="type">{type}</p>
+	<h3>
+		{link ? <a href={link}>{title}</a> : title}
+	</h3>
+	<p class="meta">
+		<time datetime={start.toISOString().slice(0, 10)}>{when}</time> · {location}
+	</p>
+	<slot />
+</Card>
+
+<style>
+	.type {
+		margin: 0 0 8px;
+		font-size: 14px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--accent);
+	}
+	.meta {
+		color: var(--muted);
+	}
+	h3 a {
+		color: inherit;
+		text-decoration-color: var(--pink);
+		text-underline-offset: 4px;
+	}
+</style>

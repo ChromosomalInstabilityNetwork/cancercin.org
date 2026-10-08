@@ -1,0 +1,55 @@
+---
+interface Props {
+	href: string;
+	variant?: 'primary' | 'light' | 'outline';
+	external?: boolean;
+}
+const { href, variant = 'primary', external = false } = Astro.props;
+---
+
+<a
+	class={`pill ${variant}`}
+	href={href}
+	{...external ? { target: '_blank', rel: 'noopener noreferrer' } : {}}
+>
+	<slot />
+</a>
+
+<style>
+	.pill {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		min-height: 44px;
+		padding: 10px 24px;
+		border-radius: var(--radius-pill);
+		border: 2px solid transparent;
+		font-weight: 600;
+		font-size: 1rem;
+		text-decoration: none;
+		transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+	}
+	.primary {
+		background: var(--accent);
+		color: #fff;
+	}
+	.primary:hover {
+		background: var(--ink);
+	}
+	.light {
+		background: var(--pink);
+		color: var(--ink);
+	}
+	.light:hover {
+		background: var(--on-dark-strong);
+	}
+	.outline {
+		border-color: var(--ink);
+		color: var(--ink);
+	}
+	.outline:hover {
+		background: var(--ink);
+		color: var(--on-dark-strong);
+	}
+</style>

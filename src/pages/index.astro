@@ -1,20 +1,46 @@
 ---
-import { url } from '../lib/url';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import Card from '../components/Card.astro';
+import EventCard from '../components/EventCard.astro';
+import NewsCard from '../components/NewsCard.astro';
+import PillButton from '../components/PillButton.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Cancer CIN Consortium</title>
-	</head>
-	<body>
-		<main>
-			<h1>Cancer CIN Consortium</h1>
-			<p>Site under construction.</p>
-			<img src={url('favicon.svg')} alt="" width="48" height="48" />
-		</main>
-	</body>
-</html>
+<BaseLayout>
+	<PageHeader eyebrow="Cancer CIN Consortium" title="[Hero headline]">
+		<p>[Hero copy to come from the site spec.]</p>
+	</PageHeader>
+
+	<section id="definition" class="section container">
+		<Eyebrow>Definition</Eyebrow>
+		<h2>[Definition heading]</h2>
+		<p>[Definition copy.]</p>
+	</section>
+
+	<section id="challenges" class="section container">
+		<Eyebrow>Challenges</Eyebrow>
+		<h2>[Challenges heading]</h2>
+		<div class="grid grid-3">
+			<Card title="[Challenge title]"><p>[Challenge text.]</p></Card>
+			<Card variant="feature" title="[Feature card]"><p>[Text.]</p></Card>
+			<Card variant="dark" title="[Dark card]"><p>[Text.]</p></Card>
+		</div>
+	</section>
+
+	<section id="roadmap" class="section container">
+		<Eyebrow>Roadmap</Eyebrow>
+		<h2>[Roadmap heading]</h2>
+		<div class="grid grid-2">
+			<EventCard
+				title="[Event title]"
+				start={new Date('2000-01-01')}
+				location="[Location]"
+				type="lecture"
+			/>
+			<NewsCard title="[News title]" date={new Date('2000-01-01')} summary="[Summary]" />
+		</div>
+		<p><PillButton href="#definition">Button</PillButton></p>
+	</section>
+</BaseLayout>

@@ -1,0 +1,22 @@
+---
+interface Props {
+	onDark?: boolean;
+}
+const { onDark = false } = Astro.props;
+---
+
+<p class:list={['eyebrow', { 'on-dark': onDark }]}><slot /></p>
+
+<style>
+	.eyebrow {
+		margin: 0 0 16px;
+		font-size: 14px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--accent);
+	}
+	.eyebrow.on-dark {
+		color: var(--pink);
+	}
+</style>

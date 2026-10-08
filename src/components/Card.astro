@@ -1,0 +1,45 @@
+---
+interface Props {
+	variant?: 'default' | 'feature' | 'dark';
+	title?: string;
+	as?: 'article' | 'div' | 'li';
+	headingLevel?: 'h2' | 'h3' | 'h4';
+}
+const { variant = 'default', title, as: Tag = 'article', headingLevel: H = 'h3' } = Astro.props;
+---
+
+<Tag class={`card ${variant}`}>
+	{title && <H>{title}</H>}
+	<slot />
+</Tag>
+
+<style>
+	.card {
+		background: var(--card);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-card);
+		padding: clamp(20px, 3vw, 32px);
+		color: var(--ink);
+	}
+	.card.feature {
+		border-radius: var(--radius-feature);
+		padding: clamp(24px, 4vw, 40px);
+	}
+	.card.dark {
+		background: var(--ink);
+		border-color: var(--divider-dark);
+		color: var(--on-dark);
+	}
+	.card.dark :global(h2),
+	.card.dark :global(h3),
+	.card.dark :global(h4) {
+		color: var(--on-dark-strong);
+	}
+	.card :global(h3:first-child),
+	.card :global(h2:first-child) {
+		margin-top: 0;
+	}
+	.card > :global(:last-child) {
+		margin-bottom: 0;
+	}
+</style>

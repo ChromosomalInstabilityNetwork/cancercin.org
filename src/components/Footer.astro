@@ -1,0 +1,95 @@
+---
+import { url } from '../lib/url';
+import { SITE_NAME, SITE_DOMAIN, SITE_DESCRIPTION, PAGE_LINKS } from '../lib/site';
+
+const links = [{ href: '', label: 'Home' }, ...PAGE_LINKS];
+const half = Math.ceil(links.length / 2);
+const columns = [links.slice(0, half), links.slice(half)];
+---
+
+<footer class="footer on-dark">
+	<div class="container">
+		<div class="top">
+			<div class="brand">
+				<p class="name">{SITE_NAME}</p>
+				<p>{SITE_DESCRIPTION}</p>
+			</div>
+			<nav aria-label="Site map" class="map">
+				{
+					columns.map((col) => (
+						<ul>
+							{col.map((l) => (
+								<li>
+									<a href={url(l.href)}>{l.label}</a>
+								</li>
+							))}
+						</ul>
+					))
+				}
+			</nav>
+		</div>
+		<hr />
+		<p class="legal">{SITE_NAME} · {SITE_DOMAIN}</p>
+	</div>
+</footer>
+
+<style>
+	.footer {
+		background: var(--ink);
+		color: var(--on-dark);
+		padding-block: clamp(40px, 6vw, 72px) 32px;
+	}
+	.top {
+		display: grid;
+		grid-template-columns: 1.5fr 1fr;
+		gap: 40px;
+	}
+	.name {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 1.5rem;
+		color: var(--on-dark-strong);
+		margin: 0 0 8px;
+	}
+	.brand p:last-child {
+		max-width: 40ch;
+		margin: 0;
+	}
+	.map {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 24px;
+	}
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+	a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		color: var(--on-dark);
+		text-decoration: none;
+	}
+	a:hover {
+		color: var(--on-dark-strong);
+		text-decoration: underline;
+		text-decoration-color: var(--pink);
+		text-underline-offset: 4px;
+	}
+	hr {
+		border: 0;
+		border-top: 1px solid var(--divider-dark);
+		margin: 32px 0 20px;
+	}
+	.legal {
+		margin: 0;
+		font-size: 0.9375rem;
+	}
+	@media (max-width: 900px) {
+		.top {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
