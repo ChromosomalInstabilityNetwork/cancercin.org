@@ -17,7 +17,7 @@ import { roadmap } from '../../../data/roadmap';
 				<div class="group">
 					<div class="group-head">
 						<span class="num" aria-hidden="true">
-							{g.number}
+							{String(g.number).padStart(2, '0')}
 						</span>
 						<h3>{g.title}</h3>
 					</div>
@@ -69,7 +69,7 @@ import { roadmap } from '../../../data/roadmap';
 	}
 	.num {
 		font-family: var(--font-display);
-		font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+		font-size: 2.5rem;
 		line-height: 1;
 		color: var(--accent);
 	}
