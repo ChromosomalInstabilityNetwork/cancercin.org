@@ -1,7 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PageHeader from '../../components/PageHeader.astro';
 import Card from '../../components/Card.astro';
 import PeopleMap from '../../components/PeopleMap.astro';
 import PillButton from '../../components/PillButton.astro';
@@ -15,66 +14,88 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 ---
 
 <BaseLayout title="People" description="The laboratories and investigators of the Cancer CIN Consortium.">
-	<PageHeader title="People" />
-
-	<section class="section container">
-		<div class="dir-map">
-			<ul class="directory" aria-label="Directory" data-directory>
-				{
-					people.map((p) => (
-						<li>
-							<button type="button" class="person" data-person-id={p.id} aria-pressed="false">
-								{p.data.photo ? (
-									<img class="avatar" src={url(p.data.photo)} alt="" width="64" height="64" loading="lazy" />
-								) : (
-									<span class="avatar placeholder" aria-hidden="true">
-										<svg viewBox="0 0 24 24" fill="currentColor">
-											<circle cx="12" cy="8.5" r="4" />
-											<path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z" />
-										</svg>
-									</span>
-								)}
-								<span class="text">
-									<span class="name">{p.data.name}</span>
-									<span class="inst">{p.data.institution}</span>
-									<span class="addr">{p.data.address}</span>
-								</span>
-							</button>
-						</li>
-					))
-				}
-			</ul>
-			<div class="map">
-				<PeopleMap />
-			</div>
-		</div>
-	</section>
-
-	<section class="container pair">
-		<div class="grid grid-2">
-			<Card variant="feature">
-				<h3>Would you like to be added?</h3>
+	<div class="container people">
+		<div class="left">
+			<h1>People</h1>
+			<Card class="add" title="Would you like to be added?" headingLevel="h2">
 				<p>
-					If you would like to be added to the directory, email your name, institution, and
-					address to <a href={mailto('Add me to the CIN people directory', addBody)}>{CONTACT_EMAIL}</a>.
+					Email your name, institution, and address to{' '}
+					<a href={mailto('Add me to the CIN people directory', addBody)}>{CONTACT_EMAIL}</a>.
 				</p>
 				<PillButton href={mailto('Add me to the CIN people directory', addBody)}>
 					Email us to be added
 				</PillButton>
 			</Card>
+			<ul class="directory" aria-label="Directory" data-directory>
+			{
+				people.map((p) => (
+					<li>
+						<button type="button" class="person" data-person-id={p.id} aria-pressed="false">
+							{p.data.photo ? (
+								<img class="avatar" src={url(p.data.photo)} alt="" width="64" height="64" loading="lazy" />
+							) : (
+								<span class="avatar placeholder" aria-hidden="true">
+									<svg viewBox="0 0 24 24" fill="currentColor">
+										<circle cx="12" cy="8.5" r="4" />
+										<path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z" />
+									</svg>
+								</span>
+							)}
+							<span class="text">
+								<span class="name">{p.data.name}</span>
+								<span class="inst">{p.data.institution}</span>
+								<span class="addr">{p.data.address}</span>
+							</span>
+						</button>
+					</li>
+				))
+			}
+		</ul>
 		</div>
-	</section>
+		<div class="map">
+			<PeopleMap />
+		</div>
+	</div>
 </BaseLayout>
 
 <style>
-	.dir-map {
+	/* One viewport tall (below the 72px nav): fixed columns, directory scrolls on its own. */
+	.people {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
 		gap: 32px;
-		height: 520px;
-		margin-top: 32px;
+		height: calc(100dvh - 72px);
+		min-height: 520px;
+		padding-block: 24px;
+	}
+	.left {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		min-height: 0;
+	}
+	h1 {
+		margin: 0;
+		font-size: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
+	}
+	.left :global(.add) {
+		flex: none;
+		padding: 16px 20px;
+	}
+	.left :global(.add h2) {
+		font-size: 1.125rem;
+		margin-bottom: 4px;
+	}
+	.left :global(.add p) {
+		font-size: 0.9375rem;
+		margin-bottom: 12px;
+	}
+	.map {
+		min-height: 0;
 	}
 	.directory {
+		flex: 1;
+		min-height: 0;
 		list-style: none;
 		margin: 0;
 		padding: 0 8px 0 0;
@@ -139,20 +160,14 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		font-size: 14px;
 		color: var(--muted);
 	}
-	.map {
-		min-height: 0;
-	}
-	.pair {
-		padding-bottom: var(--section-y);
-	}
 	@media (max-width: 900px) {
-		/* Map on top (~30% of the screen), compact directory below (~60%). */
-		.dir-map {
+		/* Map on top (~30% of the screen), then title, add-card and compact directory. */
+		.people {
 			grid-template-columns: 1fr;
 			grid-template-rows: auto auto;
-			gap: 16px;
 			height: auto;
-			margin-top: 16px;
+			gap: 16px;
+			padding-block: 16px 32px;
 		}
 		.map {
 			order: -1;
@@ -160,6 +175,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 			min-height: 200px;
 		}
 		.directory {
+			flex: none;
 			height: 60dvh;
 			min-height: 240px;
 			gap: 8px;

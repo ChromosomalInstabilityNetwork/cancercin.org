@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Card from '../components/Card.astro';
 import PillButton from '../components/PillButton.astro';
 import { url } from '../lib/url';
 ---
@@ -25,25 +24,6 @@ import { url } from '../lib/url';
 		</div>
 	</section>
 
-	<section id="definition" class="section container">
-		<div class="def">
-			<div>
-				<h2>What is CIN?</h2>
-			</div>
-			<div>
-				<Card variant="feature">
-					<p class="quote">
-						Chromosomal instability is any process that causes repeated generation of karyotype
-						alterations from kilobase scale to whole chromosomes.
-					</p>
-				</Card>
-				<p class="after">
-					It is an ongoing <strong>rate of change</strong>, not a cell state, which sets it apart
-					from the genome complexity and aneuploidy left behind as its scars.
-				</p>
-			</div>
-		</div>
-	</section>
 </BaseLayout>
 
 <style>
@@ -67,24 +47,5 @@ import { url } from '../lib/url';
 		gap: 16px;
 		margin-top: 24px;
 	}
-	.def {
-		display: grid;
-		grid-template-columns: 4fr 8fr;
-		gap: 48px;
-	}
-	.quote {
-		font-family: var(--font-display);
-		font-size: clamp(1.4rem, 1.1rem + 1vw, 1.875rem);
-		line-height: 1.3;
-		margin: 0;
-	}
-	.after {
-		margin: 24px 0 0;
-		color: var(--muted);
-	}
 	@media (max-width: 900px) {
-		.def {
-			grid-template-columns: 1fr;
-		}
-	}
-</style>
+	</style>
