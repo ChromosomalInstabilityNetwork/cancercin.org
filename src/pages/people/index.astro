@@ -3,7 +3,6 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/Card.astro';
 import PeopleMap from '../../components/PeopleMap.astro';
-import PillButton from '../../components/PillButton.astro';
 import { url } from '../../lib/url';
 import { mailto, CONTACT_EMAIL } from '../../lib/site';
 
@@ -22,9 +21,6 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 					Email your name, institution, and address to{' '}
 					<a href={mailto('Add me to the CIN people directory', addBody)}>{CONTACT_EMAIL}</a>.
 				</p>
-				<PillButton href={mailto('Add me to the CIN people directory', addBody)}>
-					Email us to be added
-				</PillButton>
 			</Card>
 			<ul class="directory" aria-label="Directory" data-directory>
 			{
@@ -88,7 +84,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 	}
 	.left :global(.add p) {
 		font-size: 0.9375rem;
-		margin-bottom: 12px;
+		margin-bottom: 0;
 	}
 	.map {
 		min-height: 0;
