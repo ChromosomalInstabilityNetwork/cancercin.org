@@ -1,10 +1,141 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import Card from '../../components/Card.astro';
+import PillButton from '../../components/PillButton.astro';
+import { mailto, CONTACT_EMAIL } from '../../lib/site';
+
+const people = await getCollection('people');
+const addBody = 'Name:\nInstitution:\nAddress:\n';
 ---
 
-<BaseLayout title="People">
-	<PageHeader eyebrow="Directory" title="People">
-		<p>[Page copy to come from the site spec.]</p>
+<BaseLayout title="People" description="The laboratories and investigators of the Cancer CIN Consortium.">
+	<PageHeader eyebrow="The consortium" title="The people behind the Cancer CIN Consortium">
+		<p>
+			Thirty-seven laboratories, working across disciplines and continents. Browse the directory
+			or select a pin to see where each investigator is based.
+		</p>
 	</PageHeader>
+
+	<section class="section container">
+		<Eyebrow>Directory and map</Eyebrow>
+		<h2>Where we work</h2>
+		<div class="dir-map">
+			<ul class="directory" aria-label="Directory">
+				{
+					people.map((p) => (
+						<li>
+							<button type="button" class="person" data-person-id={p.id}>
+								<span class="name">{p.data.name}</span>
+								<span class="inst">{p.data.institution}</span>
+								<span class="addr">{p.data.address}</span>
+							</button>
+						</li>
+					))
+				}
+			</ul>
+			<div class="map" id="map" role="region" aria-label="Map of consortium laboratories">
+				<p class="map-note">The interactive map is added in Phase 4.</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="container pair">
+		<div class="grid grid-2">
+			<Card variant="feature">
+				<p class="eyebrow-accent">Get listed</p>
+				<h3>Would you like to be added?</h3>
+				<p>
+					If you would like to be added to the directory, email your name, institution, and
+					address to <a href={mailto('Add me to the CIN people directory', addBody)}>{CONTACT_EMAIL}</a>.
+				</p>
+				<PillButton href={mailto('Add me to the CIN people directory', addBody)}>
+					Email us to be added
+				</PillButton>
+			</Card>
+		</div>
+	</section>
 </BaseLayout>
+
+<style>
+	.dir-map {
+		display: grid;
+		grid-template-columns: 340px minmax(0, 1fr);
+		gap: 32px;
+		height: 520px;
+		margin-top: 32px;
+	}
+	.directory {
+		list-style: none;
+		margin: 0;
+		padding: 0 8px 0 0;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.person {
+		width: 100%;
+		text-align: left;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		min-height: 44px;
+		padding: 16px 20px;
+		background: #fbf9f5;
+		border: 2px solid var(--border);
+		border-radius: var(--radius-card);
+		font: inherit;
+		color: var(--ink);
+		cursor: pointer;
+	}
+	.person[aria-pressed='true'] {
+		background: #fff;
+		border-color: var(--accent);
+	}
+	.name {
+		font-family: var(--font-display);
+		font-size: 1.25rem;
+		font-weight: 600;
+	}
+	.inst {
+		font-size: 15px;
+		font-weight: 500;
+	}
+	.addr {
+		font-size: 14px;
+		color: var(--muted);
+	}
+	.map {
+		background: var(--ink);
+		border-radius: var(--radius-feature);
+		display: grid;
+		place-items: center;
+		color: var(--on-dark);
+	}
+	.eyebrow-accent {
+		margin: 0 0 12px;
+		font-size: 14px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--accent);
+	}
+	.pair {
+		padding-bottom: var(--section-y);
+	}
+	@media (max-width: 900px) {
+		.dir-map {
+			grid-template-columns: 1fr;
+			height: auto;
+		}
+		.directory {
+			max-height: 360px;
+		}
+		.map {
+			min-height: 360px;
+		}
+	}
+</style>

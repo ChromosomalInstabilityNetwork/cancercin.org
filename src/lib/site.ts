@@ -16,3 +16,7 @@ export const HOME_ANCHORS = [
 	{ href: '#challenges', label: 'Challenges' },
 	{ href: '#roadmap', label: 'Roadmap' },
 ] as const;
+
+export const mailto = (subject: string, body?: string) =>
+	`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}` +
+	(body ? `&body=${encodeURIComponent(body)}` : '');

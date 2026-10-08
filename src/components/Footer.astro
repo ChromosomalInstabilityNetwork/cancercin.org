@@ -1,10 +1,20 @@
 ---
 import { url } from '../lib/url';
-import { SITE_NAME, SITE_DOMAIN, SITE_DESCRIPTION, PAGE_LINKS } from '../lib/site';
+import { SITE_NAME, SITE_DOMAIN, PAGE_LINKS } from '../lib/site';
 
-const links = [{ href: '', label: 'Home' }, ...PAGE_LINKS];
-const half = Math.ceil(links.length / 2);
-const columns = [links.slice(0, half), links.slice(half)];
+const columns = [
+	{
+		heading: 'Site map',
+		links: [
+			{ href: '', label: 'Home' },
+			{ href: '#definition', label: 'Definition' },
+			{ href: '#challenges', label: 'Challenges' },
+			{ href: '#roadmap', label: 'Roadmap' },
+		],
+	},
+	{ heading: 'Community', links: [...PAGE_LINKS] },
+];
+const href = (h: string) => (h.startsWith('#') ? url('') + h : url(h));
 ---
 
 <footer class="footer on-dark">
@@ -12,18 +22,21 @@ const columns = [links.slice(0, half), links.slice(half)];
 		<div class="top">
 			<div class="brand">
 				<p class="name">{SITE_NAME}</p>
-				<p>{SITE_DESCRIPTION}</p>
+				<p>A community of laboratories advancing chromosomal instability research from the bench to the clinic.</p>
 			</div>
 			<nav aria-label="Site map" class="map">
 				{
 					columns.map((col) => (
-						<ul>
-							{col.map((l) => (
-								<li>
-									<a href={url(l.href)}>{l.label}</a>
-								</li>
-							))}
-						</ul>
+						<div>
+							<h2>{col.heading}</h2>
+							<ul>
+								{col.links.map((l) => (
+									<li>
+										<a href={href(l.href)}>{l.label}</a>
+									</li>
+								))}
+							</ul>
+						</div>
 					))
 				}
 			</nav>
@@ -59,6 +72,15 @@ const columns = [links.slice(0, half), links.slice(half)];
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 24px;
+	}
+	h2 {
+		margin: 0 0 8px;
+		font-family: var(--font-body);
+		font-size: 13px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--pink);
 	}
 	ul {
 		list-style: none;

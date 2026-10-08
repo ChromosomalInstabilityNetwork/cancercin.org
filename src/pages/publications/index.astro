@@ -1,10 +1,98 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import Card from '../../components/Card.astro';
+
+const topics = {
+	causes: 'Causes and consequences',
+	detection: 'Detection and measurement',
+	clinical: 'Clinical translation',
+} as const;
+
+const all = await getCollection('publications');
+const featured = all.filter((p) => p.data.featured);
+const rest = all
+	.filter((p) => !p.data.featured)
+	.sort((a, b) => (b.data.year ?? 0) - (a.data.year ?? 0));
+const year = (y?: number) => (y ? String(y) : '[Year]');
 ---
 
-<BaseLayout title="Publications">
-	<PageHeader eyebrow="Research" title="Publications">
-		<p>[Page copy to come from the site spec.]</p>
+<BaseLayout title="Publications" description="Papers, perspectives, and resources from consortium laboratories.">
+	<PageHeader eyebrow="Publications" title="Research from the CIN community">
+		<p>
+			Papers, perspectives, and resources from consortium laboratories, organized around the
+			challenges of chromosomal instability research.
+		</p>
 	</PageHeader>
+
+	{
+		featured.length > 0 && (
+			<section class="section container">
+				<Eyebrow>Start here</Eyebrow>
+				<h2>Featured publication</h2>
+				{featured.map((p) => (
+					<Card variant="dark" class="feat">
+						<p class="feat-label">Featured · {year(p.data.year)}</p>
+						<h3>{p.data.url ? <a href={p.data.url}>{p.data.title}</a> : p.data.title}</h3>
+						{p.data.summary && <p>{p.data.summary}</p>}
+						<p class="cite">
+							{p.data.authors} · {p.data.journal}
+						</p>
+					</Card>
+				))}
+			</section>
+		)
+	}
+
+	<section class="section container">
+		<Eyebrow>Library</Eyebrow>
+		<h2>All publications</h2>
+		<div class="grid grid-2">
+			{
+				rest.map((p) => (
+					<Card>
+						<p class="label">
+							{topics[p.data.topic]} · {year(p.data.year)}
+						</p>
+						<h3>{p.data.url ? <a href={p.data.url}>{p.data.title}</a> : p.data.title}</h3>
+						<p>{p.data.authors}</p>
+						<p class="journal">{p.data.journal}</p>
+					</Card>
+				))
+			}
+		</div>
+	</section>
 </BaseLayout>
+
+<style>
+	.feat :global(h3) {
+		font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.25rem);
+	}
+	.feat :global(a),
+	h3 a {
+		color: inherit;
+		text-decoration-color: var(--pink);
+		text-underline-offset: 4px;
+	}
+	.feat-label,
+	.label {
+		margin: 0 0 8px;
+		font-size: 13px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--accent);
+	}
+	.feat-label {
+		color: var(--pink);
+	}
+	.cite {
+		margin-top: 20px;
+		color: var(--on-dark-strong);
+	}
+	.journal {
+		color: var(--muted);
+	}
+</style>

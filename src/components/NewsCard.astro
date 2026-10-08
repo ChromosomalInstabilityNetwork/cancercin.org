@@ -3,21 +3,25 @@ import Card from './Card.astro';
 
 interface Props {
 	title: string;
-	date: Date;
+	date?: Date;
 	summary: string;
 	link?: string;
 }
 const { title, date, summary, link } = Astro.props;
-const fmt = new Intl.DateTimeFormat('en-US', {
-	month: 'long',
-	day: 'numeric',
-	year: 'numeric',
-	timeZone: 'UTC',
-});
+const label = date
+	? new Intl.DateTimeFormat('en-US', {
+			month: 'long',
+			day: 'numeric',
+			year: 'numeric',
+			timeZone: 'UTC',
+		}).format(date)
+	: '[Date]';
 ---
 
 <Card>
-	<p class="date"><time datetime={date.toISOString().slice(0, 10)}>{fmt.format(date)}</time></p>
+	<p class="date">
+		{date ? <time datetime={date.toISOString().slice(0, 10)}>{label}</time> : label}
+	</p>
 	<h3>{link ? <a href={link}>{title}</a> : title}</h3>
 	<p>{summary}</p>
 </Card>
@@ -25,8 +29,11 @@ const fmt = new Intl.DateTimeFormat('en-US', {
 <style>
 	.date {
 		margin: 0 0 8px;
-		color: var(--muted);
-		font-size: 0.9375rem;
+		color: var(--accent);
+		font-size: 14px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
 	}
 	h3 a {
 		color: inherit;

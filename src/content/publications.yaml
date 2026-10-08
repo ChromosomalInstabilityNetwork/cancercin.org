@@ -1,0 +1,38 @@
+# PLACEHOLDER entries. Never add a DOI/URL that has not been verified.
+- id: featured
+  title: "[Title of the consortium Perspective]"
+  authors: "[Authors]"
+  journal: "[Journal]"
+  topic: causes
+  featured: true
+  summary: "The community Perspective that proposes a mechanistically inclusive definition of CIN, sets out three major challenges, and lays out a research roadmap."
+- id: pub-1
+  title: "[Publication title]"
+  authors: "[Authors]"
+  journal: "[Journal]"
+  topic: causes
+- id: pub-2
+  title: "[Publication title]"
+  authors: "[Authors]"
+  journal: "[Journal]"
+  topic: detection
+- id: pub-3
+  title: "[Publication title]"
+  authors: "[Authors]"
+  journal: "[Journal]"
+  topic: clinical
+- id: pub-4
+  title: "[Publication title]"
+  authors: "[Authors]"
+  journal: "[Journal]"
+  topic: causes
+- id: pub-5
+  title: "[Publication title]"
+  authors: "[Authors]"
+  journal: "[Journal]"
+  topic: detection
+- id: pub-6
+  title: "[Publication title]"
+  authors: "[Authors]"
+  journal: "[Journal]"
+  topic: clinical

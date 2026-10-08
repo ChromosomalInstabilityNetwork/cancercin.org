@@ -1,7 +1,7 @@
 ---
 interface Props {
 	href: string;
-	variant?: 'primary' | 'light' | 'outline';
+	variant?: 'primary' | 'light' | 'outline' | 'ghost';
 	external?: boolean;
 }
 const { href, variant = 'primary', external = false } = Astro.props;
@@ -43,6 +43,14 @@ const { href, variant = 'primary', external = false } = Astro.props;
 	}
 	.light:hover {
 		background: var(--on-dark-strong);
+	}
+	.ghost {
+		border-color: var(--on-dark);
+		color: var(--on-dark-strong);
+	}
+	.ghost:hover {
+		background: var(--on-dark-strong);
+		color: var(--ink);
 	}
 	.outline {
 		border-color: var(--ink);

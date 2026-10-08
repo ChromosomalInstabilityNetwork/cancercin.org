@@ -3,13 +3,12 @@ import Card from './Card.astro';
 
 interface Props {
 	title: string;
-	start: Date;
+	start?: Date;
 	end?: Date;
 	location: string;
-	type: 'lecture' | 'session' | 'workshop';
 	link?: string;
 }
-const { title, start, end, location, type, link } = Astro.props;
+const { title, start, end, location, link } = Astro.props;
 
 const fmt = new Intl.DateTimeFormat('en-US', {
 	month: 'short',
@@ -17,35 +16,83 @@ const fmt = new Intl.DateTimeFormat('en-US', {
 	year: 'numeric',
 	timeZone: 'UTC',
 });
-const when = end ? `${fmt.format(start)} – ${fmt.format(end)}` : fmt.format(start);
+const month = start
+	? new Intl.DateTimeFormat('en-US', { month: 'short', timeZone: 'UTC' }).format(start)
+	: '[Mon]';
+const day = start ? String(start.getUTCDate()) : '[DD]';
+const when = start
+	? end
+		? `${fmt.format(start)} – ${fmt.format(end)}`
+		: fmt.format(start)
+	: '[Date]';
 ---
 
 <Card>
-	<p class="type">{type}</p>
-	<h3>
-		{link ? <a href={link}>{title}</a> : title}
-	</h3>
-	<p class="meta">
-		<time datetime={start.toISOString().slice(0, 10)}>{when}</time> · {location}
-	</p>
-	<slot />
+	<div class="row">
+		<div class="date" aria-hidden="true">
+			<span class="mon">{month}</span>
+			<span class="day">{day}</span>
+		</div>
+		<div class="body">
+			<h3>{link ? <a href={link}>{title}</a> : title}</h3>
+			<p class="meta">
+				{start ? <time datetime={start.toISOString().slice(0, 10)}>{when}</time> : when} · {location}
+			</p>
+			<slot />
+		</div>
+	</div>
 </Card>
 
 <style>
-	.type {
-		margin: 0 0 8px;
-		font-size: 14px;
+	.row {
+		display: flex;
+		gap: 20px;
+		align-items: flex-start;
+	}
+	.date {
+		flex: none;
+		width: 72px;
+		height: 72px;
+		border-radius: 14px;
+		background: var(--ink);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		line-height: 1.1;
+	}
+	.mon {
+		color: var(--pink);
+		font-size: 12px;
 		font-weight: 600;
 		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		color: var(--accent);
+		letter-spacing: 0.1em;
+	}
+	.day {
+		color: var(--on-dark-strong);
+		font-family: var(--font-display);
+		font-size: 1.5rem;
+		font-weight: 600;
+	}
+	.body {
+		min-width: 0;
+	}
+	h3 {
+		margin-bottom: 6px;
+		font-size: 1.25rem;
 	}
 	.meta {
-		color: var(--muted);
+		color: var(--accent);
+		font-size: 14px;
+		font-weight: 600;
+		margin-bottom: 8px;
 	}
 	h3 a {
 		color: inherit;
 		text-decoration-color: var(--pink);
 		text-underline-offset: 4px;
+	}
+	.body :global(p:last-child) {
+		margin-bottom: 0;
 	}
 </style>

@@ -4,11 +4,12 @@ interface Props {
 	title?: string;
 	as?: 'article' | 'div' | 'li';
 	headingLevel?: 'h2' | 'h3' | 'h4';
+	class?: string;
 }
-const { variant = 'default', title, as: Tag = 'article', headingLevel: H = 'h3' } = Astro.props;
+const { variant = 'default', title, as: Tag = 'article', headingLevel: H = 'h3', class: className } = Astro.props;
 ---
 
-<Tag class={`card ${variant}`}>
+<Tag class:list={['card', variant, className]}>
 	{title && <H>{title}</H>}
 	<slot />
 </Tag>
@@ -34,6 +35,10 @@ const { variant = 'default', title, as: Tag = 'article', headingLevel: H = 'h3' 
 	.card.dark :global(h3),
 	.card.dark :global(h4) {
 		color: var(--on-dark-strong);
+	}
+	.card :global(h4) {
+		font-size: var(--fs-card-title);
+		line-height: 1.2;
 	}
 	.card :global(h3:first-child),
 	.card :global(h2:first-child) {

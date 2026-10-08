@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    # Daily rebuild so events roll from upcoming to past.
+    - cron: '15 5 * * *'
 
 permissions:
   contents: read

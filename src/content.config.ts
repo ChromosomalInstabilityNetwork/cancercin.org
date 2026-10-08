@@ -1,0 +1,71 @@
+import { defineCollection } from 'astro:content';
+import { glob, file } from 'astro/loaders';
+import { z } from 'astro/zod';
+
+// Placeholder entries leave dates/links unset; real entries should fill them in.
+const people = defineCollection({
+	loader: file('src/content/people.yaml'),
+	schema: z.object({
+		name: z.string(),
+		institution: z.string(),
+		address: z.string(),
+		city: z.string(),
+		country: z.string(),
+		lat: z.number().min(-90).max(90).optional(),
+		lng: z.number().min(-180).max(180).optional(),
+		lab_url: z.url().optional(),
+		photo: z.string().optional(),
+		show_on_map: z.boolean().default(true),
+	}),
+});
+
+const events = defineCollection({
+	loader: glob({ pattern: '**/*.md', base: 'src/content/events' }),
+	schema: z.object({
+		title: z.string(),
+		start: z.coerce.date().optional(), // unset = date to be announced (shown as upcoming)
+		end: z.coerce.date().optional(),
+		location: z.string(),
+		type: z.enum(['lecture', 'session', 'workshop']),
+		link: z.url().optional(),
+	}),
+});
+
+const news = defineCollection({
+	loader: glob({ pattern: '**/*.md', base: 'src/content/news' }),
+	schema: z.object({
+		title: z.string(),
+		date: z.coerce.date().optional(),
+		summary: z.string(),
+		link: z.url().optional(),
+	}),
+});
+
+const publications = defineCollection({
+	loader: file('src/content/publications.yaml'),
+	schema: z.object({
+		title: z.string(),
+		authors: z.string(),
+		journal: z.string(),
+		year: z.number().int().optional(),
+		url: z.url().optional(),
+		topic: z.enum(['causes', 'detection', 'clinical']),
+		featured: z.boolean().default(false),
+		summary: z.string().optional(),
+	}),
+});
+
+const resources = defineCollection({
+	loader: file('src/content/resources.yaml'),
+	schema: z.object({
+		kind: z.enum(['method', 'data']),
+		title: z.string(),
+		category: z.string(),
+		description: z.string(),
+		url: z.url().optional(),
+		host: z.enum(['github', 'website', 'repository']),
+		label: z.string().optional(), // text shown on the link button
+	}),
+});
+
+export const collections = { people, events, news, publications, resources };

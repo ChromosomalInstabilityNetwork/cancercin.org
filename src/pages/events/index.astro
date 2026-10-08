@@ -1,10 +1,62 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import EventCard from '../../components/EventCard.astro';
+import { getEvents } from '../../lib/events';
+
+const { upcoming, past } = await getEvents();
 ---
 
-<BaseLayout title="Events">
-	<PageHeader eyebrow="Gatherings" title="Events">
-		<p>[Page copy to come from the site spec.]</p>
+<BaseLayout title="Events" description="Lectures, meeting sessions, and workshops for the CIN community.">
+	<PageHeader eyebrow="Events" title="Events for the CIN community">
+		<p>
+			Lectures, meeting sessions, and workshops that bring basic, translational, and clinical
+			scientists together around the major CIN challenges.
+		</p>
 	</PageHeader>
+
+	<section class="section container">
+		<Eyebrow>Coming up</Eyebrow>
+		<h2>Upcoming events</h2>
+		<div class="grid grid-2">
+			{
+				upcoming.map((e) => (
+					<EventCard
+						title={e.data.title}
+						start={e.data.start}
+						end={e.data.end}
+						location={e.data.location}
+						link={e.data.link}
+					>
+						<p>{e.body}</p>
+					</EventCard>
+				))
+			}
+		</div>
+	</section>
+
+	<section class="section container">
+		<Eyebrow>Archive</Eyebrow>
+		<h2>Past events</h2>
+		{
+			past.length ? (
+				<div class="grid grid-2">
+					{past.map((e) => (
+						<EventCard
+							title={e.data.title}
+							start={e.data.start}
+							end={e.data.end}
+							location={e.data.location}
+							link={e.data.link}
+						>
+							<p>{e.body}</p>
+						</EventCard>
+					))}
+				</div>
+			) : (
+				<p>No past events yet.</p>
+			)
+		}
+	</section>
 </BaseLayout>

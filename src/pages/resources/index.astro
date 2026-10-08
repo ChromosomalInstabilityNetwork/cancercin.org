@@ -1,10 +1,130 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import Card from '../../components/Card.astro';
+import PillButton from '../../components/PillButton.astro';
+import { mailto, CONTACT_EMAIL } from '../../lib/site';
+
+const all = await getCollection('resources');
+const sections = [
+	{
+		kind: 'method',
+		eyebrow: 'Code and protocols',
+		title: 'Methods',
+		intro:
+			'Software, analysis pipelines, and protocols for detecting and measuring CIN, shared openly on GitHub or elsewhere.',
+	},
+	{
+		kind: 'data',
+		eyebrow: 'Shared datasets',
+		title: 'Data',
+		intro:
+			'Public repositories of CIN-related data, including single-cell genomics and imaging, with their experimental and analytical metadata.',
+	},
+] as const;
+const hostName = { github: 'GitHub', website: 'Website', repository: 'Repository' } as const;
 ---
 
-<BaseLayout title="Resources">
-	<PageHeader eyebrow="Tools and data" title="Resources">
-		<p>[Page copy to come from the site spec.]</p>
+<BaseLayout title="Resources" description="Shared tools, protocols, and datasets from the CIN community.">
+	<PageHeader eyebrow="Resources" title="Methods and data for CIN research">
+		<p>
+			Shared tools, protocols, and datasets from the CIN community, so that studies can be
+			reproduced and compared directly.
+		</p>
 	</PageHeader>
+
+	{
+		sections.map((s) => (
+			<section class="section container">
+				<Eyebrow>{s.eyebrow}</Eyebrow>
+				<h2>{s.title}</h2>
+				<p class="intro">{s.intro}</p>
+				<div class="grid grid-3">
+					{all
+						.filter((r) => r.data.kind === s.kind)
+						.map((r) => (
+							<Card class="res">
+								<p class="label">
+									{r.data.category} · {hostName[r.data.host]}
+								</p>
+								<h3>{r.data.title}</h3>
+								<p>{r.data.description}</p>
+								<PillButton
+									href={r.data.url ?? 'https://github.com/'}
+									variant="primary"
+									external
+								>
+									{r.data.host === 'github' ? (
+										<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+											<path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.69 1.25 3.35.96.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.68.8.56A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z" />
+										</svg>
+									) : (
+										<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+										</svg>
+									)}
+									<span>{r.data.label}</span>
+								</PillButton>
+							</Card>
+						))}
+				</div>
+			</section>
+		))
+	}
+
+	<section class="container contribute">
+		<Card variant="dark" class="feature-dark">
+			<p class="eyebrow-pink">Contribute</p>
+			<h3>Have a tool or dataset to share?</h3>
+			<p>
+				If you would like your tool or data listed here, email the details to
+				<a href={mailto('Add my tool or data to the CIN resources')}>{CONTACT_EMAIL}</a>.
+			</p>
+			<PillButton href={mailto('Add my tool or data to the CIN resources')} variant="light">
+				Email your details
+			</PillButton>
+		</Card>
+	</section>
 </BaseLayout>
+
+<style>
+	.intro {
+		max-width: 62ch;
+		color: var(--muted);
+		margin-bottom: 32px;
+	}
+	.label {
+		margin: 0 0 8px;
+		font-size: 13px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--accent);
+	}
+	.res {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+	}
+	.res :global(.pill) {
+		margin-top: auto;
+		text-align: left;
+		overflow-wrap: anywhere;
+	}
+	.contribute {
+		padding-bottom: var(--section-y);
+	}
+	.eyebrow-pink {
+		margin: 0 0 12px;
+		font-size: 14px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--pink);
+	}
+	.contribute :global(a:not(.pill)) {
+		color: var(--pink);
+	}
+</style>

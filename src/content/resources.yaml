@@ -1,0 +1,43 @@
+# PLACEHOLDER entries. Add url only once verified.
+- id: method-1
+  kind: method
+  title: "[Method name]"
+  category: "[Category]"
+  host: github
+  label: "github.com/[org]/[repo]"
+  description: "[One or two sentences on what the method does and who it is for.]"
+- id: method-2
+  kind: method
+  title: "[Method name]"
+  category: "[Category]"
+  host: github
+  label: "github.com/[org]/[repo]"
+  description: "[One or two sentences on what the method does and who it is for.]"
+- id: method-3
+  kind: method
+  title: "[Method or protocol name]"
+  category: "[Category]"
+  host: website
+  label: "[Link to protocol or documentation]"
+  description: "[One or two sentences on what the method does and who it is for.]"
+- id: data-1
+  kind: data
+  title: "[Dataset name]"
+  category: "[Data type]"
+  host: repository
+  label: "[Link to data repository]"
+  description: "[One or two sentences on what the dataset contains, such as single-cell genomics or imaging.]"
+- id: data-2
+  kind: data
+  title: "[Dataset name]"
+  category: "[Data type]"
+  host: repository
+  label: "[Link to data repository]"
+  description: "[One or two sentences on what the dataset contains.]"
+- id: data-3
+  kind: data
+  title: "[Dataset name]"
+  category: "[Data type]"
+  host: repository
+  label: "[Link to data repository]"
+  description: "[One or two sentences on what the dataset contains.]"

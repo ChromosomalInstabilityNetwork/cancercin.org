@@ -1,0 +1,92 @@
+# PLACEHOLDER entries. Replace with real consortium members (with their consent).
+# Coordinates are city centres; run scripts/geocode.mjs for real addresses.
+- id: person-1
+  name: "[Name 1]"
+  institution: "[Institution]"
+  address: "[Street address], Boston"
+  city: "Boston"
+  country: "USA"
+  lat: 42.36
+  lng: -71.06
+  show_on_map: true
+- id: person-2
+  name: "[Name 2]"
+  institution: "[Institution]"
+  address: "[Street address], London"
+  city: "London"
+  country: "UK"
+  lat: 51.51
+  lng: -0.13
+  show_on_map: true
+- id: person-3
+  name: "[Name 3]"
+  institution: "[Institution]"
+  address: "[Street address], Tokyo"
+  city: "Tokyo"
+  country: "Japan"
+  lat: 35.68
+  lng: 139.69
+  show_on_map: true
+- id: person-4
+  name: "[Name 4]"
+  institution: "[Institution]"
+  address: "[Street address], Sydney"
+  city: "Sydney"
+  country: "Australia"
+  lat: -33.87
+  lng: 151.21
+  show_on_map: true
+- id: person-5
+  name: "[Name 5]"
+  institution: "[Institution]"
+  address: "[Street address], São Paulo"
+  city: "São Paulo"
+  country: "Brazil"
+  lat: -23.55
+  lng: -46.63
+  show_on_map: true
+- id: person-6
+  name: "[Name 6]"
+  institution: "[Institution]"
+  address: "[Street address], Cape Town"
+  city: "Cape Town"
+  country: "South Africa"
+  lat: -33.92
+  lng: 18.42
+  show_on_map: true
+- id: person-7
+  name: "[Name 7]"
+  institution: "[Institution]"
+  address: "[Street address], Toronto"
+  city: "Toronto"
+  country: "Canada"
+  lat: 43.65
+  lng: -79.38
+  show_on_map: true
+- id: person-8
+  name: "[Name 8]"
+  institution: "[Institution]"
+  address: "[Street address], Stockholm"
+  city: "Stockholm"
+  country: "Sweden"
+  lat: 59.33
+  lng: 18.07
+  show_on_map: true
+- id: person-9
+  name: "[Name 9]"
+  institution: "[Institution]"
+  address: "[Street address], Singapore"
+  city: "Singapore"
+  country: "Singapore"
+  lat: 1.35
+  lng: 103.82
+  show_on_map: true
+- id: person-10
+  name: "[Name 10]"
+  institution: "[Institution]"
+  address: "[Street address], San Francisco"
+  city: "San Francisco"
+  country: "USA"
+  lat: 37.77
+  lng: -122.42
+  show_on_map: true
