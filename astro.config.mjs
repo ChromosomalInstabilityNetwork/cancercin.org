@@ -8,7 +8,8 @@ export default defineConfig({
 	site: process.env.SITE_URL || 'https://cancercin.org',
 	base: process.env.BASE_PATH || '/',
 	vite: {
-		// Pre-bundle the lazily imported map library so dev never serves a stale dep.
-		optimizeDeps: { include: ['maplibre-gl'] },
+		// maplibre-gl resolves its web worker relative to its own files, which breaks
+		// when Vite pre-bundles it in dev.
+		optimizeDeps: { exclude: ['maplibre-gl'] },
 	},
 });

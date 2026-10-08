@@ -8,7 +8,9 @@ import PillButton from '../../components/PillButton.astro';
 import { url } from '../../lib/url';
 import { mailto, CONTACT_EMAIL } from '../../lib/site';
 
-const people = await getCollection('people');
+const people = (await getCollection('people')).sort((a, b) =>
+	a.data.name.localeCompare(b.data.name, undefined, { numeric: true }),
+);
 const addBody = 'Name:\nInstitution:\nAddress:\n';
 ---
 
@@ -126,7 +128,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 	}
 	.name {
 		font-family: var(--font-display);
-		font-size: 1.25rem;
+		font-size: 1.125rem;
 		font-weight: 600;
 	}
 	.inst {

@@ -19,6 +19,8 @@ import { url } from '../lib/url';
 <div id="after-map" tabindex="-1"></div>
 
 <script>
+	// MapLibre locates its worker at runtime, which the bundler can't see; ship it as an asset.
+	import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 	import { loadDarkStyle } from '../lib/mapStyle';
 	import { MAP_COLORS as C } from '../lib/mapConfig';
 
@@ -97,6 +99,7 @@ import { url } from '../lib/url';
 				import('maplibre-gl/dist/maplibre-gl.css'),
 			]);
 			lib = maplibre;
+			lib.setWorkerUrl(new URL(workerUrl, location.href).href);
 			for (const f of data.features) {
 				features.set(f.properties.id, { coords: f.geometry.coordinates, props: f.properties });
 			}
@@ -107,7 +110,7 @@ import { url } from '../lib/url';
 				center: [10, 25],
 				zoom: 1,
 				maxZoom: 9,
-				minZoom: 0.5,
+				minZoom: 0,
 				pitchWithRotate: false,
 				dragRotate: false,
 				attributionControl: { compact: false },
@@ -168,10 +171,11 @@ import { url } from '../lib/url';
 					},
 				});
 
+				map.resize();
 				if (features.size) {
 					const b = new lib.LngLatBounds();
 					for (const f of features.values()) b.extend(f.coords);
-					map.fitBounds(b, { padding: 50, maxZoom: 4, animate: false });
+					map.fitBounds(b, { padding: 40, maxZoom: 4, animate: false });
 				}
 				if (selected) setSelected(selected);
 
