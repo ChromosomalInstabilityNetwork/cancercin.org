@@ -5,11 +5,11 @@
 @import '@fontsource/instrument-sans/latin-600.css';
 
 :root {
-	--bg: #f6f3ee;
+	--bg: #ffffff;
 	--ink: #1b1a2e;
 	--muted: #46444f;
 	--on-dark: #d9d5e3;
-	--on-dark-strong: #f6f3ee;
+	--on-dark-strong: #ffffff;
 	--pink: #e9a8d8;
 	--accent: #8a2f73; /* alternates: #1F6F78, #B4531C */
 	--card: #ffffff;

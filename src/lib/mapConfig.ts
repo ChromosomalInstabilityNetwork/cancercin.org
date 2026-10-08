@@ -28,5 +28,5 @@ export const MAP_COLORS = {
 	label: '#B9B5CC',
 	pink: '#E9A8D8',
 	accent: '#8A2F73',
-	light: '#F6F3EE',
+	light: '#FFFFFF',
 };

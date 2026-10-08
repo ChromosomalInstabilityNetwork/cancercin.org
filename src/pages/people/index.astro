@@ -6,6 +6,7 @@ import Eyebrow from '../../components/Eyebrow.astro';
 import Card from '../../components/Card.astro';
 import PeopleMap from '../../components/PeopleMap.astro';
 import PillButton from '../../components/PillButton.astro';
+import { url } from '../../lib/url';
 import { mailto, CONTACT_EMAIL } from '../../lib/site';
 
 const people = await getCollection('people');
@@ -29,9 +30,21 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 					people.map((p) => (
 						<li>
 							<button type="button" class="person" data-person-id={p.id} aria-pressed="false">
-								<span class="name">{p.data.name}</span>
-								<span class="inst">{p.data.institution}</span>
-								<span class="addr">{p.data.address}</span>
+								{p.data.photo ? (
+									<img class="avatar" src={url(p.data.photo)} alt="" width="64" height="64" loading="lazy" />
+								) : (
+									<span class="avatar placeholder" aria-hidden="true">
+										<svg viewBox="0 0 24 24" fill="currentColor">
+											<circle cx="12" cy="8.5" r="4" />
+											<path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z" />
+										</svg>
+									</span>
+								)}
+								<span class="text">
+									<span class="name">{p.data.name}</span>
+									<span class="inst">{p.data.institution}</span>
+									<span class="addr">{p.data.address}</span>
+								</span>
 							</button>
 						</li>
 					))
@@ -63,7 +76,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 <style>
 	.dir-map {
 		display: grid;
-		grid-template-columns: 340px minmax(0, 1fr);
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 32px;
 		height: 520px;
 		margin-top: 32px;
@@ -81,11 +94,11 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		width: 100%;
 		text-align: left;
 		display: flex;
-		flex-direction: column;
-		gap: 2px;
+		align-items: center;
+		gap: 16px;
 		min-height: 44px;
 		padding: 16px 20px;
-		background: #fbf9f5;
+		background: #f8f8fa;
 		border: 2px solid var(--border);
 		border-radius: var(--radius-card);
 		font: inherit;
@@ -95,6 +108,30 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 	.person[aria-pressed='true'] {
 		background: #fff;
 		border-color: var(--accent);
+	}
+	.text {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		min-width: 0;
+	}
+	.avatar {
+		flex: none;
+		width: 64px;
+		height: 64px;
+		border-radius: 50%;
+		object-fit: cover;
+	}
+	.avatar.placeholder {
+		display: grid;
+		place-items: end center;
+		overflow: hidden;
+		background: #e8e6ee;
+		color: #aaa7bd;
+	}
+	.avatar.placeholder svg {
+		width: 80%;
+		height: 80%;
 	}
 	.name {
 		font-family: var(--font-display);

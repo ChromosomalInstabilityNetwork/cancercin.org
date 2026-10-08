@@ -115,7 +115,13 @@ import { url } from '../lib/url';
 			map.touchZoomRotate.disableRotation();
 			map.addControl(new lib.NavigationControl({ showCompass: false }), 'top-right');
 
+			const timer = window.setTimeout(() => {
+				status.hidden = false;
+				status.textContent = 'The map is taking too long to load. Use the directory instead.';
+			}, 20000);
+
 			map.on('load', () => {
+				window.clearTimeout(timer);
 				status.hidden = true;
 				map.addSource('people', {
 					type: 'geojson',
@@ -222,6 +228,9 @@ import { url } from '../lib/url';
 	.map-canvas {
 		position: absolute;
 		inset: 0;
+	}
+	.map-status[hidden] {
+		display: none;
 	}
 	.map-status {
 		position: absolute;
