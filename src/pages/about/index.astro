@@ -1,6 +1,6 @@
 ---
 import SectionLayout from '../../layouts/SectionLayout.astro';
-import PillButton from '../../components/PillButton.astro';
+import Card from '../../components/Card.astro';
 import { url } from '../../lib/url';
 ---
 
@@ -29,18 +29,53 @@ import { url } from '../../lib/url';
 		<p>[Mission, history, and how the network is organized to come.]</p>
 	</section>
 
-	<section class="block">
-		<h2>Challenges and a shared roadmap</h2>
-		<p>
-			The network has identified three major challenges in CIN research and a roadmap for
-			addressing them.
-		</p>
-		<PillButton href={url('about/challenges-and-roadmap/')}>See challenges and roadmap</PillButton>
+	<section class="block split">
+		<div>
+			<h2>Challenges and a shared roadmap</h2>
+			<p>
+				The network has identified three major challenges in CIN research and a roadmap for
+				addressing them.
+			</p>
+		</div>
+		<Card variant="dark" class="go">
+			<h3><a href={url('about/challenges-and-roadmap/')}>Challenges &amp; Roadmap</a></h3>
+			<p>See the three major challenges and the roadmap for addressing them →</p>
+		</Card>
 	</section>
 
-	<section class="block">
-		<h2>[Governance]</h2>
-		<p>[Steering group, funders, and how to get involved to come.]</p>
-	</section>
 </SectionLayout>
 
+<style>
+	.split {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: 40px;
+		align-items: start;
+	}
+	.split p {
+		margin-bottom: 0;
+	}
+	.split :global(.go) {
+		position: relative;
+	}
+	.split :global(.go a) {
+		color: inherit;
+		text-decoration: none;
+	}
+	/* Whole card is the click target. */
+	.split :global(.go a::after) {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+	}
+	.split :global(.go:hover) {
+		border-color: var(--pink);
+	}
+	@media (max-width: 700px) {
+		.split {
+			grid-template-columns: 1fr;
+			gap: 20px;
+		}
+	}
+</style>
