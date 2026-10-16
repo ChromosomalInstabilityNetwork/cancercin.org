@@ -1,7 +1,5 @@
 ---
 import SectionLayout from '../../layouts/SectionLayout.astro';
-import Card from '../../components/Card.astro';
-import { url } from '../../lib/url';
 ---
 
 <SectionLayout
@@ -12,8 +10,8 @@ import { url } from '../../lib/url';
 	<section class="block">
 		<h2>What is CIN?</h2>
 		<p>
-			Chromosomal instability is one of the hallmarks of cancer. It broadly refers to any process
-			that causes repeated generation of karyotype alterations from kilobase scale to whole
+			Chromosomal instability (CIN) is one of the hallmarks of cancer. It broadly refers to any
+			process that causes repeated generation of karyotype alterations from kilobase scale to whole
 			chromosomes. It is an ongoing <strong>rate of change</strong>, which sets it apart from
 			aneuploidy or karyotype complexity often seen in cacner genomes.
 		</p>
@@ -24,62 +22,12 @@ import { url } from '../../lib/url';
 	</section>
 
 	<section class="block">
-		<h2>CINners Unite!</h2>
+		<h2>About the Network</h2>
 		<p>
-			CIN drives cancer formation and therapy resistance, but it also offers a chance to transform
-			how we treat and prevent cancer.
+			The International CIN Network (iCIN) originated while writing a community consensus on
+			challenges we face in CIN research. In doing so, we identified seven challenges across three
+			domains of CIN research and a roadmap for addressing them. The mission of iCIN is to foster
+			collaboration within the CIN community to solve these challenges.
 		</p>
-		<p>[Mission, history, and how the network is organized to come.]</p>
-	</section>
-
-	<section class="block split">
-		<div>
-			<h2>Challenges and a shared roadmap</h2>
-			<p>
-				The network has identified three major challenges in CIN research and a roadmap for
-				addressing them.
-			</p>
-		</div>
-		<Card variant="dark" class="go">
-			<h3>
-				<a href={url('about/challenges-and-roadmap/')}>Challenges &amp; Roadmap</a>
-			</h3>
-			<p>See the three major challenges and the roadmap for addressing them →</p>
-		</Card>
 	</section>
 </SectionLayout>
-
-<style>
-	.split {
-		display: grid;
-		grid-template-columns: 2fr 1fr;
-		gap: 40px;
-		align-items: start;
-	}
-	.split p {
-		margin-bottom: 0;
-	}
-	.split :global(.go) {
-		position: relative;
-	}
-	.split :global(.go a) {
-		color: inherit;
-		text-decoration: none;
-	}
-	/* Whole card is the click target. */
-	.split :global(.go a::after) {
-		content: '';
-		position: absolute;
-		inset: 0;
-		border-radius: inherit;
-	}
-	.split :global(.go:hover) {
-		border-color: var(--pink);
-	}
-	@media (max-width: 700px) {
-		.split {
-			grid-template-columns: 1fr;
-			gap: 20px;
-		}
-	}
-</style>

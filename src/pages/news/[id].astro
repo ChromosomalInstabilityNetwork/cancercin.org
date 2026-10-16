@@ -33,7 +33,7 @@ const when = date
 			</p>
 		)}
 		<p>
-			<a href={url('news/')}>← All news</a>
+			<a href={url('news/')}>← All news and views</a>
 		</p>
 	</article>
 </SectionLayout>
@@ -53,8 +53,9 @@ const when = date
 		margin: 0 0 8px;
 		color: var(--muted);
 	}
+	/* Same typeface and size as the date above it. */
 	.summary {
-		font-size: 1.125rem;
-		font-family: var(--font-display);
+		font-family: inherit;
+		font-size: inherit;
 	}
 </style>

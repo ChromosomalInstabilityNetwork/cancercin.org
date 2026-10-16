@@ -273,7 +273,7 @@ const activeGroup = groupFor(path)?.label;
 		align-items: center;
 		justify-content: center;
 		background: none;
-		border: 1px solid var(--border);
+		border: 0;
 		border-radius: 12px;
 		color: var(--ink);
 		cursor: pointer;
@@ -305,7 +305,7 @@ const activeGroup = groupFor(path)?.label;
 			z-index: 1;
 			overflow-y: auto;
 			background: var(--bg);
-			padding: 88px var(--pad-x) 40px;
+			padding: 88px 20px 40px;
 		}
 		nav[data-open] {
 			display: block;
@@ -322,9 +322,12 @@ const activeGroup = groupFor(path)?.label;
 			font-weight: 600;
 			min-height: 52px;
 		}
-		/* Groups are shown expanded inside the mobile menu. */
-		.group-btn,
-		.group-link {
+		/* Groups are shown expanded inside the mobile menu (stacked, not side by side). */
+		.has-menu {
+			display: block;
+		}
+		nav .group-btn,
+		nav .group-link {
 			display: none;
 		}
 		.group-label {
