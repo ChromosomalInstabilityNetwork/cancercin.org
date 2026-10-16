@@ -18,6 +18,28 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 	description="The laboratories and investigators of the International CIN Network."
 >
 	<div class="people" data-map="shown" data-people-root>
+		<button
+			type="button"
+			class="map-toggle"
+			id="map-toggle"
+			aria-controls="people-map-pane"
+			aria-expanded="true"
+			aria-label="Hide map"
+			title="Hide map"
+			hidden
+		>
+			<svg
+				viewBox="0 0 24 24"
+				aria-hidden="true"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path d="M9 4 3 6.5v13L9 17l6 3 6-2.5v-13L15 7 9 4Zm0 0v13m6-10v13" />
+			</svg>
+		</button>
 		<div class="left" data-scroll>
 			<div class="left-inner">
 				<h1>People</h1>
@@ -40,27 +62,6 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 							spellcheck="false"
 						/>
 					</div>
-					<button
-						type="button"
-						class="map-toggle"
-						id="map-toggle"
-						aria-controls="people-map-pane"
-						aria-expanded="true"
-						hidden
-					>
-						<svg
-							viewBox="0 0 24 24"
-							aria-hidden="true"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M9 4 3 6.5v13L9 17l6 3 6-2.5v-13L15 7 9 4Zm0 0v13m6-10v13" />
-						</svg>
-						<span data-label>Hide map</span>
-					</button>
 				</div>
 				<p class="visually-hidden" id="people-count" aria-live="polite"></p>
 				<p class="none" id="people-none" hidden>
@@ -184,9 +185,10 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 	toggle.hidden = false;
 	toggle.addEventListener('click', async () => {
 		const hiding = root.dataset.map !== 'hidden';
-		const label = toggle.querySelector('[data-label]')!;
 		toggle.setAttribute('aria-expanded', String(!hiding));
-		label.textContent = hiding ? 'Show map' : 'Hide map';
+		const text = hiding ? 'Show map' : 'Hide map';
+		toggle.setAttribute('aria-label', text);
+		toggle.title = text;
 		if (hiding) {
 			if (!reduce.matches) {
 				pane.style.opacity = '0';
@@ -262,27 +264,37 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		border: 1px solid #b9b5c4;
 		border-radius: 999px;
 	}
+	/* Pinned to the top-right corner of the map area (and stays there when the map is hidden). */
+	.people {
+		position: relative;
+	}
 	.map-toggle {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		min-height: 44px;
-		padding: 0 16px;
-		font: inherit;
-		font-weight: 600;
-		color: var(--accent);
-		background: none;
-		border: 2px solid var(--accent);
-		border-radius: 999px;
+		position: absolute;
+		top: 12px;
+		right: 12px;
+		z-index: 20;
+		display: grid;
+		place-items: center;
+		width: 44px;
+		height: 44px;
+		padding: 0;
+		color: var(--ink);
+		background: #fff;
+		border: 1px solid #b9b5c4;
+		border-radius: 50%;
+		box-shadow: 0 1px 4px rgba(27, 26, 46, 0.25);
 		cursor: pointer;
-		white-space: nowrap;
+	}
+	.map-toggle:hover {
+		color: var(--accent);
+		border-color: var(--accent);
 	}
 	.map-toggle[hidden] {
 		display: none;
 	}
 	.map-toggle svg {
-		width: 18px;
-		height: 18px;
+		width: 22px;
+		height: 22px;
 	}
 	.none {
 		margin: 0;
@@ -393,6 +405,13 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 			display: flex;
 			flex-direction: column;
 			height: auto;
+		}
+		.map-toggle {
+			order: -2;
+			position: sticky;
+			top: 84px;
+			align-self: flex-end;
+			margin: 0 12px -44px 0;
 		}
 		.map {
 			order: -1;
