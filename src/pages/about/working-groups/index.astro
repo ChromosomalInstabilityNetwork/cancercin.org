@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import SectionLayout from '../../../layouts/SectionLayout.astro';
 import PersonAvatar from '../../../components/PersonAvatar.astro';
+import SocialLinks from '../../../components/SocialLinks.astro';
 
 const groups = (await getCollection('workingGroups')).sort(
 	(a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
@@ -39,21 +40,32 @@ const entries = await Promise.all(
 			<ul class="members" aria-label={`Members of the ${group.data.title}`}>
 				{members.map((m) => {
 					const link = m.data.website;
-					const Tag = link ? 'a' : 'div';
 					return (
-						<li>
-							<Tag
-								class:list={['member', { linked: !!link }]}
-								{...(link ? { href: link, target: '_blank', rel: 'noopener noreferrer' } : {})}
-							>
-								<span class="face">
-									<PersonAvatar name={m.data.name} photo={m.data.photo} />
+						<li class="member">
+							<span class="face">
+								<PersonAvatar name={m.data.name} photo={m.data.photo} />
+							</span>
+							<span class="info">
+								<span class="who">
+									{link ? (
+										<a class="who-link" href={link} target="_blank" rel="noopener noreferrer">
+											{m.data.name}
+										</a>
+									) : (
+										m.data.name
+									)}
 								</span>
-								<span class="info">
-									<span class="who">{m.data.name}</span>
-									{m.data.institution && <span class="inst">{m.data.institution}</span>}
+								{m.data.institution && <span class="inst">{m.data.institution}</span>}
+								<span class="links">
+									<SocialLinks
+										name={m.data.name}
+										website={m.data.website}
+										bluesky={m.data.bluesky}
+										x={m.data.x}
+										linkedin={m.data.linkedin}
+									/>
 								</span>
-							</Tag>
+							</span>
 						</li>
 					);
 				})}
@@ -80,12 +92,12 @@ const entries = await Promise.all(
 		padding: 0;
 	}
 	.member {
+		position: relative;
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 		gap: 14px;
 		color: var(--ink);
 		text-align: left;
-		text-decoration: none;
 	}
 	.face {
 		flex: none;
@@ -100,18 +112,29 @@ const entries = await Promise.all(
 		gap: 2px;
 		min-width: 0;
 	}
-	.linked:hover .face,
-	.linked:focus-visible .face {
-		transform: scale(1.06);
-	}
 	.who {
 		font-family: var(--font-display);
 		font-weight: 600;
 		line-height: 1.25;
 	}
-	.linked:hover .who {
+	.who-link {
+		color: inherit;
+		text-decoration: none;
+	}
+	.who-link:hover {
 		color: var(--accent);
 		text-decoration: underline;
+	}
+	/* The whole member (photo and text) is the click target for the website; icons stay above it. */
+	.who-link::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+	}
+	.links {
+		position: relative;
+		z-index: 2;
+		margin-left: -8px;
 	}
 	.inst {
 		display: -webkit-box;
