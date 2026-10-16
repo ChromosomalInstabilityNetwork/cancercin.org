@@ -27,3 +27,15 @@ export async function getNews() {
 		(a, b) => (b.data.date?.getTime() ?? Infinity) - (a.data.date?.getTime() ?? Infinity),
 	);
 }
+
+/** "October 15, 2026", or a bracketed placeholder when a post has no date yet. */
+export function formatPostDate(date?: Date): string {
+	return date
+		? new Intl.DateTimeFormat('en-US', {
+				month: 'long',
+				day: 'numeric',
+				year: 'numeric',
+				timeZone: 'UTC',
+			}).format(date)
+		: '[Date]';
+}

@@ -1,6 +1,7 @@
 ---
 import Card from './Card.astro';
 import { url } from '../lib/url';
+import { formatPostDate } from '../lib/events';
 
 interface Props {
 	title: string;
@@ -10,20 +11,24 @@ interface Props {
 	image?: string;
 	imageAlt?: string;
 	headingLevel?: 'h2' | 'h3';
+	/** Image on top of the text instead of beside it (for grids of cards). */
+	stacked?: boolean;
 }
-const { title, date, summary, link, image, imageAlt = '', headingLevel: H = 'h3' } = Astro.props;
-const label = date
-	? new Intl.DateTimeFormat('en-US', {
-			month: 'long',
-			day: 'numeric',
-			year: 'numeric',
-			timeZone: 'UTC',
-		}).format(date)
-	: '[Date]';
+const {
+	title,
+	date,
+	summary,
+	link,
+	image,
+	imageAlt = '',
+	headingLevel: H = 'h3',
+	stacked = false,
+} = Astro.props;
+const label = formatPostDate(date);
 ---
 
 <Card>
-	<div class="row">
+	<div class:list={['row', { stacked }]}>
 		<div class="body">
 			<p class="date">
 				{date ? <time datetime={date.toISOString().slice(0, 10)}>{label}</time> : label}
@@ -32,7 +37,14 @@ const label = date
 			<p>{summary}</p>
 		</div>
 		{image && (
-			<img class="thumb" src={url(image)} alt={imageAlt} width="96" height="96" loading="lazy" />
+			<img
+				class="thumb"
+				src={url(image)}
+				alt={imageAlt}
+				width={stacked ? 640 : 96}
+				height={stacked ? 360 : 96}
+				loading="lazy"
+			/>
 		)}
 	</div>
 </Card>
@@ -49,6 +61,16 @@ const label = date
 	}
 	.body > :global(p:last-child) {
 		margin-bottom: 0;
+	}
+	.stacked {
+		flex-direction: column;
+		gap: 16px;
+	}
+	.stacked .thumb {
+		order: -1;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 16 / 9;
 	}
 	.thumb {
 		flex: none;

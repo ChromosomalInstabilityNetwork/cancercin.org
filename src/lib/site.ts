@@ -31,7 +31,7 @@ export const NAV: NavItem[] = [
 	{
 		label: 'News & Events',
 		children: [
-			{ label: 'News', href: 'news/' },
+			{ label: 'News and Views', href: 'news/' },
 			{ label: 'Events Calendar', href: 'events/' },
 		],
 	},
