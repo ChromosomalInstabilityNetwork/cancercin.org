@@ -9,10 +9,8 @@
  * hand-curated and kept as is. Bracketed placeholder rows are dropped once real results arrive.
  *
  * Environment (all optional):
- *   PUBMED_QUERY   PubMed search term (default: any of "chromosomal instability", "tumor evolution",
- *                  "tumour evolution", "aneuploidy" AND "cancer", "replication stress",
- *                  "chromosome mis-segregation", "chromosome missegregation",
- *                  "DNA damage response", in title/abstract)
+ *   PUBMED_QUERY   PubMed search term, replacing the default (any of the KEYWORDS below, in
+ *                  title/abstract). The Keyword column is then left empty.
  *   PUBS_MAX       maximum number of most-recent results to keep (default 200)
  *   PUBS_OUT       output file (default src/content/publications.yaml)
  *   NCBI_API_KEY   raises the NCBI rate limit from 3 to 10 requests/second
@@ -21,18 +19,27 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { parse, stringify } from 'yaml';
 
-const QUERY =
-	process.env.PUBMED_QUERY ||
-	[
-		'"chromosomal instability"[Title/Abstract]',
-		'"tumor evolution"[Title/Abstract]',
-		'"tumour evolution"[Title/Abstract]',
-		'("aneuploidy"[Title/Abstract] AND "cancer"[Title/Abstract])',
-		'"replication stress"[Title/Abstract]',
-		'"chromosome mis-segregation"[Title/Abstract]',
-		'"chromosome missegregation"[Title/Abstract]',
-		'"DNA damage response"[Title/Abstract]',
-	].join(' OR ');
+// Each keyword is searched in titles and abstracts. `label` is what the Keyword column shows.
+const KEYWORDS = [
+	{ label: 'chromosomal instability', query: '"chromosomal instability"[Title/Abstract]' },
+	{
+		label: 'tumor evolution',
+		query: '("tumor evolution"[Title/Abstract] OR "tumour evolution"[Title/Abstract])',
+	},
+	{
+		label: 'aneuploidy + cancer',
+		query: '("aneuploidy"[Title/Abstract] AND "cancer"[Title/Abstract])',
+	},
+	{ label: 'replication stress', query: '"replication stress"[Title/Abstract]' },
+	{
+		label: 'chromosome mis-segregation',
+		query:
+			'("chromosome mis-segregation"[Title/Abstract] OR "chromosome missegregation"[Title/Abstract])',
+	},
+	{ label: 'DNA damage response', query: '"DNA damage response"[Title/Abstract]' },
+];
+// A PUBMED_QUERY override replaces the whole search; the Keyword column is then left empty.
+const QUERY = process.env.PUBMED_QUERY || KEYWORDS.map((k) => k.query).join(' OR ');
 const MAX = parseInt(process.env.PUBS_MAX || '200', 10);
 const OUT = process.env.PUBS_OUT || 'src/content/publications.yaml';
 const HEADER =
@@ -111,12 +118,32 @@ function authorList(authors = []) {
 	return `${names.slice(0, MAX_AUTHORS).join(', ')}, et al.`;
 }
 
+/** Which of the KEYWORDS does each publication satisfy? PubMed doesn't say, so ask once per keyword. */
+async function tagKeywords(ids) {
+	const tags = new Map(ids.map((id) => [id, []]));
+	if (process.env.PUBMED_QUERY) return tags;
+	for (const kw of KEYWORDS) {
+		for (let i = 0; i < ids.length; i += 100) {
+			const batch = ids.slice(i, i + 100);
+			const only = batch.map((id) => `${id}[uid]`).join(' OR ');
+			const res = await get('esearch.fcgi', {
+				term: `(${kw.query}) AND (${only})`,
+				retmax: String(batch.length),
+			});
+			for (const id of res.esearchresult.idlist) tags.get(id)?.push(kw.label);
+			await sleep(API_KEY ? 110 : 400);
+		}
+	}
+	return tags;
+}
+
 async function fetchPubMed() {
 	const search = await get('esearch.fcgi', { term: QUERY, retmax: String(MAX), sort: 'pub_date' });
 	const ids = search.esearchresult.idlist;
 	console.log(
 		`PubMed matched ${search.esearchresult.count} records; keeping the ${ids.length} newest.`,
 	);
+	const tags = await tagKeywords(ids);
 	const rows = [];
 	for (let i = 0; i < ids.length; i += 100) {
 		const batch = ids.slice(i, i + 100);
@@ -131,6 +158,7 @@ async function fetchPubMed() {
 				title: clean(r.title).replace(/\.$/, ''),
 				authors: authorList(r.authors),
 				journal: r.source,
+				keywords: tags.get(id) ?? [],
 				url: `https://pubmed.ncbi.nlm.nih.gov/${id}/`,
 			});
 		}

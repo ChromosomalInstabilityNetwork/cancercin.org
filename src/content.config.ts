@@ -61,6 +61,7 @@ const publications = defineCollection({
 			.regex(/^\d{4}(-\d{2}(-\d{2})?)?$/)
 			.optional(),
 		year: z.number().int().optional(), // legacy: use date
+		keywords: z.array(z.string()).default([]), // search keywords this publication matched
 		url: z.url().optional(),
 		topic: z.enum(['causes', 'detection', 'clinical']).optional(), // not shown for now
 		featured: z.boolean().default(false),

@@ -26,7 +26,6 @@ const rows = all
 	);
 
 const years = [...new Set(rows.map((p) => parts(p).y).filter(Boolean))].sort().reverse();
-const journals = [...new Set(rows.map((p) => p.data.journal))].sort();
 ---
 
 <BaseLayout
@@ -45,7 +44,12 @@ const journals = [...new Set(rows.map((p) => p.data.journal))].sort();
 		<form class="filters" data-filters hidden onsubmit="return false">
 			<div class="field search">
 				<label for="f-q">Search</label>
-				<input id="f-q" type="search" placeholder="Title, author, or journal" autocomplete="off" />
+				<input
+					id="f-q"
+					type="search"
+					placeholder="Title, author, journal, or keyword"
+					autocomplete="off"
+				/>
 			</div>
 			<div class="field">
 				<label for="f-year">Year</label>
@@ -53,15 +57,6 @@ const journals = [...new Set(rows.map((p) => p.data.journal))].sort();
 					<option value="">All years</option>
 					{years.map((y) => (
 						<option value={y}>{y}</option>
-					))}
-				</select>
-			</div>
-			<div class="field">
-				<label for="f-journal">Journal</label>
-				<select id="f-journal">
-					<option value="">All journals</option>
-					{journals.map((j) => (
-						<option value={j}>{j}</option>
 					))}
 				</select>
 			</div>
@@ -80,14 +75,14 @@ const journals = [...new Set(rows.map((p) => p.data.journal))].sort();
 						<th scope="col">Title</th>
 						<th scope="col">Authors</th>
 						<th scope="col">Journal</th>
+						<th scope="col">Keyword</th>
 					</tr>
 				</thead>
 				<tbody>
 					{rows.map((p) => (
 						<tr
 							data-year={parts(p).y}
-							data-journal={p.data.journal}
-							data-text={`${p.data.title} ${p.data.authors} ${p.data.journal}`.toLowerCase()}
+							data-text={`${p.data.title} ${p.data.authors} ${p.data.journal} ${p.data.keywords.join(' ')}`.toLowerCase()}
 						>
 							<td data-label="Date" class="date">
 								<time datetime={parts(p).y ? parts(p).key.replace(/-00/g, '') : undefined}>
@@ -99,6 +94,13 @@ const journals = [...new Set(rows.map((p) => p.data.journal))].sort();
 							</td>
 							<td data-label="Authors">{p.data.authors}</td>
 							<td data-label="Journal">{p.data.journal}</td>
+							<td data-label="Keyword" class="kw">
+								<div class="chips">
+									{p.data.keywords.map((k) => (
+										<span class="chip">{k}</span>
+									))}
+								</div>
+							</td>
 						</tr>
 					))}
 				</tbody>
@@ -117,28 +119,51 @@ const journals = [...new Set(rows.map((p) => p.data.journal))].sort();
 		form.hidden = false;
 		const q = form.querySelector<HTMLInputElement>('#f-q')!;
 		const year = form.querySelector<HTMLSelectElement>('#f-year')!;
-		const journal = form.querySelector<HTMLSelectElement>('#f-journal')!;
 		const rows = Array.from(document.querySelectorAll<HTMLTableRowElement>('tbody tr'));
 		const count = document.querySelector<HTMLElement>('[data-count]')!;
 		const empty = document.querySelector<HTMLElement>('[data-empty]')!;
 		count.hidden = false;
 
-		const apply = () => {
+		// Rows are all in the page, but only the first PAGE are shown; more are revealed on scroll.
+		const PAGE = 40;
+		let limit = PAGE;
+		let matches = 0;
+
+		const apply = (resetLimit = true) => {
+			if (resetLimit) limit = PAGE;
 			const text = q.value.trim().toLowerCase();
-			let shown = 0;
+			matches = 0;
 			for (const r of rows) {
 				const ok =
 					(!text || r.dataset.text!.includes(text)) &&
-					(!year.value || r.dataset.year === year.value) &&
-					(!journal.value || r.dataset.journal === journal.value);
-				r.hidden = !ok;
-				if (ok) shown++;
+					(!year.value || r.dataset.year === year.value);
+				if (ok) matches++;
+				r.hidden = !ok || matches > limit;
 			}
-			count.textContent = `Showing ${shown} of ${rows.length} publications`;
-			empty.hidden = shown > 0;
+			const shown = Math.min(matches, limit);
+			count.textContent = `Showing ${shown} of ${matches} publication${matches === 1 ? '' : 's'}`;
+			empty.hidden = matches > 0;
+			more.hidden = matches <= limit;
 		};
-		form.addEventListener('input', apply);
-		form.addEventListener('reset', () => setTimeout(apply));
+
+		// An invisible marker under the table: scrolling it into view loads the next page.
+		const more = document.createElement('div');
+		more.className = 'more';
+		more.setAttribute('aria-hidden', 'true');
+		more.hidden = true;
+		empty.before(more);
+		new IntersectionObserver(
+			(entries) => {
+				if (entries.some((e) => e.isIntersecting) && matches > limit) {
+					limit += PAGE;
+					apply(false);
+				}
+			},
+			{ rootMargin: '600px' },
+		).observe(more);
+
+		form.addEventListener('input', () => apply());
+		form.addEventListener('reset', () => setTimeout(() => apply()));
 		apply();
 	}
 </script>
@@ -169,6 +194,7 @@ const journals = [...new Set(rows.map((p) => p.data.journal))].sort();
 	.filters[hidden],
 	[data-count][hidden],
 	[data-empty][hidden],
+	.more[hidden],
 	tr[hidden] {
 		display: none;
 	}
@@ -230,6 +256,20 @@ const journals = [...new Set(rows.map((p) => p.data.journal))].sort();
 		vertical-align: top;
 		border-bottom: 1px solid var(--border);
 	}
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+	}
+	.chip {
+		padding: 1px 8px;
+		font-size: 12px;
+		line-height: 1.6;
+		color: var(--accent);
+		background: #f6eef4;
+		border-radius: 999px;
+		white-space: nowrap;
+	}
 	td.date {
 		white-space: nowrap;
 	}
@@ -244,6 +284,9 @@ const journals = [...new Set(rows.map((p) => p.data.journal))].sort();
 	}
 	tbody tr:hover {
 		background: #faf9fc;
+	}
+	.more {
+		height: 1px;
 	}
 	.empty {
 		padding: 24px 12px;
