@@ -30,8 +30,8 @@ pages is in `src/pages/about/` and `src/data/`.
 
 ### Adding yourself to the directory
 
-Add an entry to `people.yaml` with your name, institution and **institutional** address (not a home
-address). Only add people who have agreed to be listed. Set `show_on_map: false` to appear in the
+Add an entry to `people.yaml` with your name, institution, and city, state or province (if applicable) and
+country. Please don't add street addresses. Only add people who have agreed to be listed. Set `show_on_map: false` to appear in the
 directory without a pin on the map. Leave `lat` and `lng` out; a maintainer will run the geocoder. You can also add `website`, `bluesky`, `x` and `linkedin` (full URLs); they show as small icons under your name.
 
 ### Images

@@ -29,7 +29,7 @@ import { url } from '../lib/url';
 		id: string;
 		name: string;
 		institution: string;
-		address: string;
+		location: string;
 		photo: string;
 		coords: [number, number];
 	};
@@ -255,7 +255,7 @@ import { url } from '../lib/url';
 		el.append(name);
 		for (const [text, cls] of [
 			[p.institution, ''],
-			[p.address, 'pm-pop-addr'],
+			[p.location, 'pm-pop-addr'],
 		]) {
 			if (!text) continue;
 			const d = document.createElement('div');

@@ -42,7 +42,8 @@ data are bracketed placeholders (`[Name 1]`) and should be replaced with real, v
 - id: jane-doe # unique, URL-safe; also the #anchor used by links from the home page
   name: 'Jane Doe'
   institution: 'Example University'
-  address: '1 Example Way, City, Country' # institutional address
+  city: 'City' # location is city / state / country; no street addresses
+  state: 'State' # optional, where it applies
   country: 'Country'
   photo: people/jane-doe.jpg # optional; file in public/people/
   website: 'https://…' # optional links, shown as icons under the person (full URLs)
@@ -53,7 +54,7 @@ data are bracketed placeholders (`[Name 1]`) and should be replaced with real, v
   # lat / lng are filled in by `npm run geocode`, or set by hand (never overwritten)
 ```
 
-People without an address have no pin. The directory and the home-page "Our community" bubbles
+People without a city and country have no pin. The directory and the home-page "Our community" bubbles
 both come from this file. If a person has a `website`, their name in the directory links to it.
 
 **Event**: a Markdown file in `src/content/events/`. The body is the description.
@@ -132,10 +133,10 @@ GEOCODE_CONTACT=you@example.org node scripts/geocode.mjs --dry-run
 It only fills in people with no `lat`/`lng`, so coordinates you set by hand are never overwritten. It
 uses [Nominatim](https://nominatim.org/release-docs/latest/api/Search/) at one request per second
 (its usage policy), caches results in `.geocode-cache.json` (commit it so re-runs never re-query), and
-prints a table of address, coordinates and matched place so you can spot bad matches. To use a
+prints a table of query, coordinates and matched place so you can spot bad matches. To use a
 different provider, replace the `provider` object in `scripts/geocode.mjs`; read any API key from an
-environment variable and never commit it. Pins show institutional addresses only. Get consent before
-publishing names and addresses.
+environment variable and never commit it. It looks people up by institution, city, state and country; no street addresses are stored.
+Get consent before publishing names and locations.
 
 **Changing the map style or provider:** the style URL is in
 [`src/lib/mapConfig.ts`](src/lib/mapConfig.ts); the style is used as published, with no recolouring. The

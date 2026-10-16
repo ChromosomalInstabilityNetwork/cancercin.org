@@ -6,11 +6,12 @@ import PeopleMap from '../../components/PeopleMap.astro';
 import PersonAvatar from '../../components/PersonAvatar.astro';
 import SocialLinks from '../../components/SocialLinks.astro';
 import { mailto, CONTACT_EMAIL } from '../../lib/site';
+import { locationText } from '../../lib/people';
 
 const people = (await getCollection('people')).sort((a, b) =>
 	a.data.name.localeCompare(b.data.name, undefined, { numeric: true }),
 );
-const addBody = 'Name:\nInstitution:\nAddress:\n';
+const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and country:\n';
 ---
 
 <BaseLayout
@@ -45,7 +46,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 				<h1>People</h1>
 				<Card class="add" title="Would you like to be added?" headingLevel="h2">
 					<p>
-						Email your name, institution, and address to{' '}
+						Email your name, institution, and location (city and country) to{' '}
 						<a href={mailto('Add me to the CIN people directory', addBody)}>{CONTACT_EMAIL}</a>.
 					</p>
 				</Card>
@@ -90,7 +91,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 										)}
 									</span>
 									{p.data.institution && <span class="inst">{p.data.institution}</span>}
-									{p.data.address && <span class="addr">{p.data.address}</span>}
+									{locationText(p.data) && <span class="addr">{locationText(p.data)}</span>}
 								</span>
 							</div>
 							<div class="links">

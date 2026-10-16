@@ -7,8 +7,8 @@
  * - Only entries with no lat/lng are geocoded; existing coordinates (including
  *   manual overrides) are never overwritten.
  * - Results are cached in .geocode-cache.json (committed) so reruns never re-query.
- * - Run locally, never in CI or in visitors' browsers. Use institutional
- *   addresses, not home addresses.
+ * - Run locally, never in CI or in visitors' browsers. It looks people up by institution, city,
+ *   state and country (no street addresses are stored).
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { parseDocument } from 'yaml';
@@ -50,19 +50,11 @@ for (const item of doc.contents.items) {
 	const get = (k) => item.get(k);
 	if (get('lat') !== undefined && get('lng') !== undefined) continue;
 
-	const address = get('address');
-	if (!address && !get('institution')) continue; // nothing to look up
-	const parts = String(address ?? '')
-		.split(',')
-		.map((p) => p.trim())
-		.filter(Boolean);
-	// Most specific first; street/suite details often fail, so fall back to a coarser place.
-	const queries = [
-		address,
-		[get('institution')?.split(';')[0], get('city'), get('country')].filter(Boolean).join(', '),
-		parts.slice(-3).join(', '),
-		parts.slice(-2).join(', '),
-	].filter((q, i, a) => q && a.indexOf(q) === i);
+	const place = [get('city'), get('state'), get('country')].filter(Boolean).join(', ');
+	if (!place) continue; // nothing to look up
+	// Institution first (usually finds the building), then just the city.
+	const institution = get('institution')?.split(';')[0].split(',').pop()?.trim();
+	const queries = [institution ? `${institution}, ${place}` : '', place].filter(Boolean);
 	let result = null;
 	let usedQuery = '';
 	for (const q of queries.filter(Boolean)) {

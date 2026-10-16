@@ -1,5 +1,5 @@
 # Directory of iCIN members, from the group-leader list. Add people here.
-# Only list people who have agreed. `address` should be institutional, never a home address.
+# Only list people who have agreed. Locations are city / state (if any) / country: no street addresses.
 # lat/lng are filled in by `npm run geocode` (or set by hand; never overwritten).
 # Links (website, x, linkedin, bluesky) are optional full URLs and show as icons under the person.
 
@@ -7,7 +7,8 @@
   name: 'Pippa F. Cosper'
   institution: 'Dept. of Human Oncology, University of Wisconsin School of
     Medicine and Public Health; University of Wisconsin Carbone Cancer Center'
-  address: '1111 Highland Ave, WIMR I 3057, Madison, WI 53705, USA'
+  city: 'Madison'
+  state: 'WI'
   country: 'USA'
   website: 'https://radmed.wisc.edu/2026/05/14/the-cosper-lab-kedar-copy/'
   x: 'https://x.com/pipcosper'
@@ -19,7 +20,8 @@
   name: 'Sarah J. Aitken'
   institution: 'Center of Molecular and Cellular Oncology, Yale Cancer Center;
     Dept. of Pathology, Yale University School of Medicine'
-  address: '300 George Street, New Haven, CT 06511, USA'
+  city: 'New Haven'
+  state: 'CT'
   country: 'USA'
   website: 'https://www.aitkenlab.org'
   linkedin: 'https://www.linkedin.com/in/sarah-j-aitken'
@@ -31,7 +33,8 @@
   name: 'Sam Aparicio'
   institution: 'Dept. of Pathology and Laboratory Medicine, University of British
     Columbia; BC Cancer'
-  address: '675 W 10th Avenue, Vancouver, Canada'
+  city: 'Vancouver'
+  state: 'BC'
   country: 'Canada'
   show_on_map: true
   lat: 49.26259
@@ -40,7 +43,8 @@
   name: 'Samuel Bakhoum'
   institution: 'Volastra Therapeutics Inc.; Dept. of Radiation Oncology, Geisel
     School of Medicine at Dartmouth'
-  address: '1361 Amsterdam Ave, Suite 520, New York, NY 10027, USA'
+  city: 'New York'
+  state: 'NY'
   country: 'USA'
   website: 'https://www.volastratx.com/our-team/samuel-bakhoum/'
   x: 'https://x.com/Samuel_Bakhoum'
@@ -51,7 +55,7 @@
 - id: francisco-m-barriga
   name: 'Francisco M. Barriga'
   institution: "Systems Oncology Program, Vall d'Hebron Institute of Oncology (VHIO)"
-  address: 'C/ Natzaret 115, Barcelona, Spain'
+  city: 'Barcelona'
   country: 'Spain'
   website: 'https://barrigalab.net/'
   linkedin: 'https://www.linkedin.com/in/francisco-barriga-02878072/'
@@ -61,7 +65,7 @@
 - id: uri-ben-david
   name: 'Uri Ben-David'
   institution: 'Tel Aviv University'
-  address: 'Tel Aviv 6997801, Israel'
+  city: 'Tel Aviv'
   country: 'Israel'
   website: 'https://www.bendavidlab.com'
   x: 'https://x.com/BenDavidLab'
@@ -73,7 +77,7 @@
   name: 'James D. Brenton'
   institution: 'Dept. of Oncology, University of Cambridge; Cancer Research UK
     Cambridge Institute'
-  address: 'Li Ka Shing Centre, Robinson Way, Cambridge CB2 0RE, UK'
+  city: 'Cambridge'
   country: 'UK'
   show_on_map: true
   lat: 52.17842
@@ -81,7 +85,7 @@
 - id: isidro-cortes-ciriano
   name: 'Isidro Cortes-Ciriano'
   institution: 'EMBL-EBI; Wellcome Sanger Institute'
-  address: 'Wellcome Genome Campus, Hinxton CB10 1SA, UK'
+  city: 'Hinxton'
   country: 'UK'
   website: 'https://www.paediatrics.ox.ac.uk/research/little-princess-trust-professor-of-paediatric-oncology'
   x: 'https://x.com/isidrolauscher'
@@ -92,7 +96,7 @@
 - id: felipe-cortes-ledesma
   name: 'Felipe Cortés-Ledesma'
   institution: 'Spanish National Cancer Research Centre (CNIO)'
-  address: 'Melchor Fernández Almagro 3, 28029 Madrid, Spain'
+  city: 'Madrid'
   country: 'Spain'
   show_on_map: true
   lat: 40.47669
@@ -100,7 +104,8 @@
 - id: christina-curtis
   name: 'Christina Curtis'
   institution: 'Stanford University'
-  address: '265 Campus Drive, Stanford, CA 94305, USA'
+  city: 'Stanford'
+  state: 'CA'
   country: 'USA'
   show_on_map: true
   lat: 37.43275
@@ -108,7 +113,8 @@
 - id: teresa-davoli
   name: 'Teresa Davoli'
   institution: 'NYU Langone Health'
-  address: '435 E 30th Street, New York, NY 10016, USA'
+  city: 'New York'
+  state: 'NY'
   country: 'USA'
   show_on_map: true
   lat: 40.74101
@@ -116,7 +122,7 @@
 - id: aurelie-ernst
   name: 'Aurélie Ernst'
   institution: 'German Cancer Research Center (DKFZ); German Cancer Consortium (DKTK)'
-  address: 'Im Neuenheimer Feld 580, 69115 Heidelberg, Germany'
+  city: 'Heidelberg'
   country: 'Germany'
   website: 'https://www.dkfz.de/en/genome-instability-in-tumors'
   show_on_map: true
@@ -126,7 +132,7 @@
   name: 'Ailith Ewing'
   institution: 'MRC Human Genetics Unit, Institute of Genetics and Cancer,
     University of Edinburgh; CRUK Scotland Centre'
-  address: 'Crewe Road South, Edinburgh EH4 2XU, UK'
+  city: 'Edinburgh'
   country: 'UK'
   show_on_map: true
   lat: 55.96322
@@ -134,7 +140,7 @@
 - id: daniele-fachinetti
   name: 'Daniele Fachinetti'
   institution: 'Institut Curie'
-  address: "26 rue d'Ulm, 75005 Paris, France"
+  city: 'Paris'
   country: 'France'
   website: 'https://institut-curie.org/team/fachinetti'
   linkedin: 'https://www.linkedin.com/in/daniele-fachinetti-73085134/'
@@ -145,8 +151,7 @@
 - id: rebecca-c-fitzgerald
   name: 'Rebecca C. Fitzgerald'
   institution: 'Early Cancer Institute, Dept. of Oncology, University of Cambridge'
-  address: 'Hutchison/MRC Research Centre, Box 197, Cambridge Biomedical Campus,
-    Cambridge CB2 0XZ, UK'
+  city: 'Cambridge'
   country: 'UK'
   show_on_map: true
   lat: 52.17369
@@ -155,7 +160,7 @@
   name: 'Floris Foijer'
   institution: 'European Research Institute for the Biology of Ageing, University
     of Groningen / UMCG'
-  address: 'Antonius Deusinglaan 1, 9713 AV Groningen, Netherlands'
+  city: 'Groningen'
   country: 'Netherlands'
   website: 'https://eriba.umcg.nl/groups/genomic-instability-in-development-and-disease/'
   x: 'https://x.com/Foijer_lab'
@@ -167,7 +172,7 @@
 - id: trevor-a-graham
   name: 'Trevor A. Graham'
   institution: 'Institute of Cancer Research (ICR)'
-  address: '15 Cotswold Road, Sutton, London SM2 5NG, UK'
+  city: 'London'
   country: 'UK'
   show_on_map: true
   lat: 51.34518
@@ -175,7 +180,8 @@
 - id: marcin-imielinski
   name: 'Marcin Imielinski'
   institution: 'NYU Grossman School of Medicine; New York Genome Center'
-  address: '550 1st Avenue, New York, NY 10016, USA'
+  city: 'New York'
+  state: 'NY'
   country: 'USA'
   show_on_map: true
   lat: 40.74207
@@ -184,7 +190,7 @@
   name: 'Andrew P. Jackson'
   institution: 'MRC Human Genetics Unit, Institute of Genetics and Cancer,
     University of Edinburgh'
-  address: 'Crewe Road South, Edinburgh EH4 2XU, UK'
+  city: 'Edinburgh'
   country: 'UK'
   show_on_map: true
   lat: 55.96322
@@ -193,7 +199,7 @@
   name: 'Stephen P. Jackson'
   institution: 'Cancer Research UK Cambridge Institute and Dept. of Biochemistry,
     University of Cambridge'
-  address: 'Li Ka Shing Centre, Robinson Way, Cambridge CB2 0RE, UK'
+  city: 'Cambridge'
   country: 'UK'
   show_on_map: true
   lat: 52.17842
@@ -201,7 +207,7 @@
 - id: jan-oliver-korbel
   name: 'Jan Oliver Korbel'
   institution: 'European Molecular Biology Laboratory (EMBL)'
-  address: 'Meyerhofstr. 1, 69117 Heidelberg, Germany'
+  city: 'Heidelberg'
   country: 'Germany'
   show_on_map: true
   lat: 49.38375
@@ -209,7 +215,8 @@
 - id: john-maciejowski
   name: 'John Maciejowski'
   institution: 'Memorial Sloan Kettering Cancer Center'
-  address: '1275 York Avenue, New York, NY 10065, USA'
+  city: 'New York'
+  state: 'NY'
   country: 'USA'
   website: 'https://maciejowskilab.org/'
   linkedin: 'https://www.linkedin.com/in/john-maciejowski-b776808/'
@@ -219,7 +226,7 @@
 - id: geoff-macintyre
   name: 'Geoff Macintyre'
   institution: 'Spanish National Cancer Research Centre (CNIO)'
-  address: 'Melchor Fernández Almagro 3, 28029 Madrid, Spain'
+  city: 'Madrid'
   country: 'Spain'
   website: 'https://macintyrelab.org'
   x: 'https://x.com/gjmacintyre'
@@ -232,7 +239,8 @@
   name: 'David Pellman'
   institution: 'Dept. of Cell Biology, Harvard Medical School; Dept. of Pediatric
     Oncology, Dana-Farber Cancer Institute; Howard Hughes Medical Institute'
-  address: '450 Brookline Ave, Boston, MA 02215, USA'
+  city: 'Boston'
+  state: 'MA'
   country: 'USA'
   website: 'https://labs.dana-farber.org/pellmanlab/'
   show_on_map: true
@@ -242,7 +250,7 @@
   name: 'Eva Petermann'
   institution: 'Dept. of Cancer and Genomic Sciences, University of Birmingham;
     Birmingham Centre for Genome Biology'
-  address: 'Edgbaston, Birmingham B15 2TT, UK'
+  city: 'Birmingham'
   country: 'UK'
   website: 'https://www.evapetermann.org/'
   linkedin: 'https://www.linkedin.com/in/eva-petermann-996985134/'
@@ -254,7 +262,7 @@
   name: 'Nischalan Pillay'
   institution: 'Dept. of Research Pathology, UCL Cancer Institute; Royal National
     Orthopaedic Hospital NHS Trust'
-  address: 'Gower Street, London WC1E 6BT, UK'
+  city: 'London'
   country: 'UK'
   website: 'https://www.sarcoma-research.com/'
   linkedin: 'https://www.linkedin.com/in/nischalan-pillay-681663340'
@@ -265,7 +273,7 @@
   name: 'Stefano Santaguida'
   institution: 'Dept. of Experimental Oncology, European Institute of Oncology
     IRCCS; Dept. of Oncology and Hemato-Oncology, University of Milan'
-  address: 'Via Adamello 16, 20139 Milan, Italy'
+  city: 'Milan'
   country: 'Italy'
   website: 'https://www.santaguidalab.org'
   x: 'https://x.com/SteSantaguida'
@@ -277,7 +285,7 @@
 - id: roland-schwarz
   name: 'Roland Schwarz'
   institution: 'Institute for Computational Cancer Biology, University of Cologne'
-  address: 'Cologne, Germany'
+  city: 'Cologne'
   country: 'Germany'
   show_on_map: true
   lat: 50.93836
@@ -285,7 +293,7 @@
 - id: christine-sers
   name: 'Christine Sers'
   institution: 'Charité – Universitätsmedizin Berlin'
-  address: 'Charitéplatz 1, 10117 Berlin, Germany'
+  city: 'Berlin'
   country: 'Germany'
   website: 'https://pathologie-ccm.charite.de/en/research/research_group_sers_molecular_tumor_pathology/'
   show_on_map: true
@@ -294,7 +302,8 @@
 - id: sohrab-shah
   name: 'Sohrab Shah'
   institution: 'Memorial Sloan Kettering Cancer Center'
-  address: '323 E 61st St, New York, NY 10065, USA'
+  city: 'New York'
+  state: 'NY'
   country: 'USA'
   show_on_map: true
   lat: 40.76144
@@ -302,7 +311,8 @@
 - id: jason-m-sheltzer
   name: 'Jason M. Sheltzer'
   institution: 'Stanford Cancer Institute, Stanford University'
-  address: '450 Jane Stanford Way, Stanford, CA 94305, USA'
+  city: 'Stanford'
+  state: 'CA'
   country: 'USA'
   website: 'https://sheltzerlab.org/'
   x: 'https://x.com/JSheltzer'
@@ -313,7 +323,7 @@
 - id: ofer-shoshani
   name: 'Ofer Shoshani'
   institution: 'Weizmann Institute of Science'
-  address: 'Rehovot 7610001, Israel'
+  city: 'Rehovot'
   country: 'Israel'
   show_on_map: true
   lat: 31.89525
@@ -321,7 +331,7 @@
 - id: andrea-sottoriva
   name: 'Andrea Sottoriva'
   institution: 'Computational Biology Research Centre, Human Technopole'
-  address: 'Viale Rita Levi-Montalcini 1, 20157 Milan, Italy'
+  city: 'Milan'
   country: 'Italy'
   show_on_map: true
   lat: 45.51928
@@ -329,7 +339,8 @@
 - id: roel-g-w-verhaak
   name: 'Roel G.W. Verhaak'
   institution: 'Dept. of Neurosurgery, Yale University'
-  address: '333 Cedar St, New Haven, CT 06510, USA'
+  city: 'New Haven'
+  state: 'CT'
   country: 'USA'
   website: 'https://www.verhaaklab.org'
   linkedin: 'https://www.linkedin.com/in/roel-verhaak-3619829/'
@@ -341,7 +352,8 @@
   name: 'Wenyi Wang'
   institution: 'Dept. of Bioinformatics and Computational Biology, The University
     of Texas MD Anderson Cancer Center'
-  address: '1515 Holcombe Blvd, Houston, TX 77030, USA'
+  city: 'Houston'
+  state: 'TX'
   country: 'USA'
   show_on_map: true
   lat: 29.70767
@@ -350,7 +362,8 @@
   name: 'Peter Van Loo'
   institution: 'Dept. of Genetics and Dept. of Genomic Medicine, The University of
     Texas MD Anderson Cancer Center'
-  address: '1515 Holcombe Blvd, Houston, TX 77030, USA'
+  city: 'Houston'
+  state: 'TX'
   country: 'USA'
   website: 'https://www.mdanderson.org/research/departments-labs-institutes/labs/van-loo-laboratory.html'
   x: 'https://x.com/VanLooLab'
@@ -362,7 +375,7 @@
   name: 'Sarah E. McClelland'
   institution: 'Centre for Cancer Evolution, Barts Cancer Institute, Queen Mary
     University of London'
-  address: 'Charterhouse Square, London EC1M 6BQ, UK'
+  city: 'London'
   country: 'UK'
   show_on_map: true
   lat: 51.5209
@@ -371,7 +384,7 @@
   name: 'Florian Markowetz'
   institution: 'Dept. of Oncology, University of Cambridge; Cancer Research UK
     Cambridge Institute'
-  address: 'Li Ka Shing Centre, Robinson Way, Cambridge CB2 0RE, UK'
+  city: 'Cambridge'
   country: 'UK'
   show_on_map: true
   lat: 52.17842

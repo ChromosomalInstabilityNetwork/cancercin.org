@@ -8,8 +8,8 @@ const people = defineCollection({
 	schema: z.object({
 		name: z.string(),
 		institution: z.string().optional(),
-		address: z.string().optional(),
 		city: z.string().optional(),
+		state: z.string().optional(), // state or province, where it applies
 		country: z.string().optional(),
 		lat: z.number().min(-90).max(90).optional(),
 		lng: z.number().min(-180).max(180).optional(),
