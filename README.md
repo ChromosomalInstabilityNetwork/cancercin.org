@@ -117,7 +117,9 @@ scheduled GitHub Action rebuilds and redeploys it every day (05:15 UTC, see
 The People page shows a directory plus a [MapLibre GL JS](https://maplibre.org) map. MapLibre is
 loaded only on that page, when the map nears the viewport. The directory is plain HTML and works
 without JavaScript. Pins come from `/people.geojson`, built from people who have coordinates and
-`show_on_map: true`.
+`show_on_map: true`. Everyone is drawn as a face at their true location; faces that would overlap are pushed
+apart (with a thin line back to the true spot) by a small collision pass in
+[`PeopleMap.astro`](src/components/PeopleMap.astro), recomputed as you pan and zoom.
 
 **Geocoding** is run by hand, locally; never in CI and never in a visitor's browser:
 

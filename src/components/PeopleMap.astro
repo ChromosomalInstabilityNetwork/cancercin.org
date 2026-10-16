@@ -33,6 +33,15 @@ import { url } from '../lib/url';
 		photo: string;
 		coords: [number, number];
 	};
+	type Marker = {
+		marker: any;
+		root: HTMLElement;
+		face: HTMLElement;
+		line: SVGLineElement;
+		dot: SVGCircleElement;
+		dx: number;
+		dy: number;
+	};
 
 	const wrap = document.getElementById('people-map')!;
 	const canvas = wrap.querySelector<HTMLElement>('[data-map-canvas]')!;
@@ -40,22 +49,21 @@ import { url } from '../lib/url';
 	const scroller = document.querySelector<HTMLElement>('[data-scroll]');
 	const cards = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-person-id]'));
 	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-	const CLUSTER_MAX_ZOOM = 5;
-	const MAX_GROUP = 5; // up to this many people are shown as a row of faces; more as a hex grid
+	const FACE = 44; // px, diameter of a face
+	const MIN_DIST = FACE + 4; // faces are never closer than this (centre to centre)
+	const SELECT_ZOOM = 6;
 	const SILHOUETTE =
 		'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg>';
+	const SVG_NS = 'http://www.w3.org/2000/svg';
 
 	let selected: string | null = null;
 	let map: any;
 	let popup: any;
-	let hoverMarker: any;
 	let lib: typeof import('maplibre-gl');
-	let allData: any;
 	let filterIds: Set<string> | null = null;
+	let hoverId: string | null = null;
 	const people = new Map<string, Person>();
-	const markers = new Map<string, { marker: any; el: HTMLElement }>();
-	const leafCache = new Map<string, string[]>();
-	let renderToken = 0;
+	const markers = new Map<string, Marker>();
 
 	const avatar = (p: Person) => {
 		const span = document.createElement('span');
@@ -72,179 +80,142 @@ import { url } from '../lib/url';
 		return span;
 	};
 
-	// Markers duplicate the directory, which is the accessible equivalent: keep them out of the tab order.
-	const hideFromAT = (el: HTMLElement) => {
-		el.tabIndex = -1;
-		el.setAttribute('aria-hidden', 'true');
-	};
-
-	function markSelected() {
-		for (const { el } of markers.values()) {
-			const hasSelected = !!selected && !!el.querySelector(`[data-person="${selected}"]`);
-			el.classList.toggle('pm-selected', hasSelected || el.dataset.person === selected);
-			for (const n of el.querySelectorAll<HTMLElement>('[data-person]')) {
-				n.classList.toggle('is-selected', n.dataset.person === selected);
-			}
-		}
-	}
-
 	function toggle(id: string, scroll: boolean) {
 		setSelected(selected === id ? null : id, { scroll });
 	}
 
-	function pinEl(p: Person) {
-		const el = document.createElement('button');
-		el.type = 'button';
-		el.className = 'pm-pin';
-		el.dataset.person = p.id;
-		el.append(avatar(p));
-		hideFromAT(el);
-		el.addEventListener('click', (e) => {
+	/** One marker per person, anchored at their true position; the face may be pushed aside. */
+	function makeMarker(p: Person): Marker {
+		const root = document.createElement('div');
+		root.className = 'pm-m'; // zero-sized, sits exactly on the person's location
+		root.dataset.person = p.id;
+
+		const svg = document.createElementNS(SVG_NS, 'svg');
+		svg.setAttribute('class', 'pm-leader');
+		svg.setAttribute('aria-hidden', 'true');
+		const line = document.createElementNS(SVG_NS, 'line');
+		const dot = document.createElementNS(SVG_NS, 'circle');
+		dot.setAttribute('r', '3.5');
+		svg.append(line, dot);
+
+		// Markers duplicate the directory, which is the accessible equivalent: keep them out of the tab order.
+		const face = document.createElement('button');
+		face.type = 'button';
+		face.className = 'pm-pin';
+		face.tabIndex = -1;
+		face.setAttribute('aria-hidden', 'true');
+		face.dataset.person = p.id;
+		face.append(avatar(p));
+		const label = document.createElement('span');
+		label.className = 'pm-label';
+		label.textContent = p.name;
+		face.append(label);
+		face.addEventListener('click', (e) => {
 			e.stopPropagation();
 			toggle(p.id, true);
 		});
-		return el;
-	}
 
-	function groupEl(ids: string[]) {
-		const el = document.createElement('div');
-		el.className = 'pm-group';
-		for (const id of ids) {
-			const p = people.get(id);
-			if (p) el.append(miniEl(p));
-		}
-		return el;
-	}
-
-	function miniEl(p: Person) {
-		const b = document.createElement('button');
-		b.type = 'button';
-		b.className = 'pm-mini';
-		b.dataset.person = p.id;
-		b.append(avatar(p));
-		hideFromAT(b);
-		b.addEventListener('click', (e) => {
-			e.stopPropagation();
-			toggle(p.id, true);
-		});
-		return b;
+		root.append(svg, face);
+		const marker = new lib.Marker({ element: root }).setLngLat(p.coords).addTo(map);
+		return { marker, root, face, line, dot, dx: 0, dy: 0 };
 	}
 
 	/**
-	 * Many people at once: pack their faces in a hex grid centred on the cluster's point. Zooming in
-	 * pulls the cluster apart and each face moves to their real position.
+	 * Push overlapping faces apart. Everyone starts on their true spot (projected to the screen); pairs
+	 * closer than MIN_DIST are separated, with a gentle pull back toward the true spot so the shift stays
+	 * small. A pure function of the positions, so the same view always gives the same result.
 	 */
-	function hexEl(ids: string[]) {
-		const el = document.createElement('div');
-		el.className = 'pm-hex'; // zero-sized and centred on the point; faces are placed around it
-		const dirs = [
-			[1, 0],
-			[1, -1],
-			[0, -1],
-			[-1, 0],
-			[-1, 1],
-			[0, 1],
-		];
-		// Spiral out from the centre, ring by ring (axial hex coordinates).
-		const cells: [number, number][] = [[0, 0]];
-		for (let ring = 1; cells.length < ids.length; ring++) {
-			let q = -ring;
-			let r = ring;
-			for (const [dq, dr] of dirs) {
-				for (let k = 0; k < ring; k++) {
-					cells.push([q, r]);
-					q += dq;
-					r += dr;
+	function separate(pts: { x: number; y: number }[]) {
+		const n = pts.length;
+		const d = pts.map(() => ({ x: 0, y: 0 }));
+		const GOLDEN = 2.399963;
+		for (let iter = 0; iter < 90; iter++) {
+			let moved = false;
+			for (let i = 0; i < n; i++) {
+				for (let j = i + 1; j < n; j++) {
+					let dx = pts[i].x + d[i].x - (pts[j].x + d[j].x);
+					let dy = pts[i].y + d[i].y - (pts[j].y + d[j].y);
+					let dist = Math.hypot(dx, dy);
+					if (dist >= MIN_DIST) continue;
+					if (dist < 0.01) {
+						// exactly the same spot: fan out in a deterministic direction
+						const a = (i * 31 + j) * GOLDEN;
+						dx = Math.cos(a);
+						dy = Math.sin(a);
+						dist = 1;
+					}
+					const push = (MIN_DIST - dist) / 2;
+					const ux = dx / dist;
+					const uy = dy / dist;
+					d[i].x += ux * push;
+					d[i].y += uy * push;
+					d[j].x -= ux * push;
+					d[j].y -= uy * push;
+					moved = true;
+				}
+			}
+			if (!moved) break;
+			if (iter < 60) {
+				// the pull back toward the true spot only runs in the early passes, then it settles
+				for (const o of d) {
+					o.x *= 0.97;
+					o.y *= 0.97;
 				}
 			}
 		}
-		ids.forEach((id, i) => {
-			const p = people.get(id);
-			if (!p) return;
-			const [q, r] = cells[i];
-			const face = miniEl(p);
-			face.style.setProperty('--q', String(q));
-			face.style.setProperty('--r', String(r));
-			el.append(face);
+		return d;
+	}
+
+	let frame = 0;
+	function scheduleLayout() {
+		if (!frame) frame = requestAnimationFrame(layout);
+	}
+
+	function layout() {
+		frame = 0;
+		if (!map) return;
+		const shown: { id: string; m: Marker; x: number; y: number }[] = [];
+		for (const [id, m] of markers) {
+			const on = !filterIds || filterIds.has(id);
+			m.root.hidden = !on;
+			if (!on) continue;
+			const pt = map.project(people.get(id)!.coords);
+			shown.push({ id, m, x: pt.x, y: pt.y });
+		}
+		const offsets = separate(shown);
+		shown.forEach(({ id, m }, i) => {
+			const { x, y } = offsets[i];
+			m.dx = x;
+			m.dy = y;
+			m.face.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+			// A leader line from the true spot to a face that has been moved away from it.
+			const moved = Math.hypot(x, y) > 3;
+			m.line.setAttribute('x2', x.toFixed(1));
+			m.line.setAttribute('y2', y.toFixed(1));
+			m.line.style.display = moved ? '' : 'none';
+			m.dot.style.display = moved ? '' : 'none';
+			m.root.classList.toggle('pm-moved', moved);
+			if (id === selected) positionPopup(m);
 		});
-		return el;
 	}
 
-	async function leaves(clusterId: number, count: number): Promise<string[]> {
-		const key = `${clusterId}:${count}`;
-		const cached = leafCache.get(key);
-		if (cached) return cached;
-		const fs = await map.getSource('people').getClusterLeaves(clusterId, count, 0);
-		const ids: string[] = fs.map((f: any) => f.properties.id);
-		leafCache.set(key, ids);
-		return ids;
+	function positionPopup(m: Marker) {
+		popup?.setOffset([m.dx, m.dy - FACE / 2 - 8]);
 	}
 
-	/** Draw people as faces: single people as a bubble, 2-5 close together as a row, more as a count. */
-	async function renderMarkers() {
-		if (!map?.getLayer('pins-q')) return;
-		const token = ++renderToken;
-		const want = new Map<string, { coords: [number, number]; make: () => HTMLElement }>();
-		const stacks = new Map<string, { coords: [number, number]; ids: string[] }>();
-		const seen = new Set<string>();
-
-		for (const f of map.queryRenderedFeatures({ layers: ['clusters-q', 'pins-q'] })) {
-			const pr = f.properties;
-			const coords = f.geometry.coordinates as [number, number];
-			if (pr.cluster) {
-				if (seen.has(`c${pr.cluster_id}`)) continue;
-				seen.add(`c${pr.cluster_id}`);
-				const n = pr.point_count as number;
-				if (n <= MAX_GROUP) {
-					const ids = await leaves(pr.cluster_id, n);
-					want.set(`g:${[...ids].sort().join(',')}`, { coords, make: () => groupEl(ids) });
-				} else {
-					const ids = await leaves(pr.cluster_id, n);
-					want.set(`h:${[...ids].sort().join(',')}`, { coords, make: () => hexEl(ids) });
-				}
-			} else {
-				if (seen.has(pr.id)) continue;
-				seen.add(pr.id);
-				const key = coords.map((c) => c.toFixed(5)).join(',');
-				const stack = stacks.get(key) ?? { coords, ids: [] };
-				stack.ids.push(pr.id);
-				stacks.set(key, stack);
-			}
+	function markState() {
+		for (const [id, m] of markers) {
+			m.root.classList.toggle('pm-selected', id === selected);
+			m.face.classList.toggle('is-selected', id === selected);
+			m.root.classList.toggle('pm-hovered', id === hoverId);
 		}
-		// People at exactly the same place can never be pulled apart by zooming: show them together.
-		for (const { coords, ids } of stacks.values()) {
-			if (ids.length === 1) {
-				const p = people.get(ids[0]);
-				if (p) want.set(`p:${p.id}`, { coords, make: () => pinEl(p) });
-			} else if (ids.length <= MAX_GROUP) {
-				want.set(`g:${[...ids].sort().join(',')}`, { coords, make: () => groupEl(ids) });
-			} else {
-				want.set(`h:${[...ids].sort().join(',')}`, { coords, make: () => hexEl(ids) });
-			}
-		}
-		if (token !== renderToken) return; // a newer render superseded this one
-
-		for (const [key, m] of markers) {
-			if (!want.has(key)) {
-				m.marker.remove();
-				markers.delete(key);
-			}
-		}
-		for (const [key, w] of want) {
-			if (markers.has(key)) continue;
-			const el = w.make();
-			if (el.dataset.person === undefined) el.removeAttribute('data-person');
-			const marker = new lib.Marker({ element: el }).setLngLat(w.coords).addTo(map);
-			markers.set(key, { marker, el });
-		}
-		markSelected();
 	}
 
 	function setSelected(id: string | null, opts: { scroll?: boolean } = {}) {
 		popup?.remove();
 		selected = id;
 		for (const c of cards) c.setAttribute('aria-pressed', String(c.dataset.personId === id));
-		markSelected();
+		markState();
 		if (!id) return;
 
 		const card = cards.find((c) => c.dataset.personId === id);
@@ -261,7 +232,7 @@ import { url } from '../lib/url';
 
 		const p = people.get(id);
 		if (!map || !p) return;
-		const target = { center: p.coords, zoom: Math.max(map.getZoom(), CLUSTER_MAX_ZOOM + 1) };
+		const target = { center: p.coords, zoom: Math.max(map.getZoom(), SELECT_ZOOM) };
 		if (reduceMotion.matches) map.jumpTo(target);
 		else map.flyTo({ ...target, speed: 0.8, essential: false });
 
@@ -283,74 +254,44 @@ import { url } from '../lib/url';
 		// Reuse the directory's link icons so the callout always matches the list.
 		const links = document.querySelector(`#${CSS.escape(id)} .links .social`);
 		if (links) el.append(links.cloneNode(true));
-		popup = new lib.Popup({ offset: 36, maxWidth: '280px', closeButton: false })
+		popup = new lib.Popup({ offset: 0, maxWidth: '280px', closeButton: false })
 			.setLngLat(p.coords)
 			.setDOMContent(el)
 			.addTo(map);
+		const m = markers.get(id);
+		if (m) positionPopup(m);
 	}
 
-	/** Show a person on the map while their card is hovered, even if they are inside a group. */
-	function showHover(id: string) {
-		hideHover();
-		const p = people.get(id);
-		if (!map || !p || !wrap.offsetParent) return;
-		const el = document.createElement('div');
-		el.className = 'pm-hover';
-		el.append(avatar(p));
-		const label = document.createElement('span');
-		label.className = 'pm-hover-label';
-		label.textContent = p.name;
-		el.append(label);
-		hoverMarker = new lib.Marker({ element: el }).setLngLat(p.coords).addTo(map);
-	}
-	function hideHover() {
-		hoverMarker?.remove();
-		hoverMarker = null;
+	function setHover(id: string | null) {
+		hoverId = id;
+		markState();
 	}
 
 	for (const c of cards) {
 		const id = c.dataset.personId!;
 		c.addEventListener('click', () => toggle(id, false));
 		const row = c.closest('li') ?? c;
-		row.addEventListener('pointerenter', () => showHover(id));
-		row.addEventListener('pointerleave', hideHover);
-		c.addEventListener('focus', () => showHover(id));
-		c.addEventListener('blur', hideHover);
+		row.addEventListener('pointerenter', () => setHover(id));
+		row.addEventListener('pointerleave', () => setHover(null));
+		c.addEventListener('focus', () => setHover(id));
+		c.addEventListener('blur', () => setHover(null));
 	}
 	document.addEventListener('keydown', (e) => {
 		if (e.key === 'Escape' && selected) setSelected(null);
 	});
 
-	// Directory search: only the matching people stay on the map.
+	// Directory search: only the matching people stay on the map, and the rest re-pack around them.
 	window.addEventListener('people:filter', (e) => {
 		const ids = (e as CustomEvent<{ ids: string[] | null }>).detail.ids;
 		filterIds = ids ? new Set(ids) : null;
 		if (selected && filterIds && !filterIds.has(selected)) setSelected(null);
-		hideHover();
-		if (!map?.getSource('people')) return;
-		leafCache.clear();
-		map.getSource('people').setData({
-			...allData,
-			features: allData.features.filter((f: any) => !filterIds || filterIds.has(f.properties.id)),
-		});
+		scheduleLayout();
 	});
 	// The map was shown again after being hidden.
 	window.addEventListener('people:mapshown', () => {
 		map?.resize();
-		renderMarkers();
+		scheduleLayout();
 	});
-
-	/**
-	 * Faces grow as you zoom in, so there is room for everyone and nobody overlaps. The sizes are CSS
-	 * variables on the map element, so markers (including hex layouts) rescale smoothly while zooming.
-	 */
-	function applyScale() {
-		const z = map?.getZoom() ?? 1;
-		const face = Math.round(Math.min(52, Math.max(30, 26 + 5 * z)));
-		wrap.style.setProperty('--face', `${face}px`);
-		wrap.style.setProperty('--space', `${face + 4}px`);
-		wrap.style.setProperty('--pin', `${Math.round(face * 1.25)}px`);
-	}
 
 	async function init() {
 		try {
@@ -362,7 +303,6 @@ import { url } from '../lib/url';
 			]);
 			lib = maplibre;
 			lib.setWorkerUrl(new URL(workerUrl, location.href).href);
-			allData = data;
 			for (const f of data.features) {
 				const pr = f.properties;
 				people.set(pr.id, { ...pr, coords: f.geometry.coordinates });
@@ -391,46 +331,18 @@ import { url } from '../lib/url';
 			map.on('load', () => {
 				window.clearTimeout(timer);
 				status.hidden = true;
-				map.addSource('people', {
-					type: 'geojson',
-					data: {
-						...data,
-						features: data.features.filter(
-							(f: any) => !filterIds || filterIds.has(f.properties.id),
-						),
-					},
-					cluster: true,
-					clusterRadius: 60,
-					clusterMaxZoom: CLUSTER_MAX_ZOOM,
-				});
-				// Invisible layers: they only exist so the visible clusters and points can be queried;
-				// the faces themselves are HTML markers.
-				map.addLayer({
-					id: 'clusters-q',
-					type: 'circle',
-					source: 'people',
-					filter: ['has', 'point_count'],
-					paint: { 'circle-radius': 20, 'circle-opacity': 0 },
-				});
-				map.addLayer({
-					id: 'pins-q',
-					type: 'circle',
-					source: 'people',
-					filter: ['!', ['has', 'point_count']],
-					paint: { 'circle-radius': 20, 'circle-opacity': 0 },
-				});
-
 				map.resize();
 				if (people.size) {
 					const b = new lib.LngLatBounds();
 					for (const p of people.values()) b.extend(p.coords);
-					map.fitBounds(b, { padding: 60, maxZoom: 4, animate: false });
+					map.fitBounds(b, { padding: 70, maxZoom: 4, animate: false });
 				}
-				applyScale();
-				map.on('zoom', applyScale);
-				map.on('idle', renderMarkers);
+				for (const p of people.values()) markers.set(p.id, makeMarker(p));
+				map.on('move', scheduleLayout);
+				map.on('resize', scheduleLayout);
+				layout();
+				markState();
 				if (selected) setSelected(selected);
-				renderMarkers();
 			});
 			map.on('error', (e: any) => console.warn('Map error', e?.error ?? e));
 		} catch (err) {
@@ -502,6 +414,13 @@ import { url } from '../lib/url';
 	}
 
 	/* Faces on the map (created by script, so these rules are global). */
+	:global(.pm-m) {
+		width: 0;
+		height: 0;
+	}
+	:global(.pm-m[hidden]) {
+		display: none;
+	}
 	:global(.pm-av) {
 		display: grid;
 		place-items: end center;
@@ -521,84 +440,65 @@ import { url } from '../lib/url';
 		width: 80%;
 		height: 80%;
 	}
-	:global(.pm-pin),
-	:global(.pm-mini) {
+	/* Thin line and dot from a pushed-aside face back to the person's true location. */
+	:global(.pm-leader) {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 1px;
+		height: 1px;
+		overflow: visible;
+		pointer-events: none;
+	}
+	:global(.pm-leader line) {
+		stroke: rgba(27, 26, 46, 0.45);
+		stroke-width: 1.5;
+	}
+	:global(.pm-leader circle) {
+		fill: var(--accent);
+		stroke: #fff;
+		stroke-width: 1.5;
+	}
+	:global(.pm-pin) {
+		position: absolute;
+		left: -22px;
+		top: -22px;
+		width: 44px;
+		height: 44px;
 		padding: 0;
 		font: inherit;
 		cursor: pointer;
+		background: #fff;
 		border: 3px solid #fff;
 		border-radius: 50%;
-		box-shadow: 0 1px 4px rgba(27, 26, 46, 0.35);
-	}
-	:global(.pm-pin) {
-		width: var(--pin, 44px);
-		height: var(--pin, 44px);
-		background: #fff;
-		transition:
-			width 0.15s,
-			height 0.15s,
-			border-color 0.15s;
+		box-shadow: 0 1px 4px rgba(27, 26, 46, 0.4);
+		transition: border-color 0.15s;
 	}
 	:global(.pm-pin:hover) {
 		border-color: var(--pink);
 	}
-	:global(.pm-group) {
-		display: flex;
-		padding: 2px 0 2px 3px;
-		background: #fff;
-		border-radius: 999px;
-		box-shadow: 0 1px 4px rgba(27, 26, 46, 0.35);
-	}
-	:global(.pm-mini) {
-		flex: none;
-		width: var(--face, 34px);
-		height: var(--face, 34px);
-		margin-right: 3px;
-		border-width: 2px;
-		background: #fff;
-		box-shadow: none;
-	}
-	:global(.pm-hex) {
-		position: relative;
-		width: 0;
-		height: 0;
-	}
-	:global(.pm-hex .pm-mini) {
-		position: absolute;
-		margin: 0;
-		left: calc(var(--space, 38px) * (var(--q) + var(--r) / 2) - var(--face, 34px) / 2);
-		top: calc(var(--space, 38px) * 0.866 * var(--r) - var(--face, 34px) / 2);
-		border-width: 2px;
-		box-shadow: 0 1px 3px rgba(27, 26, 46, 0.4);
-	}
-	:global(.pm-mini:hover) {
-		border-color: var(--pink);
-		z-index: 2;
-	}
-	:global(.pm-pin.is-selected),
-	:global(.pm-mini.is-selected) {
+	:global(.pm-pin.is-selected) {
 		border-color: var(--accent);
-		z-index: 3;
 	}
+	:global(.pm-m.pm-moved) {
+		z-index: 1;
+	}
+	:global(.pm-hovered),
 	:global(.pm-selected) {
-		z-index: 5;
+		z-index: 6;
 	}
-	:global(.pm-hover) {
-		position: relative;
-		width: 60px;
-		height: 60px;
-		border: 4px solid var(--accent);
-		border-radius: 50%;
-		background: #fff;
-		box-shadow: 0 2px 10px rgba(27, 26, 46, 0.45);
-		pointer-events: none;
-		z-index: 9;
+	:global(.pm-hovered .pm-pin) {
+		border-color: var(--accent);
+		box-shadow:
+			0 0 0 3px rgba(138, 47, 115, 0.35),
+			0 2px 8px rgba(27, 26, 46, 0.5);
 	}
-	:global(.pm-hover-label) {
+	:global(.pm-label) {
 		position: absolute;
 		top: calc(100% + 6px);
 		left: 50%;
 		transform: translateX(-50%);
+		display: none;
 		padding: 3px 10px;
 		white-space: nowrap;
 		font-size: 13px;
@@ -606,6 +506,10 @@ import { url } from '../lib/url';
 		color: #fff;
 		background: var(--ink);
 		border-radius: 999px;
+		pointer-events: none;
+	}
+	:global(.pm-hovered .pm-label) {
+		display: block;
 	}
 
 	:global(.maplibregl-popup-content) {
