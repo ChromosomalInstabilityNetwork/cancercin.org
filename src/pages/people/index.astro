@@ -212,6 +212,9 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		grid-template-columns: minmax(380px, 1fr) 2fr;
 		height: calc(100dvh - 72px);
 		min-height: 520px;
+		/* Align with the site container. Set here (not on the column) so it never changes when the
+		   column is resized by showing or hiding the map. */
+		padding-left: max(var(--pad-x), calc((100% - var(--max-width)) / 2));
 	}
 	.left {
 		min-height: 0;
@@ -222,8 +225,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		display: flex;
 		flex-direction: column;
 		gap: 16px;
-		/* Align with the site container on the left. */
-		padding: 24px 24px 32px max(var(--pad-x), calc((100% - var(--max-width)) / 2));
+		padding: 24px 24px 32px 0;
 	}
 	h1 {
 		margin: 0;
@@ -264,15 +266,12 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		border: 1px solid #b9b5c4;
 		border-radius: 999px;
 	}
-	/* Pinned to the top-right corner of the map area (and stays there when the map is hidden). */
-	.people {
-		position: relative;
-	}
+	/* Pinned to the bottom-right corner of the viewport, so it stays put while scrolling. */
 	.map-toggle {
-		position: absolute;
-		top: 12px;
-		right: 12px;
-		z-index: 20;
+		position: fixed;
+		right: 16px;
+		bottom: 44px; /* clears the map attribution */
+		z-index: 40;
 		display: grid;
 		place-items: center;
 		width: 44px;
@@ -312,8 +311,11 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 	[data-map='hidden'] .map {
 		display: none;
 	}
-	[data-map='hidden'] .left-inner {
+	[data-map='hidden'] {
 		padding-right: max(var(--pad-x), calc((100% - var(--max-width)) / 2));
+	}
+	[data-map='hidden'] .left-inner {
+		padding-right: 0;
 	}
 	[data-map='hidden'] .directory {
 		columns: 300px;
@@ -405,13 +407,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 			display: flex;
 			flex-direction: column;
 			height: auto;
-		}
-		.map-toggle {
-			order: -2;
-			position: sticky;
-			top: 84px;
-			align-self: flex-end;
-			margin: 0 12px -44px 0;
+			padding-inline: 0;
 		}
 		.map {
 			order: -1;
