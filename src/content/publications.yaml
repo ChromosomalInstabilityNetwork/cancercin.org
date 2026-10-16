@@ -199,7 +199,7 @@
   url: 'https://pubmed.ncbi.nlm.nih.gov/42875880/'
 - id: 'pmid-42873340'
   date: '2026-10-14'
-  title: 'Thymic epithelial tumors: what''s next?'
+  title: "Thymic epithelial tumors: what's next?"
   authors: 'Zhang L, Zhang F, Ismail M, Li G, Rueckert JC'
   journal: 'Cancer Metastasis Rev'
   keywords:
@@ -361,7 +361,7 @@
 - id: 'pmid-42853681'
   date: '2026-10-08'
   title: 'Small extracellular vesicles as mediators of paracrine senescence in cellular models of aging'
-  authors: 'Llabrés-Mas AM, Merino-Navarro A, Menéndez-García M, O''Loghlen A'
+  authors: "Llabrés-Mas AM, Merino-Navarro A, Menéndez-García M, O'Loghlen A"
   journal: 'Aging (Albany NY)'
   keywords:
     - 'DNA damage response'
@@ -694,7 +694,7 @@
 - id: 'pmid-42817718'
   date: '2026-10-01'
   title: 'Correction: EZH2-Deficient T-Cell Acute Lymphoblastic Leukemia is Sensitized to CHK1 Inhibition Through Enhanced Replication Stress'
-  authors: 'León TE, Rapoz-D''Silva T, Bertoli C, Rahman S, Magnussen M, Philip B, et al.'
+  authors: "León TE, Rapoz-D'Silva T, Bertoli C, Rahman S, Magnussen M, Philip B, et al."
   journal: 'Cancer Discov'
   keywords:
     - 'replication stress'
@@ -1096,7 +1096,7 @@
   url: 'https://pubmed.ncbi.nlm.nih.gov/42607848/'
 - id: 'pmid-42607351'
   date: '2026-08-17'
-  title: 'Putative gatekeepers of incoming DNA: 3'' exonucleases in natural transformation and bacterial evolution'
+  title: "Putative gatekeepers of incoming DNA: 3' exonucleases in natural transformation and bacterial evolution"
   authors: 'Hinrichs R'
   journal: 'Biochim Biophys Acta Mol Cell Res'
   keywords:
@@ -1152,7 +1152,7 @@
   url: 'https://pubmed.ncbi.nlm.nih.gov/42579369/'
 - id: 'pmid-42578810'
   date: '2026-08-11'
-  title: 'Effects of damaged astrocytes on DNA damage and repair in human neurons: Implications for Alzheimer''s disease'
+  title: "Effects of damaged astrocytes on DNA damage and repair in human neurons: Implications for Alzheimer's disease"
   authors: 'Welty S, Bagnell M, Ma F, Herrup K, Levine AS'
   journal: 'J Alzheimers Dis'
   keywords:
@@ -1468,7 +1468,7 @@
 - id: 'pmid-42288227'
   date: '2026-06-13'
   title: 'The role of KIF23 in cancer: From molecular insights to therapeutic approaches'
-  authors: 'Eskandari H, Alsa''d AA, Al-Hasnaawei S, Renuka Jyothi S, Nayak PP, Janney JB, et al.'
+  authors: "Eskandari H, Alsa'd AA, Al-Hasnaawei S, Renuka Jyothi S, Nayak PP, Janney JB, et al."
   journal: 'Gene'
   keywords:
     - 'DNA damage response'
@@ -1547,7 +1547,7 @@
   url: 'https://pubmed.ncbi.nlm.nih.gov/42148588/'
 - id: 'pmid-42135921'
   date: '2026-05-14'
-  title: 'Impact of leucine-rich diet on placenta''s proteomic and metabolomic profiles of pregnant tumor-bearing rats'
+  title: "Impact of leucine-rich diet on placenta's proteomic and metabolomic profiles of pregnant tumor-bearing rats"
   authors: 'Dos Santos IF, Salgado CM, Carregari VC, Dos Santos RW, de Souza DM, Viana LR, et al.'
   journal: 'Cancer Biol Ther'
   keywords:

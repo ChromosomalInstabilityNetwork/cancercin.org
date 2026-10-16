@@ -1,5 +1,6 @@
 ---
 import { url } from '../lib/url';
+import Logo from './Logo.astro';
 import { SITE_NAME, SITE_DOMAIN, NAV, isGroup, type NavLink } from '../lib/site';
 
 // One footer column per nav group; standalone nav links share a "Community" column.
@@ -16,11 +17,7 @@ columns.push({ heading: 'Community', links: community });
 	<div class="container">
 		<div class="top">
 			<div class="brand">
-				<p class="name">{SITE_NAME}</p>
-				<p>
-					A community of laboratories advancing chromosomal instability research from the bench to
-					the clinic.
-				</p>
+				<Logo />
 			</div>
 			<nav aria-label="Site map" class="map">
 				{columns.map((col) => (
@@ -55,16 +52,11 @@ columns.push({ heading: 'Community', links: community });
 		grid-template-columns: 1.2fr 2fr;
 		gap: 40px;
 	}
-	.name {
-		font-family: var(--font-display);
-		font-weight: 600;
-		font-size: 1.125rem;
-		color: var(--on-dark-strong);
-		margin: 0 0 8px;
-	}
-	.brand p:last-child {
-		max-width: 40ch;
-		margin: 0;
+	/* The same logo and size as in the header, in white (its "C" cut out in the footer colour). */
+	.brand {
+		height: 56px;
+		color: #fff;
+		--logo-cut: var(--ink);
 	}
 	.map {
 		display: grid;
