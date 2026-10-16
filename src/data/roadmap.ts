@@ -1,6 +1,8 @@
 export interface RoadmapItem {
 	title: string;
 	text: string;
+	/** Optional call-to-action link shown on the card (href is relative to the site root). */
+	action?: { label: string; href: string };
 }
 
 export const roadmap: RoadmapItem[] = [
@@ -19,6 +21,10 @@ export const roadmap: RoadmapItem[] = [
 	{
 		title: 'Improve and harmonize CIN measurements',
 		text: 'Shared standards, methods, and automated quantification that account for fitness effects, so studies can be compared directly.',
+		action: {
+			label: 'Go to CIN Measurement Working Group',
+			href: 'about/working-groups/#cin-measurement',
+		},
 	},
 	{
 		title: 'Develop next-generation CIN biomarkers',
