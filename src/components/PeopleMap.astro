@@ -49,8 +49,10 @@ import { url } from '../lib/url';
 	const scroller = document.querySelector<HTMLElement>('[data-scroll]');
 	const cards = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-person-id]'));
 	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-	const FACE = 44; // px, diameter of a face
-	const MIN_DIST = FACE + 4; // faces are never closer than this (centre to centre)
+	// Faces are half the size on narrow screens (the same breakpoint as the stacked layout).
+	const narrow = window.matchMedia('(max-width: 900px)');
+	const faceSize = () => (narrow.matches ? 22 : 44); // px, diameter of a face
+	const minDist = () => faceSize() + (narrow.matches ? 2 : 4); // never closer (centre to centre)
 	const SELECT_ZOOM = 6;
 	const SILHOUETTE =
 		'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg>';
@@ -122,11 +124,12 @@ import { url } from '../lib/url';
 
 	/**
 	 * Push overlapping faces apart. Everyone starts on their true spot (projected to the screen); pairs
-	 * closer than MIN_DIST are separated, with a gentle pull back toward the true spot so the shift stays
+	 * closer than minDist() are separated, with a gentle pull back toward the true spot so the shift stays
 	 * small. A pure function of the positions, so the same view always gives the same result.
 	 */
 	function separate(pts: { x: number; y: number }[]) {
 		const n = pts.length;
+		const MIN_DIST = minDist();
 		const d = pts.map(() => ({ x: 0, y: 0 }));
 		const GOLDEN = 2.399963;
 		for (let iter = 0; iter < 90; iter++) {
@@ -174,6 +177,7 @@ import { url } from '../lib/url';
 	function layout() {
 		frame = 0;
 		if (!map) return;
+		wrap.style.setProperty('--pm-face', `${faceSize()}px`);
 		const shown: { id: string; m: Marker; x: number; y: number }[] = [];
 		for (const [id, m] of markers) {
 			const on = !filterIds || filterIds.has(id);
@@ -208,7 +212,7 @@ import { url } from '../lib/url';
 	}
 
 	function positionPopup(m: Marker) {
-		popup?.setOffset([m.dx, m.dy - FACE / 2 - 8]);
+		popup?.setOffset([m.dx, m.dy - faceSize() / 2 - 8]);
 	}
 
 	function markState() {
@@ -353,6 +357,7 @@ import { url } from '../lib/url';
 				for (const p of people.values()) markers.set(p.id, makeMarker(p));
 				map.on('move', scheduleLayout);
 				map.on('resize', scheduleLayout);
+				narrow.addEventListener('change', scheduleLayout);
 				layout();
 				markState();
 				if (selected) setSelected(selected);
@@ -474,15 +479,15 @@ import { url } from '../lib/url';
 	}
 	:global(.pm-pin) {
 		position: absolute;
-		left: -22px;
-		top: -22px;
-		width: 44px;
-		height: 44px;
+		left: calc(var(--pm-face, 44px) / -2);
+		top: calc(var(--pm-face, 44px) / -2);
+		width: var(--pm-face, 44px);
+		height: var(--pm-face, 44px);
 		padding: 0;
 		font: inherit;
 		cursor: pointer;
 		background: #fff;
-		border: 3px solid #fff;
+		border: calc(var(--pm-face, 44px) / 44 * 3) solid #fff;
 		border-radius: 50%;
 		box-shadow: 0 1px 4px rgba(27, 26, 46, 0.4);
 		transition: border-color 0.15s;
