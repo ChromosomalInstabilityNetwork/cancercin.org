@@ -42,8 +42,6 @@ import { url } from '../lib/url';
 	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 	const CLUSTER_MAX_ZOOM = 5;
 	const MAX_GROUP = 5; // up to this many people are shown as a row of faces; more as a hex grid
-	const HEX_FACE = 34; // px, diameter of a face in a hex grid
-	const HEX_SPACING = 19; // px between neighbouring face centres: faces overlap by half a step
 	const SILHOUETTE =
 		'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg>';
 
@@ -139,7 +137,6 @@ import { url } from '../lib/url';
 	function hexEl(ids: string[]) {
 		const el = document.createElement('div');
 		el.className = 'pm-hex'; // zero-sized and centred on the point; faces are placed around it
-		const D = HEX_SPACING;
 		const dirs = [
 			[1, 0],
 			[1, -1],
@@ -166,9 +163,8 @@ import { url } from '../lib/url';
 			if (!p) return;
 			const [q, r] = cells[i];
 			const face = miniEl(p);
-			face.style.left = `${D * (q + r / 2) - HEX_FACE / 2}px`;
-			face.style.top = `${D * (Math.sqrt(3) / 2) * r - HEX_FACE / 2}px`;
-			face.style.setProperty('--z', String(ids.length - i)); // inner faces sit on top of outer ones
+			face.style.setProperty('--q', String(q));
+			face.style.setProperty('--r', String(r));
 			el.append(face);
 		});
 		return el;
@@ -287,7 +283,7 @@ import { url } from '../lib/url';
 		// Reuse the directory's link icons so the callout always matches the list.
 		const links = document.querySelector(`#${CSS.escape(id)} .links .social`);
 		if (links) el.append(links.cloneNode(true));
-		popup = new lib.Popup({ offset: 30, maxWidth: '280px', closeButton: false })
+		popup = new lib.Popup({ offset: 36, maxWidth: '280px', closeButton: false })
 			.setLngLat(p.coords)
 			.setDOMContent(el)
 			.addTo(map);
@@ -343,6 +339,18 @@ import { url } from '../lib/url';
 		map?.resize();
 		renderMarkers();
 	});
+
+	/**
+	 * Faces grow as you zoom in, so there is room for everyone and nobody overlaps. The sizes are CSS
+	 * variables on the map element, so markers (including hex layouts) rescale smoothly while zooming.
+	 */
+	function applyScale() {
+		const z = map?.getZoom() ?? 1;
+		const face = Math.round(Math.min(52, Math.max(30, 26 + 5 * z)));
+		wrap.style.setProperty('--face', `${face}px`);
+		wrap.style.setProperty('--space', `${face + 4}px`);
+		wrap.style.setProperty('--pin', `${Math.round(face * 1.25)}px`);
+	}
 
 	async function init() {
 		try {
@@ -418,6 +426,8 @@ import { url } from '../lib/url';
 					for (const p of people.values()) b.extend(p.coords);
 					map.fitBounds(b, { padding: 60, maxZoom: 4, animate: false });
 				}
+				applyScale();
+				map.on('zoom', applyScale);
 				map.on('idle', renderMarkers);
 				if (selected) setSelected(selected);
 				renderMarkers();
@@ -521,8 +531,8 @@ import { url } from '../lib/url';
 		box-shadow: 0 1px 4px rgba(27, 26, 46, 0.35);
 	}
 	:global(.pm-pin) {
-		width: 44px;
-		height: 44px;
+		width: var(--pin, 44px);
+		height: var(--pin, 44px);
 		background: #fff;
 		transition:
 			width 0.15s,
@@ -534,16 +544,16 @@ import { url } from '../lib/url';
 	}
 	:global(.pm-group) {
 		display: flex;
-		padding: 2px 8px 2px 2px;
+		padding: 2px 0 2px 3px;
 		background: #fff;
 		border-radius: 999px;
 		box-shadow: 0 1px 4px rgba(27, 26, 46, 0.35);
 	}
 	:global(.pm-mini) {
 		flex: none;
-		width: 34px;
-		height: 34px;
-		margin-right: -6px;
+		width: var(--face, 34px);
+		height: var(--face, 34px);
+		margin-right: 3px;
 		border-width: 2px;
 		background: #fff;
 		box-shadow: none;
@@ -555,18 +565,15 @@ import { url } from '../lib/url';
 	}
 	:global(.pm-hex .pm-mini) {
 		position: absolute;
-		z-index: var(--z, 1);
 		margin: 0;
+		left: calc(var(--space, 38px) * (var(--q) + var(--r) / 2) - var(--face, 34px) / 2);
+		top: calc(var(--space, 38px) * 0.866 * var(--r) - var(--face, 34px) / 2);
 		border-width: 2px;
 		box-shadow: 0 1px 3px rgba(27, 26, 46, 0.4);
 	}
 	:global(.pm-mini:hover) {
 		border-color: var(--pink);
 		z-index: 2;
-	}
-	:global(.pm-hex .pm-mini:hover),
-	:global(.pm-hex .pm-mini.is-selected) {
-		z-index: 999;
 	}
 	:global(.pm-pin.is-selected),
 	:global(.pm-mini.is-selected) {
