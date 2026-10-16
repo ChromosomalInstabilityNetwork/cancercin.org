@@ -311,6 +311,13 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 	[data-map='hidden'] .map {
 		display: none;
 	}
+	/* No map: the list is just page content, so only the page scrolls (one scrollbar, not two). */
+	[data-map='hidden'] {
+		height: auto;
+	}
+	[data-map='hidden'] .left {
+		overflow: visible;
+	}
 	[data-map='hidden'] {
 		padding-right: max(var(--pad-x), calc((100% - var(--max-width)) / 2));
 	}
