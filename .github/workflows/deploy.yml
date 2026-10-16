@@ -22,6 +22,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # Refresh the publications table from PubMed. On failure the committed file is kept.
+      - run: npm ci
+      - run: npm run publications
+        env:
+          NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+          NCBI_EMAIL: ${{ vars.NCBI_EMAIL }}
       - uses: withastro/action@v5
         env:
           # Project page: set repo variables SITE_URL and BASE_PATH.

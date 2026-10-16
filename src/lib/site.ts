@@ -1,8 +1,9 @@
-export const SITE_NAME = 'Cancer CIN Consortium';
+export const SITE_NAME = 'International CIN Network';
+export const SITE_SHORT = 'iCIN';
 export const SITE_DOMAIN = 'CancerCIN.org';
 export const CONTACT_EMAIL = 'contact@cancercin.org';
 export const SITE_DESCRIPTION =
-	'A community of cancer-research labs studying chromosomal instability (CIN).';
+	'The International CIN Network (iCIN): a community of cancer-research laboratories studying chromosomal instability (CIN).';
 
 export interface NavLink {
 	label: string;

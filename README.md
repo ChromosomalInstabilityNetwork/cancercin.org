@@ -1,6 +1,6 @@
-# Cancer CIN Consortium website
+# International CIN Network website
 
-A static site for the Cancer CIN Consortium, built with [Astro](https://astro.build) and deployed to
+A static site for the International CIN Network, built with [Astro](https://astro.build) and deployed to
 GitHub Pages. Content is plain files in `src/content/`, so it can be edited without code (see
 [CONTRIBUTING.md](CONTRIBUTING.md)).
 
@@ -36,20 +36,25 @@ All collections are defined (and validated) in [`src/content.config.ts`](src/con
 field that is missing or the wrong type fails the build with a clear message. Entries in the seed
 data are bracketed placeholders (`[Name 1]`) and should be replaced with real, verified content.
 
-**Person**: add to `src/content/people.yaml`:
+**Person**: add to `src/content/people.yaml` (only `id` and `name` are required):
 
 ```yaml
-- id: jane-doe # unique, URL-safe
+- id: jane-doe # unique, URL-safe; also the #anchor used by links from the home page
   name: 'Jane Doe'
   institution: 'Example University'
   address: '1 Example Way, City, Country' # institutional address
-  city: 'City'
   country: 'Country'
-  lab_url: 'https://…' # optional
   photo: people/jane-doe.jpg # optional; file in public/people/
+  website: 'https://…' # optional links, shown as icons under the person (full URLs)
+  bluesky: 'https://bsky.app/profile/jane.bsky.social'
+  x: 'https://x.com/jane'
+  linkedin: 'https://www.linkedin.com/in/jane'
   show_on_map: true # false = listed, but no pin
   # lat / lng are filled in by `npm run geocode`, or set by hand (never overwritten)
 ```
+
+People without an address have no pin. The directory and the home-page "Our community" bubbles
+both come from this file.
 
 **Event**: a Markdown file in `src/content/events/`. The body is the description.
 
@@ -71,9 +76,15 @@ Talks from across the CIN community.
 **News**: a Markdown file in `src/content/news/` with `title`, `date`, `summary`, and optionally
 `link`, `image`, `image_alt`. The body becomes the post page.
 
-**Publication**: add to `src/content/publications.yaml` (`title`, `authors`, `journal`, `year`,
-`url`, `topic` = `causes` | `detection` | `clinical`, `featured`). One entry with `featured: true`
-is shown at the top of the page.
+**Publications** are fetched from PubMed on every deploy by
+[`scripts/fetch-publications.mjs`](scripts/fetch-publications.mjs) (`npm run publications` to run it
+locally). It searches PubMed for `"chromosomal instability"[Title/Abstract]`, keeps the 200 newest
+results and rewrites `src/content/publications.yaml`. Entries whose `id` starts with `pmid-` are
+generated and replaced each run; any other entry is hand-curated and kept. If PubMed is unreachable the
+existing file is kept, so the build never breaks. Settings (environment variables): `PUBMED_QUERY`
+(search term), `PUBS_MAX` (default 200), `NCBI_API_KEY` (a repository secret; raises the rate limit)
+and `NCBI_EMAIL` (a repository variable; contact address NCBI asks tools to send). To change what is
+listed, set `PUBMED_QUERY`, for example to restrict to consortium authors.
 
 **Resource**: add to `src/content/resources.yaml` (`kind` = `method` | `data`, `title`, `category`,
 `description`, `url`, `host` = `github` | `website` | `repository`, `label` for the button text).
@@ -158,14 +169,15 @@ builds with `withastro/action` and publishes with `actions/deploy-pages`.
 `astro check`, a production build **under a sub-path** (so base-path mistakes fail), the link check
 and the axe accessibility check.
 
-Lighthouse (mobile, run locally against a production build): every page scored 100 for
-Accessibility, Best Practices and SEO. Performance is 99-100 on every page except **People**
-(about 50), where the cost is the map: parsing MapLibre plus WebGL start-up produces about 1.5 s of
-main-thread blocking under Lighthouse's 4x CPU throttle, and the test ran WebGL in software. The
-library is already code-split, loaded only on that page, and started lazily. This is the accepted
-exception for the map page; the directory beside it is usable immediately.
+Lighthouse (mobile, run locally against a production build): Home, About, People and Publications
+all scored 99 for Performance and 100 for Accessibility, Best Practices and SEO. The map is the
+expensive part of the People page: in an earlier layout it cost about 1.5 s of main-thread blocking and
+scored about 50, so re-check that page after changing the map or its position. The library is
+code-split, loaded only on that page, and started lazily; the directory beside it is usable
+immediately.
 
 ## Not built yet
 
 The mailing-list signup form (plan Phase 5) is not implemented. The "Would you like to be added?"
-card on the People page uses a plain `mailto:` link.
+card on the People page uses a plain `mailto:` link. The featured consortium Perspective on the
+Publications page was removed for now (its placeholder entry is still in `publications.yaml`).

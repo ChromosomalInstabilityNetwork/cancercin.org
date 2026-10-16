@@ -1,7 +1,20 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Card from '../components/Card.astro';
+import EventCard from '../components/EventCard.astro';
+import NewsCard from '../components/NewsCard.astro';
+import PersonAvatar from '../components/PersonAvatar.astro';
 import PillButton from '../components/PillButton.astro';
+import { challengeGroups } from '../data/challenges';
+import { getEvents, getNews } from '../lib/events';
 import { url } from '../lib/url';
+
+const { upcoming } = await getEvents();
+const news = await getNews();
+const people = (await getCollection('people')).sort((a, b) =>
+	a.data.name.localeCompare(b.data.name, undefined, { numeric: true }),
+);
 ---
 
 <BaseLayout>
@@ -16,8 +29,8 @@ import { url } from '../lib/url';
 				turn that potential into patient benefit.
 			</p>
 			<div class="actions">
-				<PillButton href={url('about/challenges-and-roadmap/')} variant="light">
-					Explore the challenges
+				<PillButton href={url('about/')} variant="light">
+					About iCIN
 				</PillButton>
 				<PillButton href={url('events/')} variant="ghost">
 					See upcoming events
@@ -25,7 +38,120 @@ import { url } from '../lib/url';
 			</div>
 		</div>
 	</section>
+
+	<section class="band" aria-labelledby="h-challenges">
+		<div class="container">
+			<div class="head">
+				<h2 id="h-challenges">CIN challenges</h2>
+				<a href={url('about/challenges-and-roadmap/')}>All challenges and the roadmap →</a>
+			</div>
+			<div class="grid grid-3">
+				{challengeGroups.map((g) => (
+					<Card as="article" class="challenge">
+						<p class="num" aria-hidden="true">
+							{String(g.number).padStart(2, '0')}
+						</p>
+						<h3>{g.title}</h3>
+						<ul>
+							{g.items.map((c) => (
+								<li>{c.title}</li>
+							))}
+						</ul>
+					</Card>
+				))}
+			</div>
+		</div>
+	</section>
+
+	<section class="container know" aria-labelledby="h-know">
+		<h2 id="h-know">In the know</h2>
+		<div class="two-col">
+			<div>
+				<div class="head">
+					<h3>News</h3>
+					<a href={url('news/')}>All news →</a>
+				</div>
+				<div class="stack">
+					{news.slice(0, 3).map((n) => (
+						<NewsCard
+							title={n.data.title}
+							date={n.data.date}
+							summary={n.data.summary}
+							link={url(`news/${n.id}/`)}
+							image={n.data.image}
+							imageAlt={n.data.image_alt}
+						/>
+					))}
+				</div>
+			</div>
+			<div>
+				<div class="head">
+					<h3>Upcoming events</h3>
+					<a href={url('events/')}>Events calendar →</a>
+				</div>
+				<div class="stack">
+					{upcoming.slice(0, 3).map((e) => (
+						<EventCard
+							title={e.data.title}
+							start={e.data.start}
+							end={e.data.end}
+							location={e.data.location}
+							link={e.data.link}
+							image={e.data.image}
+							imageAlt={e.data.image_alt}
+						>
+							<p>{e.body}</p>
+						</EventCard>
+					))}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="band" aria-labelledby="h-community">
+		<div class="container">
+			<div class="head">
+				<h2 id="h-community">Our community</h2>
+				<a href={url('people/')}>Meet everyone →</a>
+			</div>
+			<ul class="bubbles">
+				{people.map((p) => (
+					<li>
+						<a
+							class="bubble"
+							href={url(`people/#${p.id}`)}
+							aria-label={[p.data.name, p.data.institution].filter(Boolean).join(', ')}
+						>
+							<PersonAvatar name={p.data.name} photo={p.data.photo} />
+							<span class="tip" aria-hidden="true">
+								<strong>{p.data.name}</strong>
+								{p.data.institution && <span>{p.data.institution}</span>}
+							</span>
+						</a>
+					</li>
+				))}
+			</ul>
+		</div>
+	</section>
 </BaseLayout>
+
+<script>
+	// Keep each tooltip inside the viewport: nudge it sideways when it would overflow.
+	for (const b of document.querySelectorAll<HTMLElement>('.bubble')) {
+		const place = () => {
+			const tip = b.querySelector<HTMLElement>('.tip');
+			if (!tip) return;
+			b.style.setProperty('--shift', '0px');
+			const r = tip.getBoundingClientRect();
+			const m = 12;
+			const shift =
+				r.left < m ? m - r.left : r.right > innerWidth - m ? innerWidth - m - r.right : 0;
+			b.style.setProperty('--shift', `${shift}px`);
+		};
+		b.addEventListener('pointerenter', place);
+		b.addEventListener('focus', place);
+	}
+</script>
 
 <style>
 	.hero {
@@ -36,10 +162,10 @@ import { url } from '../lib/url';
 	.hero h1 {
 		color: var(--on-dark-strong);
 		max-width: 940px;
-		font-size: clamp(2rem, 1.6rem + 1.6vw, 3.25rem);
+		font-size: var(--fs-hero);
 	}
 	.lead {
-		font-size: 1.125rem;
+		font-size: 1.0625rem;
 		max-width: 720px;
 	}
 	.actions {
@@ -47,5 +173,110 @@ import { url } from '../lib/url';
 		flex-wrap: wrap;
 		gap: 16px;
 		margin-top: 24px;
+	}
+	.band {
+		background: #f8f8fa;
+		padding-block: clamp(32px, 5vw, 56px);
+	}
+	.know {
+		padding-block: clamp(32px, 5vw, 56px);
+	}
+	.head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 8px 24px;
+		margin-bottom: 20px;
+	}
+	.head h2,
+	.head h3 {
+		margin: 0;
+	}
+	.head a {
+		font-weight: 600;
+	}
+	.know > h2 {
+		margin-bottom: 24px;
+	}
+	.num {
+		margin: 0 0 8px;
+		font-family: var(--font-display);
+		font-size: 1.75rem;
+		line-height: 1;
+		color: var(--accent);
+	}
+	:global(.challenge) ul {
+		margin: 12px 0 0;
+		padding-left: 1.1em;
+		color: var(--muted);
+		font-size: 0.9375rem;
+	}
+	:global(.challenge) li + li {
+		margin-top: 4px;
+	}
+	.two-col {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 40px;
+	}
+	.stack {
+		display: grid;
+		gap: 16px;
+	}
+	.bubbles {
+		list-style: none;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		margin: 0;
+		padding: 0;
+	}
+	.bubble {
+		position: relative;
+		display: block;
+		width: 64px;
+		height: 64px;
+		border-radius: 50%;
+		transition: transform 0.15s;
+	}
+	.bubble:hover,
+	.bubble:focus-visible {
+		transform: scale(1.12);
+		z-index: 3;
+	}
+	.tip {
+		position: absolute;
+		bottom: calc(100% + 10px);
+		left: 50%;
+		z-index: 4;
+		display: none;
+		flex-direction: column;
+		gap: 2px;
+		width: max-content;
+		max-width: min(260px, 80vw);
+		padding: 10px 14px;
+		transform: translateX(calc(-50% + var(--shift, 0px)));
+		background: var(--ink);
+		color: var(--on-dark);
+		border-radius: 12px;
+		font-size: 13px;
+		line-height: 1.35;
+		text-align: left;
+		pointer-events: none;
+	}
+	.tip strong {
+		color: var(--on-dark-strong);
+		font-family: var(--font-display);
+		font-size: 0.9375rem;
+	}
+	.bubble:hover .tip,
+	.bubble:focus-visible .tip {
+		display: flex;
+	}
+	@media (max-width: 900px) {
+		.two-col {
+			grid-template-columns: 1fr;
+		}
 	}
 </style>

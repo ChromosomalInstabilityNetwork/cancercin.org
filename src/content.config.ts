@@ -7,14 +7,18 @@ const people = defineCollection({
 	loader: file('src/content/people.yaml'),
 	schema: z.object({
 		name: z.string(),
-		institution: z.string(),
-		address: z.string(),
-		city: z.string(),
-		country: z.string(),
+		institution: z.string().optional(),
+		address: z.string().optional(),
+		city: z.string().optional(),
+		country: z.string().optional(),
 		lat: z.number().min(-90).max(90).optional(),
 		lng: z.number().min(-180).max(180).optional(),
-		lab_url: z.url().optional(),
-		photo: z.string().optional(),
+		photo: z.string().optional(), // path under public/, e.g. people/jane-doe.jpg
+		// Optional links, shown as icons under the person (full URLs).
+		website: z.url().optional(),
+		x: z.url().optional(),
+		linkedin: z.url().optional(),
+		bluesky: z.url().optional(),
 		show_on_map: z.boolean().default(true),
 	}),
 });
@@ -53,7 +57,7 @@ const publications = defineCollection({
 		journal: z.string(),
 		year: z.number().int().optional(),
 		url: z.url().optional(),
-		topic: z.enum(['causes', 'detection', 'clinical']),
+		topic: z.enum(['causes', 'detection', 'clinical']).optional(), // not shown for now
 		featured: z.boolean().default(false),
 		summary: z.string().optional(),
 	}),

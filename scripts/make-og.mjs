@@ -20,7 +20,7 @@ body::after{content:'';position:absolute;right:-140px;top:-140px;width:520px;hei
 body::before{content:'';position:absolute;right:130px;bottom:90px;width:36px;height:36px;border-radius:50%;background:#e9a8d8;z-index:1}
 h1{font:600 84px/1.05 F,serif;margin:0 0 28px;max-width:860px;position:relative;z-index:2}
 p{font:500 34px/1.3 I,sans-serif;color:#d9d5e3;margin:0;max-width:800px;position:relative;z-index:2}
-</style><h1>Cancer CIN Consortium</h1><p>A community of laboratories advancing chromosomal instability research from the bench to the clinic.</p>`;
+</style><h1>International CIN Network</h1><p>A community of laboratories advancing chromosomal instability research from the bench to the clinic.</p>`;
 
 const browser = await puppeteer.launch({
 	executablePath: exe,

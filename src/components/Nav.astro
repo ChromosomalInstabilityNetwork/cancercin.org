@@ -1,7 +1,8 @@
 ---
 import { url } from '../lib/url';
 import { isCurrent, groupFor } from '../lib/nav';
-import { SITE_NAME, NAV, isGroup } from '../lib/site';
+import Logo from './Logo.astro';
+import { NAV, isGroup } from '../lib/site';
 
 const path = Astro.url.pathname;
 const activeGroup = groupFor(path)?.label;
@@ -10,7 +11,7 @@ const activeGroup = groupFor(path)?.label;
 <header class="nav on-dark">
 	<div class="container bar">
 		<a class="brand" href={url('')}>
-			{SITE_NAME}
+			<Logo />
 		</a>
 		<button
 			class="toggle"
@@ -154,14 +155,9 @@ const activeGroup = groupFor(path)?.label;
 		position: relative;
 	}
 	.brand {
-		font-family: var(--font-display);
-		font-weight: 600;
-		font-size: 1.25rem;
-		color: var(--on-dark-strong);
-		text-decoration: none;
 		display: inline-flex;
 		align-items: center;
-		min-height: 44px;
+		height: 56px;
 	}
 	ul {
 		list-style: none;

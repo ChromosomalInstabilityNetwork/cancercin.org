@@ -50,10 +50,19 @@ for (const item of doc.contents.items) {
 	const get = (k) => item.get(k);
 	if (get('lat') !== undefined && get('lng') !== undefined) continue;
 
+	const address = get('address');
+	if (!address && !get('institution')) continue; // nothing to look up
+	const parts = String(address ?? '')
+		.split(',')
+		.map((p) => p.trim())
+		.filter(Boolean);
+	// Most specific first; street/suite details often fail, so fall back to a coarser place.
 	const queries = [
-		get('address'),
-		[get('institution'), get('city'), get('country')].filter(Boolean).join(', '),
-	];
+		address,
+		[get('institution')?.split(';')[0], get('city'), get('country')].filter(Boolean).join(', '),
+		parts.slice(-3).join(', '),
+		parts.slice(-2).join(', '),
+	].filter((q, i, a) => q && a.indexOf(q) === i);
 	let result = null;
 	let usedQuery = '';
 	for (const q of queries.filter(Boolean)) {

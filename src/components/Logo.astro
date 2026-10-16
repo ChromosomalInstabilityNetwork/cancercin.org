@@ -1,0 +1,89 @@
+---
+// iCIN logo, inlined so it can use the site's self-hosted Barlow Condensed and be recoloured.
+// White artwork: circles and lettering are white, the "C" is cut out in the nav colour.
+interface Props {
+	class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<svg
+	class:list={['logo', className]}
+	xmlns="http://www.w3.org/2000/svg"
+	viewBox="0 0 392.47 166.69"
+	role="img"
+	aria-label="International Chromosomal Instability Network (iCIN)"
+>
+	<text class="word" transform="translate(137.14 37.34)">
+		<tspan class="light">
+			<tspan x="0" y="0">
+				international
+			</tspan>
+		</tspan>
+		<tspan class="medium">
+			<tspan x="0" y="40">
+				ch
+			</tspan>
+			<tspan x="33.8" y="40">
+				r
+			</tspan>
+			<tspan x="45.76" y="40">
+				omosomal
+			</tspan>
+		</tspan>
+		<tspan class="medium">
+			<tspan x="0" y="80">
+				instability
+			</tspan>
+		</tspan>
+		<tspan class="light">
+			<tspan x="0" y="120">
+				n
+			</tspan>
+			<tspan x="16.96" y="120">
+				e
+			</tspan>
+			<tspan x="33.08" y="120">
+				t
+			</tspan>
+			<tspan x="43.76" y="120">
+				w
+			</tspan>
+			<tspan x="65.64" y="120">
+				ork
+			</tspan>
+		</tspan>
+	</text>
+	<circle class="disc" cx="59.4" cy="59.4" r="59.4"></circle>
+	<circle class="disc" cx="59.4" cy="107.29" r="59.4"></circle>
+	<path
+		class="cut"
+		d="M39.45,132.91c-4.99-5.04-7.48-11.8-7.48-20.27v-59.69c0-8.37,2.49-15.07,7.48-20.11,4.99-5.04,11.61-7.56,19.87-7.56s15.04,2.49,20.03,7.48,7.48,11.72,7.48,20.19v2.74c0,1.07-.54,1.61-1.61,1.61l-8.37.48c-1.07,0-1.61-.54-1.61-1.61v-4.02c0-5.04-1.45-9.12-4.34-12.23-2.9-3.11-6.76-4.67-11.58-4.67s-8.55,1.56-11.5,4.67c-2.95,3.11-4.42,7.19-4.42,12.23v61.46c0,5.04,1.47,9.12,4.42,12.23,2.95,3.11,6.78,4.67,11.5,4.67s8.69-1.55,11.58-4.67c2.9-3.11,4.34-7.19,4.34-12.23v-4.02c0-1.07.54-1.61,1.61-1.61l8.37.48c1.07,0,1.61.54,1.61,1.61v2.57c0,8.47-2.52,15.23-7.56,20.27-5.04,5.04-11.69,7.56-19.95,7.56s-14.88-2.52-19.87-7.56Z"
+	></path>
+</svg>
+
+<style>
+	.logo {
+		display: block;
+		height: 100%;
+		width: auto;
+	}
+	.word {
+		font-size: 40px;
+		fill: #fff;
+	}
+	.light {
+		font-family: 'Barlow Condensed', sans-serif;
+		font-weight: 400;
+	}
+	.medium {
+		font-family: 'Barlow Condensed', sans-serif;
+		font-weight: 500;
+	}
+	.disc {
+		fill: #fff;
+	}
+	.cut {
+		fill: var(--ink);
+	}
+</style>

@@ -21,7 +21,7 @@ opened and checked.
 | A person in the directory | [`src/content/people.yaml`](src/content/people.yaml)               |
 | An event                  | add or edit a file in [`src/content/events/`](src/content/events/) |
 | A news item               | add or edit a file in [`src/content/news/`](src/content/news/)     |
-| A publication             | [`src/content/publications.yaml`](src/content/publications.yaml)   |
+| A publication             | automatic: fetched from PubMed on each deploy (see the README)     |
 | A method or dataset       | [`src/content/resources.yaml`](src/content/resources.yaml)         |
 
 The README has the full list of fields for each. Page text for the About and Challenges & Roadmap
@@ -31,7 +31,7 @@ pages is in `src/pages/about/` and `src/data/`.
 
 Add an entry to `people.yaml` with your name, institution and **institutional** address (not a home
 address). Only add people who have agreed to be listed. Set `show_on_map: false` to appear in the
-directory without a pin on the map. Leave `lat` and `lng` out; a maintainer will run the geocoder.
+directory without a pin on the map. Leave `lat` and `lng` out; a maintainer will run the geocoder. You can also add `website`, `bluesky`, `x` and `linkedin` (full URLs); they show as small icons under your name.
 
 ### Images
 
