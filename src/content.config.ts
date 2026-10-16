@@ -55,7 +55,12 @@ const publications = defineCollection({
 		title: z.string(),
 		authors: z.string(),
 		journal: z.string(),
-		year: z.number().int().optional(),
+		// Publication date: YYYY-MM-DD, or YYYY-MM / YYYY when PubMed only has part of it.
+		date: z
+			.string()
+			.regex(/^\d{4}(-\d{2}(-\d{2})?)?$/)
+			.optional(),
+		year: z.number().int().optional(), // legacy: use date
 		url: z.url().optional(),
 		topic: z.enum(['causes', 'detection', 'clinical']).optional(), // not shown for now
 		featured: z.boolean().default(false),

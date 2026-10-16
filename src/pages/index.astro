@@ -151,6 +151,36 @@ const people = (await getCollection('people')).sort((a, b) =>
 		b.addEventListener('pointerenter', place);
 		b.addEventListener('focus', place);
 	}
+
+	// Hex-pack the community bubbles: rows alternate n and n-1 bubbles, the short rows offset half a step.
+	const list = document.querySelector<HTMLElement>('.bubbles');
+	if (list) {
+		const items = Array.from(list.children) as HTMLElement[];
+		const SIZE = 64;
+		const GAP = 12;
+		const STEP = SIZE + GAP;
+		const ROW = Math.round(STEP * 0.866);
+		const layout = () => {
+			const n = Math.max(1, Math.floor((list.clientWidth + GAP) / STEP));
+			let row = 0;
+			let col = 0;
+			for (const li of items) {
+				const cap = row % 2 === 1 && n > 1 ? n - 1 : n;
+				if (col >= cap) {
+					row++;
+					col = 0;
+				}
+				const offset = row % 2 === 1 && n > 1 ? STEP / 2 : 0;
+				li.style.left = `${col * STEP + offset}px`;
+				li.style.top = `${row * ROW}px`;
+				col++;
+			}
+			list.style.height = `${row * ROW + SIZE}px`;
+		};
+		list.classList.add('hex');
+		layout();
+		new ResizeObserver(layout).observe(list);
+	}
 </script>
 
 <style>
@@ -207,8 +237,9 @@ const people = (await getCollection('people')).sort((a, b) =>
 		color: var(--accent);
 	}
 	:global(.challenge) ul {
+		list-style: none;
 		margin: 12px 0 0;
-		padding-left: 1.1em;
+		padding: 0;
 		color: var(--muted);
 		font-size: 0.9375rem;
 	}
@@ -223,6 +254,14 @@ const people = (await getCollection('people')).sort((a, b) =>
 	.stack {
 		display: grid;
 		gap: 16px;
+	}
+	/* With JS the bubbles are packed as a hex grid: alternate rows are offset by half a step. */
+	.bubbles.hex {
+		display: block;
+		position: relative;
+	}
+	.bubbles.hex li {
+		position: absolute;
 	}
 	.bubbles {
 		list-style: none;

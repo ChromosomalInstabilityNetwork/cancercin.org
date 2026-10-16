@@ -17,7 +17,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 	title="People"
 	description="The laboratories and investigators of the International CIN Network."
 >
-	<div class="people">
+	<div class="people" data-map="shown" data-people-root>
 		<div class="left" data-scroll>
 			<div class="left-inner">
 				<h1>People</h1>
@@ -27,6 +27,45 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 						<a href={mailto('Add me to the CIN people directory', addBody)}>{CONTACT_EMAIL}</a>.
 					</p>
 				</Card>
+				<div class="controls">
+					<div class="search">
+						<label for="people-search" class="visually-hidden">
+							Search people
+						</label>
+						<input
+							id="people-search"
+							type="search"
+							placeholder="Search people"
+							autocomplete="off"
+							spellcheck="false"
+						/>
+					</div>
+					<button
+						type="button"
+						class="map-toggle"
+						id="map-toggle"
+						aria-controls="people-map-pane"
+						aria-expanded="true"
+						hidden
+					>
+						<svg
+							viewBox="0 0 24 24"
+							aria-hidden="true"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M9 4 3 6.5v13L9 17l6 3 6-2.5v-13L15 7 9 4Zm0 0v13m6-10v13" />
+						</svg>
+						<span data-label>Hide map</span>
+					</button>
+				</div>
+				<p class="visually-hidden" id="people-count" aria-live="polite"></p>
+				<p class="none" id="people-none" hidden>
+					No one matches your search.
+				</p>
 				<ul class="directory" aria-label="Directory" data-directory>
 					{people.map((p) => (
 						<li class="person" id={p.id}>
@@ -54,11 +93,94 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 				</ul>
 			</div>
 		</div>
-		<div class="map">
+		<div class="map" id="people-map-pane">
 			<PeopleMap />
 		</div>
 	</div>
 </BaseLayout>
+
+<script>
+	const root = document.querySelector<HTMLElement>('[data-people-root]')!;
+	const input = document.querySelector<HTMLInputElement>('#people-search')!;
+	const toggle = document.querySelector<HTMLButtonElement>('#map-toggle')!;
+	const pane = document.querySelector<HTMLElement>('#people-map-pane')!;
+	const count = document.querySelector<HTMLElement>('#people-count')!;
+	const none = document.querySelector<HTMLElement>('#people-none')!;
+	const items = Array.from(document.querySelectorAll<HTMLLIElement>('.directory > li'));
+	const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+	const fold = (t: string) =>
+		t
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.toLowerCase();
+	const haystack = new Map(
+		items.map((li) => [li, fold(li.querySelector('.text')?.textContent ?? '')]),
+	);
+
+	/** FLIP: remember where the visible rows are, change the layout, then glide each row to its new spot. */
+	function flip(change: () => void) {
+		const moving = items.filter((li) => !li.hidden);
+		const first = new Map(moving.map((li) => [li, li.getBoundingClientRect()]));
+		change();
+		if (reduce.matches) return;
+		for (const li of moving) {
+			if (li.hidden) continue;
+			const a = first.get(li)!;
+			const b = li.getBoundingClientRect();
+			const dx = a.left - b.left;
+			const dy = a.top - b.top;
+			if (!dx && !dy) continue;
+			li.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], {
+				duration: 420,
+				easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)',
+			});
+		}
+	}
+
+	function applyFilter() {
+		const terms = fold(input.value).split(/\s+/).filter(Boolean);
+		let shown = 0;
+		const ids: string[] = [];
+		flip(() => {
+			for (const li of items) {
+				const hay = haystack.get(li)!;
+				const ok = terms.every((t) => hay.includes(t));
+				li.hidden = !ok;
+				if (ok) {
+					shown++;
+					ids.push(li.id);
+				}
+			}
+		});
+		none.hidden = shown > 0;
+		count.textContent = terms.length ? `${shown} of ${items.length} people` : '';
+		window.dispatchEvent(
+			new CustomEvent('people:filter', { detail: { ids: terms.length ? ids : null } }),
+		);
+	}
+	input.addEventListener('input', applyFilter);
+
+	// Hide / show the map. Hidden, the directory becomes a multi-column list.
+	toggle.hidden = false;
+	toggle.addEventListener('click', async () => {
+		const hiding = root.dataset.map !== 'hidden';
+		const label = toggle.querySelector('[data-label]')!;
+		toggle.setAttribute('aria-expanded', String(!hiding));
+		label.textContent = hiding ? 'Show map' : 'Hide map';
+		if (hiding) {
+			if (!reduce.matches) {
+				pane.style.opacity = '0';
+				await new Promise((r) => setTimeout(r, 180));
+			}
+			flip(() => (root.dataset.map = 'hidden'));
+		} else {
+			pane.style.opacity = '0';
+			flip(() => (root.dataset.map = 'shown'));
+			window.dispatchEvent(new Event('people:mapshown'));
+			requestAnimationFrame(() => (pane.style.opacity = '1'));
+		}
+	});
+</script>
 
 <style>
 	/* One viewport tall below the 72px nav. The whole left column scrolls; the map is fixed and runs
@@ -86,6 +208,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		font-size: var(--fs-h1);
 	}
 	.left :global(.add) {
+		max-width: 560px;
 		padding: 14px 18px;
 	}
 	.left :global(.add h2) {
@@ -98,6 +221,74 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 	}
 	.map {
 		min-height: 0;
+		transition: opacity 0.18s;
+	}
+	.controls {
+		display: flex;
+		gap: 10px;
+		align-items: center;
+		max-width: 520px;
+	}
+	.search {
+		flex: 1;
+	}
+	.search input {
+		width: 100%;
+		min-height: 44px;
+		padding: 0 14px;
+		font: inherit;
+		color: var(--ink);
+		background: #fff;
+		border: 1px solid #b9b5c4;
+		border-radius: 999px;
+	}
+	.map-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		min-height: 44px;
+		padding: 0 16px;
+		font: inherit;
+		font-weight: 600;
+		color: var(--accent);
+		background: none;
+		border: 2px solid var(--accent);
+		border-radius: 999px;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+	.map-toggle[hidden] {
+		display: none;
+	}
+	.map-toggle svg {
+		width: 18px;
+		height: 18px;
+	}
+	.none {
+		margin: 0;
+		color: var(--muted);
+	}
+	.none[hidden],
+	.person[hidden] {
+		display: none;
+	}
+
+	/* Map hidden: the left column takes the full width and the directory flows into columns. */
+	[data-map='hidden'] {
+		grid-template-columns: 1fr;
+	}
+	[data-map='hidden'] .map {
+		display: none;
+	}
+	[data-map='hidden'] .left-inner {
+		padding-right: max(var(--pad-x), calc((100% - var(--max-width)) / 2));
+	}
+	[data-map='hidden'] .directory {
+		columns: 300px;
+		column-gap: 32px;
+	}
+	[data-map='hidden'] .person {
+		break-inside: avoid;
 	}
 	.directory {
 		list-style: none;

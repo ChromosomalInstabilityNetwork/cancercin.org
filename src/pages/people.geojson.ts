@@ -1,5 +1,6 @@
 import { getCollection } from 'astro:content';
 import type { APIRoute } from 'astro';
+import { url } from '../lib/url';
 
 // Only people with coordinates who have not opted out of the map.
 export const GET: APIRoute = async () => {
@@ -12,8 +13,9 @@ export const GET: APIRoute = async () => {
 			properties: {
 				id: p.id,
 				name: p.data.name,
-				institution: p.data.institution,
-				address: p.data.address,
+				institution: p.data.institution ?? '',
+				address: p.data.address ?? '',
+				photo: p.data.photo ? url(p.data.photo) : '',
 			},
 		}));
 	return new Response(JSON.stringify({ type: 'FeatureCollection', features }), {

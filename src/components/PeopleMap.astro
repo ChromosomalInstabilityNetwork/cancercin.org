@@ -9,7 +9,7 @@ import { url } from '../lib/url';
 	class="map-wrap"
 	id="people-map"
 	role="region"
-	aria-label="Map of consortium laboratories. The directory lists the same people."
+	aria-label="Map of network laboratories. The directory lists the same people."
 	data-geojson={url('people.geojson')}
 >
 	<div class="map-canvas" data-map-canvas></div>
@@ -23,36 +23,209 @@ import { url } from '../lib/url';
 <script>
 	// MapLibre locates its worker at runtime, which the bundler can't see; ship it as an asset.
 	import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
-	import { loadDarkStyle } from '../lib/mapStyle';
-	import { MAP_COLORS as C } from '../lib/mapConfig';
+	import { loadMapStyle } from '../lib/mapStyle';
+
+	type Person = {
+		id: string;
+		name: string;
+		institution: string;
+		address: string;
+		photo: string;
+		coords: [number, number];
+	};
 
 	const wrap = document.getElementById('people-map')!;
 	const canvas = wrap.querySelector<HTMLElement>('[data-map-canvas]')!;
 	const status = wrap.querySelector<HTMLElement>('[data-map-status]')!;
-	const list = document.querySelector<HTMLElement>('[data-scroll]');
+	const scroller = document.querySelector<HTMLElement>('[data-scroll]');
 	const cards = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-person-id]'));
 	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 	const CLUSTER_MAX_ZOOM = 5;
+	const MAX_GROUP = 5; // up to this many people are shown as a row of faces; more become a count
+	const SILHOUETTE =
+		'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg>';
 
 	let selected: string | null = null;
 	let map: any;
 	let popup: any;
+	let hoverMarker: any;
 	let lib: typeof import('maplibre-gl');
-	const features = new Map<string, { coords: [number, number]; props: Record<string, string> }>();
+	let allData: any;
+	let filterIds: Set<string> | null = null;
+	const people = new Map<string, Person>();
+	const markers = new Map<string, { marker: any; el: HTMLElement }>();
+	const leafCache = new Map<string, string[]>();
+	let renderToken = 0;
+
+	const avatar = (p: Person) => {
+		const span = document.createElement('span');
+		span.className = 'pm-av';
+		if (p.photo) {
+			const img = new Image();
+			img.src = p.photo;
+			img.alt = '';
+			img.width = img.height = 96;
+			span.append(img);
+		} else {
+			span.innerHTML = SILHOUETTE;
+		}
+		return span;
+	};
+
+	// Markers duplicate the directory, which is the accessible equivalent: keep them out of the tab order.
+	const hideFromAT = (el: HTMLElement) => {
+		el.tabIndex = -1;
+		el.setAttribute('aria-hidden', 'true');
+	};
+
+	function markSelected() {
+		for (const { el } of markers.values()) {
+			const hasSelected = !!selected && !!el.querySelector(`[data-person="${selected}"]`);
+			el.classList.toggle('pm-selected', hasSelected || el.dataset.person === selected);
+			for (const n of el.querySelectorAll<HTMLElement>('[data-person]')) {
+				n.classList.toggle('is-selected', n.dataset.person === selected);
+			}
+		}
+	}
+
+	function toggle(id: string, scroll: boolean) {
+		setSelected(selected === id ? null : id, { scroll });
+	}
+
+	function pinEl(p: Person) {
+		const el = document.createElement('button');
+		el.type = 'button';
+		el.className = 'pm-pin';
+		el.dataset.person = p.id;
+		el.append(avatar(p));
+		hideFromAT(el);
+		el.addEventListener('click', (e) => {
+			e.stopPropagation();
+			toggle(p.id, true);
+		});
+		return el;
+	}
+
+	function groupEl(ids: string[]) {
+		const el = document.createElement('div');
+		el.className = 'pm-group';
+		for (const id of ids) {
+			const p = people.get(id);
+			if (!p) continue;
+			const b = document.createElement('button');
+			b.type = 'button';
+			b.className = 'pm-mini';
+			b.dataset.person = id;
+			b.append(avatar(p));
+			hideFromAT(b);
+			b.addEventListener('click', (e) => {
+				e.stopPropagation();
+				toggle(id, true);
+			});
+			el.append(b);
+		}
+		return el;
+	}
+
+	function countEl(n: number, clusterId?: number, coords?: [number, number]) {
+		const el = document.createElement('button');
+		el.type = 'button';
+		el.className = 'pm-count';
+		el.textContent = String(n);
+		hideFromAT(el);
+		el.addEventListener('click', async (e) => {
+			e.stopPropagation();
+			if (clusterId === undefined || !coords) return;
+			const zoom = await map.getSource('people').getClusterExpansionZoom(clusterId);
+			const t = { center: coords, zoom };
+			if (reduceMotion.matches) map.jumpTo(t);
+			else map.easeTo(t);
+		});
+		return el;
+	}
+
+	async function leaves(clusterId: number, count: number): Promise<string[]> {
+		const key = `${clusterId}:${count}`;
+		const cached = leafCache.get(key);
+		if (cached) return cached;
+		const fs = await map.getSource('people').getClusterLeaves(clusterId, count, 0);
+		const ids: string[] = fs.map((f: any) => f.properties.id);
+		leafCache.set(key, ids);
+		return ids;
+	}
+
+	/** Draw people as faces: single people as a bubble, 2-5 close together as a row, more as a count. */
+	async function renderMarkers() {
+		if (!map?.getLayer('pins-q')) return;
+		const token = ++renderToken;
+		const want = new Map<string, { coords: [number, number]; make: () => HTMLElement }>();
+		const stacks = new Map<string, { coords: [number, number]; ids: string[] }>();
+		const seen = new Set<string>();
+
+		for (const f of map.queryRenderedFeatures({ layers: ['clusters-q', 'pins-q'] })) {
+			const pr = f.properties;
+			const coords = f.geometry.coordinates as [number, number];
+			if (pr.cluster) {
+				if (seen.has(`c${pr.cluster_id}`)) continue;
+				seen.add(`c${pr.cluster_id}`);
+				const n = pr.point_count as number;
+				if (n <= MAX_GROUP) {
+					const ids = await leaves(pr.cluster_id, n);
+					want.set(`g:${[...ids].sort().join(',')}`, { coords, make: () => groupEl(ids) });
+				} else {
+					want.set(`c:${pr.cluster_id}:${n}`, {
+						coords,
+						make: () => countEl(n, pr.cluster_id, coords),
+					});
+				}
+			} else {
+				if (seen.has(pr.id)) continue;
+				seen.add(pr.id);
+				const key = coords.map((c) => c.toFixed(5)).join(',');
+				const stack = stacks.get(key) ?? { coords, ids: [] };
+				stack.ids.push(pr.id);
+				stacks.set(key, stack);
+			}
+		}
+		// People at exactly the same place can never be pulled apart by zooming: show them together.
+		for (const { coords, ids } of stacks.values()) {
+			if (ids.length === 1) {
+				const p = people.get(ids[0]);
+				if (p) want.set(`p:${p.id}`, { coords, make: () => pinEl(p) });
+			} else if (ids.length <= MAX_GROUP) {
+				want.set(`g:${[...ids].sort().join(',')}`, { coords, make: () => groupEl(ids) });
+			} else {
+				want.set(`s:${ids.length}:${coords}`, { coords, make: () => countEl(ids.length) });
+			}
+		}
+		if (token !== renderToken) return; // a newer render superseded this one
+
+		for (const [key, m] of markers) {
+			if (!want.has(key)) {
+				m.marker.remove();
+				markers.delete(key);
+			}
+		}
+		for (const [key, w] of want) {
+			if (markers.has(key)) continue;
+			const el = w.make();
+			if (el.dataset.person === undefined) el.removeAttribute('data-person');
+			const marker = new lib.Marker({ element: el }).setLngLat(w.coords).addTo(map);
+			markers.set(key, { marker, el });
+		}
+		markSelected();
+	}
 
 	function setSelected(id: string | null, opts: { scroll?: boolean } = {}) {
-		if (map && selected)
-			map.setFeatureState({ source: 'people', id: selected }, { selected: false });
 		popup?.remove();
 		selected = id;
-		for (const c of cards) {
-			c.setAttribute('aria-pressed', String(c.dataset.personId === id));
-		}
+		for (const c of cards) c.setAttribute('aria-pressed', String(c.dataset.personId === id));
+		markSelected();
 		if (!id) return;
 
 		const card = cards.find((c) => c.dataset.personId === id);
-		if (opts.scroll && card && list) {
-			const l = list.getBoundingClientRect();
+		if (opts.scroll && card && scroller) {
+			const l = scroller.getBoundingClientRect();
 			const r = card.getBoundingClientRect();
 			if (r.top < l.top || r.bottom > l.bottom) {
 				card.scrollIntoView({
@@ -62,52 +235,101 @@ import { url } from '../lib/url';
 			}
 		}
 
-		const f = features.get(id);
-		if (!map || !f) return;
-		map.setFeatureState({ source: 'people', id }, { selected: true });
-		const target = { center: f.coords, zoom: Math.max(map.getZoom(), CLUSTER_MAX_ZOOM + 1) };
+		const p = people.get(id);
+		if (!map || !p) return;
+		const target = { center: p.coords, zoom: Math.max(map.getZoom(), CLUSTER_MAX_ZOOM + 1) };
 		if (reduceMotion.matches) map.jumpTo(target);
 		else map.flyTo({ ...target, speed: 0.8, essential: false });
 
 		const el = document.createElement('div');
+		el.className = 'pm-pop';
 		const name = document.createElement('strong');
-		name.textContent = f.props.name;
-		const inst = document.createElement('div');
-		inst.textContent = f.props.institution;
-		const addr = document.createElement('div');
-		addr.textContent = f.props.address;
-		addr.style.opacity = '0.75';
-		el.append(name, inst, addr);
-		popup = new lib.Popup({ offset: 14, maxWidth: '260px', closeButton: false })
-			.setLngLat(f.coords)
+		name.textContent = p.name;
+		el.append(name);
+		for (const [text, cls] of [
+			[p.institution, ''],
+			[p.address, 'pm-pop-addr'],
+		]) {
+			if (!text) continue;
+			const d = document.createElement('div');
+			d.textContent = text;
+			if (cls) d.className = cls;
+			el.append(d);
+		}
+		// Reuse the directory's link icons so the callout always matches the list.
+		const links = document.querySelector(`#${CSS.escape(id)} .links .social`);
+		if (links) el.append(links.cloneNode(true));
+		popup = new lib.Popup({ offset: 30, maxWidth: '280px', closeButton: false })
+			.setLngLat(p.coords)
 			.setDOMContent(el)
 			.addTo(map);
 	}
 
-	function toggle(id: string, scroll: boolean) {
-		setSelected(selected === id ? null : id, { scroll });
+	/** Show a person on the map while their card is hovered, even if they are inside a group. */
+	function showHover(id: string) {
+		hideHover();
+		const p = people.get(id);
+		if (!map || !p || !wrap.offsetParent) return;
+		const el = document.createElement('div');
+		el.className = 'pm-hover';
+		el.append(avatar(p));
+		const label = document.createElement('span');
+		label.className = 'pm-hover-label';
+		label.textContent = p.name;
+		el.append(label);
+		hoverMarker = new lib.Marker({ element: el }).setLngLat(p.coords).addTo(map);
+	}
+	function hideHover() {
+		hoverMarker?.remove();
+		hoverMarker = null;
 	}
 
-	// Directory works even if the map never loads.
 	for (const c of cards) {
-		c.addEventListener('click', () => toggle(c.dataset.personId!, false));
+		const id = c.dataset.personId!;
+		c.addEventListener('click', () => toggle(id, false));
+		const row = c.closest('li') ?? c;
+		row.addEventListener('pointerenter', () => showHover(id));
+		row.addEventListener('pointerleave', hideHover);
+		c.addEventListener('focus', () => showHover(id));
+		c.addEventListener('blur', hideHover);
 	}
 	document.addEventListener('keydown', (e) => {
 		if (e.key === 'Escape' && selected) setSelected(null);
+	});
+
+	// Directory search: only the matching people stay on the map.
+	window.addEventListener('people:filter', (e) => {
+		const ids = (e as CustomEvent<{ ids: string[] | null }>).detail.ids;
+		filterIds = ids ? new Set(ids) : null;
+		if (selected && filterIds && !filterIds.has(selected)) setSelected(null);
+		hideHover();
+		if (!map?.getSource('people')) return;
+		leafCache.clear();
+		map.getSource('people').setData({
+			...allData,
+			features: allData.features.filter((f: any) => !filterIds || filterIds.has(f.properties.id)),
+		});
+	});
+	// The map was shown again after being hidden.
+	window.addEventListener('people:mapshown', () => {
+		map?.resize();
+		renderMarkers();
 	});
 
 	async function init() {
 		try {
 			const [maplibre, style, data] = await Promise.all([
 				import('maplibre-gl'),
-				loadDarkStyle(),
+				loadMapStyle(),
 				fetch(wrap.dataset.geojson!).then((r) => r.json()),
 				import('maplibre-gl/dist/maplibre-gl.css'),
 			]);
 			lib = maplibre;
 			lib.setWorkerUrl(new URL(workerUrl, location.href).href);
+			allData = data;
 			for (const f of data.features) {
-				features.set(f.properties.id, { coords: f.geometry.coordinates, props: f.properties });
+				const pr = f.properties;
+				people.set(pr.id, { ...pr, coords: f.geometry.coordinates });
 			}
 
 			map = new lib.Map({
@@ -135,84 +357,42 @@ import { url } from '../lib/url';
 				status.hidden = true;
 				map.addSource('people', {
 					type: 'geojson',
-					data,
-					promoteId: 'id',
+					data: {
+						...data,
+						features: data.features.filter(
+							(f: any) => !filterIds || filterIds.has(f.properties.id),
+						),
+					},
 					cluster: true,
-					clusterRadius: 36,
+					clusterRadius: 60,
 					clusterMaxZoom: CLUSTER_MAX_ZOOM,
 				});
+				// Invisible layers: they only exist so the visible clusters and points can be queried;
+				// the faces themselves are HTML markers.
 				map.addLayer({
-					id: 'clusters',
+					id: 'clusters-q',
 					type: 'circle',
 					source: 'people',
 					filter: ['has', 'point_count'],
-					paint: {
-						'circle-color': C.pink,
-						'circle-stroke-color': C.ocean,
-						'circle-stroke-width': 2,
-						'circle-radius': ['step', ['get', 'point_count'], 14, 5, 18, 15, 22],
-					},
+					paint: { 'circle-radius': 20, 'circle-opacity': 0 },
 				});
 				map.addLayer({
-					id: 'cluster-count',
-					type: 'symbol',
-					source: 'people',
-					filter: ['has', 'point_count'],
-					layout: {
-						'text-field': ['get', 'point_count_abbreviated'],
-						'text-font': ['Noto Sans Bold'],
-						'text-size': 13,
-					},
-					paint: { 'text-color': C.ocean },
-				});
-				map.addLayer({
-					id: 'pins',
+					id: 'pins-q',
 					type: 'circle',
 					source: 'people',
 					filter: ['!', ['has', 'point_count']],
-					paint: {
-						'circle-radius': ['case', ['boolean', ['feature-state', 'selected'], false], 11, 7],
-						'circle-color': [
-							'case',
-							['boolean', ['feature-state', 'selected'], false],
-							C.accent,
-							C.pink,
-						],
-						'circle-stroke-color': [
-							'case',
-							['boolean', ['feature-state', 'selected'], false],
-							C.light,
-							C.ocean,
-						],
-						'circle-stroke-width': 2,
-					},
+					paint: { 'circle-radius': 20, 'circle-opacity': 0 },
 				});
 
 				map.resize();
-				if (features.size) {
+				if (people.size) {
 					const b = new lib.LngLatBounds();
-					for (const f of features.values()) b.extend(f.coords);
-					map.fitBounds(b, { padding: 40, maxZoom: 4, animate: false });
+					for (const p of people.values()) b.extend(p.coords);
+					map.fitBounds(b, { padding: 60, maxZoom: 4, animate: false });
 				}
+				map.on('idle', renderMarkers);
 				if (selected) setSelected(selected);
-
-				map.on('click', 'pins', (e: any) => {
-					const id = e.features?.[0]?.properties?.id;
-					if (id) toggle(id, true);
-				});
-				map.on('click', 'clusters', async (e: any) => {
-					const f = e.features[0];
-					const zoom = await map
-						.getSource('people')
-						.getClusterExpansionZoom(f.properties.cluster_id);
-					const t = { center: f.geometry.coordinates, zoom };
-					if (reduceMotion.matches) map.jumpTo(t);
-					else map.easeTo(t);
-				});
-				for (const layer of ['pins', 'clusters']) {
-					map.on('mouseenter', layer, () => (map.getCanvas().style.cursor = 'pointer'));
-					map.on('mouseleave', layer, () => (map.getCanvas().style.cursor = ''));
-				}
+				renderMarkers();
 			});
 			map.on('error', (e: any) => console.warn('Map error', e?.error ?? e));
 		} catch (err) {
@@ -266,7 +446,7 @@ import { url } from '../lib/url';
 		margin: 0;
 		padding: 24px;
 		text-align: center;
-		color: var(--on-dark);
+		color: var(--muted);
 		pointer-events: none;
 	}
 	.skip-map:focus {
@@ -282,12 +462,148 @@ import { url } from '../lib/url';
 		border-radius: var(--radius-pill);
 		font-weight: 600;
 	}
+
+	/* Faces on the map (created by script, so these rules are global). */
+	:global(.pm-av) {
+		display: grid;
+		place-items: end center;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		border-radius: 50%;
+		background: #e8e6ee;
+		color: #aaa7bd;
+	}
+	:global(.pm-av img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	:global(.pm-av svg) {
+		width: 80%;
+		height: 80%;
+	}
+	:global(.pm-pin),
+	:global(.pm-mini),
+	:global(.pm-count) {
+		padding: 0;
+		font: inherit;
+		cursor: pointer;
+		border: 3px solid #fff;
+		border-radius: 50%;
+		box-shadow: 0 1px 4px rgba(27, 26, 46, 0.35);
+	}
+	:global(.pm-pin) {
+		width: 44px;
+		height: 44px;
+		background: #fff;
+		transition:
+			width 0.15s,
+			height 0.15s,
+			border-color 0.15s;
+	}
+	:global(.pm-pin:hover) {
+		border-color: var(--pink);
+	}
+	:global(.pm-group) {
+		display: flex;
+		padding: 2px 8px 2px 2px;
+		background: #fff;
+		border-radius: 999px;
+		box-shadow: 0 1px 4px rgba(27, 26, 46, 0.35);
+	}
+	:global(.pm-mini) {
+		flex: none;
+		width: 34px;
+		height: 34px;
+		margin-right: -6px;
+		border-width: 2px;
+		background: #fff;
+		box-shadow: none;
+	}
+	:global(.pm-mini:hover) {
+		border-color: var(--pink);
+		z-index: 2;
+	}
+	:global(.pm-count) {
+		width: 44px;
+		height: 44px;
+		color: #fff;
+		background: var(--accent);
+		font-size: 15px;
+		font-weight: 600;
+	}
+	:global(.pm-pin.is-selected),
+	:global(.pm-mini.is-selected) {
+		border-color: var(--accent);
+		z-index: 3;
+	}
+	:global(.pm-selected) {
+		z-index: 5;
+	}
+	:global(.pm-hover) {
+		position: relative;
+		width: 60px;
+		height: 60px;
+		border: 4px solid var(--accent);
+		border-radius: 50%;
+		background: #fff;
+		box-shadow: 0 2px 10px rgba(27, 26, 46, 0.45);
+		pointer-events: none;
+		z-index: 9;
+	}
+	:global(.pm-hover-label) {
+		position: absolute;
+		top: calc(100% + 6px);
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 3px 10px;
+		white-space: nowrap;
+		font-size: 13px;
+		font-weight: 600;
+		color: #fff;
+		background: var(--ink);
+		border-radius: 999px;
+	}
+
 	:global(.maplibregl-popup-content) {
 		font-family: var(--font-body);
 		font-size: 14px;
 		color: var(--ink);
 		border-radius: 12px;
 		padding: 12px 16px;
+	}
+	:global(.pm-pop) {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+	:global(.pm-pop-addr) {
+		color: var(--muted);
+		font-size: 13px;
+	}
+	:global(.pm-pop .social) {
+		display: flex;
+		gap: 2px;
+		margin: 6px 0 -6px -8px;
+		padding: 0;
+		list-style: none;
+	}
+	:global(.pm-pop .social a) {
+		display: grid;
+		place-items: center;
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		color: var(--muted);
+	}
+	:global(.pm-pop .social a:hover) {
+		color: var(--accent);
+		background: #f1eff6;
+	}
+	:global(.pm-pop .social svg) {
+		width: 16px;
+		height: 16px;
 	}
 	:global(.maplibregl-ctrl-attrib) {
 		font-size: 12px;

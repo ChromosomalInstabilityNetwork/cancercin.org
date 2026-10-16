@@ -8,7 +8,7 @@ const path = Astro.url.pathname;
 const activeGroup = groupFor(path)?.label;
 ---
 
-<header class="nav on-dark">
+<header class="nav">
 	<div class="container bar">
 		<a class="brand" href={url('')}>
 			<Logo />
@@ -139,9 +139,10 @@ const activeGroup = groupFor(path)?.label;
 </script>
 
 <style>
+	/* No dark band: the bar is the page colour (solid, so content never shows through when it sticks). */
 	.nav {
-		background: var(--ink);
-		color: var(--on-dark);
+		background: var(--bg);
+		color: var(--ink);
 		position: sticky;
 		top: 0;
 		z-index: 50;
@@ -155,6 +156,7 @@ const activeGroup = groupFor(path)?.label;
 		position: relative;
 	}
 	.brand {
+		color: var(--ink);
 		display: inline-flex;
 		align-items: center;
 		height: 56px;
@@ -178,7 +180,7 @@ const activeGroup = groupFor(path)?.label;
 		gap: 6px;
 		min-height: 44px;
 		padding: 0 12px;
-		color: var(--on-dark);
+		color: var(--ink);
 		text-decoration: none;
 		font: inherit;
 		font-weight: 500;
@@ -188,13 +190,13 @@ const activeGroup = groupFor(path)?.label;
 	}
 	nav a:hover,
 	.group-btn:hover {
-		color: var(--on-dark-strong);
+		color: var(--accent);
 	}
 	.link[aria-current='page'],
 	.group-btn[data-current='true'] {
-		color: var(--on-dark-strong);
+		color: var(--ink);
 		text-decoration: underline;
-		text-decoration-color: var(--pink);
+		text-decoration-color: var(--accent);
 		text-decoration-thickness: 3px;
 		text-underline-offset: 8px;
 	}
@@ -214,10 +216,10 @@ const activeGroup = groupFor(path)?.label;
 		left: 0;
 		min-width: 260px;
 		padding: 8px;
-		background: var(--ink);
-		border: 1px solid var(--divider-dark);
+		background: var(--bg);
+		border: 1px solid var(--border);
 		border-radius: var(--radius-card);
-		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+		box-shadow: 0 12px 32px rgba(27, 26, 46, 0.14);
 	}
 	[data-open] > .menu {
 		display: block;
@@ -233,11 +235,7 @@ const activeGroup = groupFor(path)?.label;
 		padding: 0 14px;
 	}
 	.menu a:hover {
-		background: var(--divider-dark);
-	}
-	.menu a[aria-current='page'] {
-		color: var(--on-dark-strong);
-		box-shadow: inset 3px 0 0 var(--pink);
+		background: #f1eff6;
 	}
 	.toggle {
 		display: none;
@@ -246,9 +244,9 @@ const activeGroup = groupFor(path)?.label;
 		align-items: center;
 		justify-content: center;
 		background: none;
-		border: 1px solid var(--divider-dark);
+		border: 1px solid var(--border);
 		border-radius: 12px;
-		color: var(--on-dark-strong);
+		color: var(--ink);
 		cursor: pointer;
 	}
 	@media (max-width: 900px) {
@@ -261,8 +259,8 @@ const activeGroup = groupFor(path)?.label;
 			top: 100%;
 			left: 0;
 			right: 0;
-			background: var(--ink);
-			border-bottom: 1px solid var(--divider-dark);
+			background: var(--bg);
+			border-bottom: 1px solid var(--border);
 			padding: 8px var(--pad-x) 16px;
 		}
 		nav[data-open] {
@@ -287,7 +285,7 @@ const activeGroup = groupFor(path)?.label;
 			font-weight: 600;
 			text-transform: uppercase;
 			letter-spacing: 0.12em;
-			color: var(--pink);
+			color: var(--accent);
 		}
 		.menu {
 			display: block;

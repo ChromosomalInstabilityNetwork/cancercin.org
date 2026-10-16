@@ -22,11 +22,13 @@ export const KEEP_LAYERS = [
 ];
 
 export const MAP_COLORS = {
-	ocean: '#1B1A2E',
-	land: '#34335A',
-	border: '#4A4975',
-	label: '#B9B5CC',
+	ocean: '#DCE5EE',
+	land: '#F6F6F8',
+	border: '#C9C6D4',
+	label: '#55526A',
+	halo: '#FFFFFF',
 	pink: '#E9A8D8',
 	accent: '#8A2F73',
+	ink: '#1B1A2E',
 	light: '#FFFFFF',
 };

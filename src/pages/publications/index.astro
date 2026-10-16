@@ -4,17 +4,29 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 
 const all = await getCollection('publications');
+
+// Normalise to a sortable "YYYY-MM-DD" (missing parts become 00) and a display label.
+const parts = (p: (typeof all)[number]) => {
+	const d = p.data.date ?? (p.data.year ? String(p.data.year) : '');
+	const [y = '', m = '00', day = '00'] = d.split('-');
+	return { y, m, day, key: `${y}-${m}-${day}` };
+};
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const dateLabel = (p: (typeof all)[number]) => {
+	const { y, m, day } = parts(p);
+	if (!y) return '[Date]';
+	if (m === '00') return y;
+	return day === '00' ? `${MONTHS[+m - 1]} ${y}` : `${+day} ${MONTHS[+m - 1]} ${y}`;
+};
+
 const rows = all
 	.filter((p) => !p.data.featured)
 	.sort(
-		(a, b) => (b.data.year ?? 0) - (a.data.year ?? 0) || a.data.title.localeCompare(b.data.title),
+		(a, b) => parts(b).key.localeCompare(parts(a).key) || a.data.title.localeCompare(b.data.title),
 	);
 
-const years = [...new Set(rows.map((p) => p.data.year).filter((y): y is number => !!y))].sort(
-	(a, b) => b - a,
-);
+const years = [...new Set(rows.map((p) => parts(p).y).filter(Boolean))].sort().reverse();
 const journals = [...new Set(rows.map((p) => p.data.journal))].sort();
-const yearLabel = (y?: number) => (y ? String(y) : '[Year]');
 ---
 
 <BaseLayout
@@ -29,9 +41,7 @@ const yearLabel = (y?: number) => (y ? String(y) : '[Year]');
 		</div>
 	</div>
 
-	<section class="container library" aria-labelledby="lib-title">
-		<h2 id="lib-title">All publications</h2>
-
+	<section class="container library" aria-label="Publications">
 		<form class="filters" data-filters hidden onsubmit="return false">
 			<div class="field search">
 				<label for="f-q">Search</label>
@@ -42,7 +52,7 @@ const yearLabel = (y?: number) => (y ? String(y) : '[Year]');
 				<select id="f-year">
 					<option value="">All years</option>
 					{years.map((y) => (
-						<option value={String(y)}>{y}</option>
+						<option value={y}>{y}</option>
 					))}
 				</select>
 			</div>
@@ -66,7 +76,7 @@ const yearLabel = (y?: number) => (y ? String(y) : '[Year]');
 				<caption class="visually-hidden">Publications from the consortium</caption>
 				<thead>
 					<tr>
-						<th scope="col">Year</th>
+						<th scope="col">Date</th>
 						<th scope="col">Title</th>
 						<th scope="col">Authors</th>
 						<th scope="col">Journal</th>
@@ -75,11 +85,15 @@ const yearLabel = (y?: number) => (y ? String(y) : '[Year]');
 				<tbody>
 					{rows.map((p) => (
 						<tr
-							data-year={p.data.year ?? ''}
+							data-year={parts(p).y}
 							data-journal={p.data.journal}
 							data-text={`${p.data.title} ${p.data.authors} ${p.data.journal}`.toLowerCase()}
 						>
-							<td data-label="Year">{yearLabel(p.data.year)}</td>
+							<td data-label="Date" class="date">
+								<time datetime={parts(p).y ? parts(p).key.replace(/-00/g, '') : undefined}>
+									{dateLabel(p)}
+								</time>
+							</td>
 							<td data-label="Title" class="title">
 								{p.data.url ? <a href={p.data.url}>{p.data.title}</a> : p.data.title}
 							</td>
@@ -215,6 +229,9 @@ const yearLabel = (y?: number) => (y ? String(y) : '[Year]');
 		padding: 14px 12px;
 		vertical-align: top;
 		border-bottom: 1px solid var(--border);
+	}
+	td.date {
+		white-space: nowrap;
 	}
 	td.title {
 		font-weight: 600;

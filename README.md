@@ -78,9 +78,9 @@ Talks from across the CIN community.
 
 **Publications** are fetched from PubMed on every deploy by
 [`scripts/fetch-publications.mjs`](scripts/fetch-publications.mjs) (`npm run publications` to run it
-locally). It searches PubMed for `"chromosomal instability"[Title/Abstract]`, keeps the 200 newest
-results and rewrites `src/content/publications.yaml`. Entries whose `id` starts with `pmid-` are
-generated and replaced each run; any other entry is hand-curated and kept. If PubMed is unreachable the
+locally). It searches PubMed titles and abstracts for `"chromosomal instability"`, `"tumor evolution"` (or
+`"tumour evolution"`), or `"aneuploidy"` together with `"cancer"`, keeps the 200 newest results and rewrites `src/content/publications.yaml`. Entries whose `id` starts with `pmid-` are
+generated and replaced each run. Each gets a `date` (`YYYY-MM-DD`, or `YYYY-MM` / `YYYY` when PubMed only knows part of it): the electronic publication date when PubMed has one, otherwise the issue date, which can lie in the future for upcoming issues; any other entry is hand-curated and kept. If PubMed is unreachable the
 existing file is kept, so the build never breaks. Settings (environment variables): `PUBMED_QUERY`
 (search term), `PUBS_MAX` (default 200), `NCBI_API_KEY` (a repository secret; raises the rate limit)
 and `NCBI_EMAIL` (a repository variable; contact address NCBI asks tools to send). To change what is

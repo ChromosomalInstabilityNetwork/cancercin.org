@@ -1,6 +1,6 @@
 ---
 // iCIN logo, inlined so it can use the site's self-hosted Barlow Condensed and be recoloured.
-// White artwork: circles and lettering are white, the "C" is cut out in the nav colour.
+// Artwork uses currentColor for the discs and lettering; the "C" is cut out in --logo-cut (default white).
 interface Props {
 	class?: string;
 }
@@ -70,7 +70,7 @@ const { class: className } = Astro.props;
 	}
 	.word {
 		font-size: 40px;
-		fill: #fff;
+		fill: currentColor;
 	}
 	.light {
 		font-family: 'Barlow Condensed', sans-serif;
@@ -81,9 +81,9 @@ const { class: className } = Astro.props;
 		font-weight: 500;
 	}
 	.disc {
-		fill: #fff;
+		fill: currentColor;
 	}
 	.cut {
-		fill: var(--ink);
+		fill: var(--logo-cut, #fff);
 	}
 </style>

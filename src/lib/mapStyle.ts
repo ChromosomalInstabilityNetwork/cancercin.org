@@ -1,7 +1,7 @@
 import { KEEP_LAYERS, MAP_COLORS as C, MAP_STYLE_URL } from './mapConfig';
 
-/** Fetch the provider's style and recolour it to the dark brand palette. */
-export async function loadDarkStyle(): Promise<any> {
+/** Fetch the provider's style and recolour it to the light brand palette. */
+export async function loadMapStyle(): Promise<any> {
 	const res = await fetch(MAP_STYLE_URL);
 	if (!res.ok) throw new Error(`Map style request failed: ${res.status}`);
 	const style = await res.json();
@@ -20,7 +20,7 @@ export async function loadDarkStyle(): Promise<any> {
 			} else if (l.type === 'symbol') {
 				delete l.layout['icon-image'];
 				l.paint['text-color'] = C.label;
-				l.paint['text-halo-color'] = C.ocean;
+				l.paint['text-halo-color'] = C.halo;
 				l.paint['text-halo-width'] = 1;
 			}
 			return l;

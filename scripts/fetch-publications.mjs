@@ -9,7 +9,8 @@
  * hand-curated and kept as is. Bracketed placeholder rows are dropped once real results arrive.
  *
  * Environment (all optional):
- *   PUBMED_QUERY   PubMed search term (default: "chromosomal instability" in title/abstract)
+ *   PUBMED_QUERY   PubMed search term (default: "chromosomal instability" OR "tumor evolution" OR
+ *                  ("aneuploidy" AND "cancer"), in title/abstract)
  *   PUBS_MAX       maximum number of most-recent results to keep (default 200)
  *   PUBS_OUT       output file (default src/content/publications.yaml)
  *   NCBI_API_KEY   raises the NCBI rate limit from 3 to 10 requests/second
@@ -18,7 +19,14 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { parse, stringify } from 'yaml';
 
-const QUERY = process.env.PUBMED_QUERY || '"chromosomal instability"[Title/Abstract]';
+const QUERY =
+	process.env.PUBMED_QUERY ||
+	[
+		'"chromosomal instability"[Title/Abstract]',
+		'"tumor evolution"[Title/Abstract]',
+		'"tumour evolution"[Title/Abstract]',
+		'("aneuploidy"[Title/Abstract] AND "cancer"[Title/Abstract])',
+	].join(' OR ');
 const MAX = parseInt(process.env.PUBS_MAX || '200', 10);
 const OUT = process.env.PUBS_OUT || 'src/content/publications.yaml';
 const HEADER =
@@ -57,6 +65,40 @@ const clean = (s) =>
 		.replace(/\s+/g, ' ')
 		.trim();
 
+const MONTHS = {
+	jan: '01',
+	feb: '02',
+	mar: '03',
+	apr: '04',
+	may: '05',
+	jun: '06',
+	jul: '07',
+	aug: '08',
+	sep: '09',
+	oct: '10',
+	nov: '11',
+	dec: '12',
+};
+
+/** "2026 Oct 15" -> "2026-10-15", "2026 Oct" -> "2026-10", "2026" or "2026 Spring" -> "2026". */
+function parseDate(text) {
+	const m = /^(\d{4})(?:\s+([A-Za-z]{3})[a-z]*)?(?:\s+(\d{1,2}))?/.exec(text ?? '');
+	if (!m) return null;
+	const month = m[2] && MONTHS[m[2].toLowerCase()];
+	if (!month) return m[1];
+	return m[3] ? `${m[1]}-${month}-${m[3].padStart(2, '0')}` : `${m[1]}-${month}`;
+}
+
+/** Prefer the electronic publication date (the day it appeared online); fall back to the issue date. */
+function bestDate(r) {
+	const online = parseDate(r.epubdate);
+	const issue = parseDate(r.pubdate);
+	return online && online.length === 10 ? online : (issue ?? online);
+}
+
+/** Sort key that orders partial dates sensibly ("2026" < "2026-03" < "2026-03-09"). */
+const sortKey = (d = '') => `${d}${'-00-00'.slice(Math.max(0, d.length - 4))}`;
+
 function authorList(authors = []) {
 	const names = authors.filter((a) => a.authtype === 'Author' || !a.authtype).map((a) => a.name);
 	if (names.length <= MAX_AUTHORS) return names.join(', ');
@@ -76,10 +118,10 @@ async function fetchPubMed() {
 		for (const id of batch) {
 			const r = sum.result?.[id];
 			if (!r) continue;
-			const year = parseInt(r.pubdate?.slice(0, 4), 10);
+			const date = bestDate(r);
 			rows.push({
 				id: `pmid-${id}`,
-				...(Number.isFinite(year) ? { year } : {}),
+				...(date ? { date } : {}),
 				title: clean(r.title).replace(/\.$/, ''),
 				authors: authorList(r.authors),
 				journal: r.source,
@@ -100,7 +142,9 @@ async function main() {
 
 	const generated = await fetchPubMed();
 	if (generated.length === 0) throw new Error('PubMed returned no results');
-	generated.sort((a, b) => (b.year ?? 0) - (a.year ?? 0) || a.title.localeCompare(b.title));
+	generated.sort(
+		(a, b) => sortKey(b.date).localeCompare(sortKey(a.date)) || a.title.localeCompare(b.title),
+	);
 
 	const out = [...curated, ...generated];
 	writeFileSync(

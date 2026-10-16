@@ -17,8 +17,8 @@
 	--card: #ffffff;
 	--border: #e3ded5;
 	--divider-dark: #3a3955;
-	--map-land: #34335a;
-	--map-stroke: #4a4975;
+	--map-land: #f6f6f8;
+	--map-stroke: #c9c6d4;
 
 	--font-display: 'Fraunces', Georgia, serif;
 	--font-body: 'Instrument Sans', system-ui, sans-serif;
@@ -28,7 +28,7 @@
 	--radius-pill: 999px;
 
 	--max-width: 1280px;
-	--pad-x: clamp(20px, 6.25vw, 80px);
+	--pad-x: clamp(10px, 3.125vw, 40px);
 	--section-y: clamp(48px, 8vw, 96px);
 
 	--fs-h1: clamp(1.5rem, 1.3rem + 0.8vw, 2rem);
