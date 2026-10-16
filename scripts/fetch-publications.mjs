@@ -27,7 +27,7 @@ const KEYWORDS = [
 		query: '("tumor evolution"[Title/Abstract] OR "tumour evolution"[Title/Abstract])',
 	},
 	{
-		label: 'aneuploidy + cancer',
+		label: 'cancer aneuploidy',
 		query: '("aneuploidy"[Title/Abstract] AND "cancer"[Title/Abstract])',
 	},
 	{ label: 'replication stress', query: '"replication stress"[Title/Abstract]' },
