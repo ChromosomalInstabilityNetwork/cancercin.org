@@ -8,27 +8,3 @@ const key = import.meta.env.PUBLIC_MAP_KEY ?? '';
 export const MAP_STYLE_URL = (
 	import.meta.env.PUBLIC_MAP_STYLE_URL ?? 'https://tiles.openfreemap.org/styles/positron'
 ).replace('{key}', key);
-
-/** Layers kept from the provider style (OpenMapTiles schema); everything else is dropped. */
-export const KEEP_LAYERS = [
-	'background',
-	'water',
-	'boundary_2',
-	'label_city',
-	'label_city_capital',
-	'label_country_1',
-	'label_country_2',
-	'label_country_3',
-];
-
-export const MAP_COLORS = {
-	ocean: '#DCE5EE',
-	land: '#F6F6F8',
-	border: '#C9C6D4',
-	label: '#55526A',
-	halo: '#FFFFFF',
-	pink: '#E9A8D8',
-	accent: '#8A2F73',
-	ink: '#1B1A2E',
-	light: '#FFFFFF',
-};

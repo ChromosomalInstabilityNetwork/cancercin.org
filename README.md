@@ -136,9 +136,9 @@ different provider, replace the `provider` object in `scripts/geocode.mjs`; read
 environment variable and never commit it. Pins show institutional addresses only. Get consent before
 publishing names and addresses.
 
-**Changing the map style or provider:** the style URL and the layers/colours kept from it are in
-[`src/lib/mapConfig.ts`](src/lib/mapConfig.ts) and [`src/lib/mapStyle.ts`](src/lib/mapStyle.ts). The
-default is OpenFreeMap (no key). Set `PUBLIC_MAP_STYLE_URL` (and `PUBLIC_MAP_KEY` if the URL contains
+**Changing the map style or provider:** the style URL is in
+[`src/lib/mapConfig.ts`](src/lib/mapConfig.ts); the style is used as published, with no recolouring. The
+default is OpenFreeMap's Positron (no key). Set `PUBLIC_MAP_STYLE_URL` (and `PUBLIC_MAP_KEY` if the URL contains
 `{key}`) to switch; a client-side key is public by design, so restrict it to your domain with the
 provider. Keep the attribution visible. Check the provider's current terms before relying on it.
 

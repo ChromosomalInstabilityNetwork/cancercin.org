@@ -62,6 +62,7 @@ import { url } from '../lib/url';
 	let lib: typeof import('maplibre-gl');
 	let filterIds: Set<string> | null = null;
 	let hoverId: string | null = null;
+	let leaders: SVGSVGElement; // one SVG under all markers, in map-pixel coordinates
 	const people = new Map<string, Person>();
 	const markers = new Map<string, Marker>();
 
@@ -90,13 +91,12 @@ import { url } from '../lib/url';
 		root.className = 'pm-m'; // zero-sized, sits exactly on the person's location
 		root.dataset.person = p.id;
 
-		const svg = document.createElementNS(SVG_NS, 'svg');
-		svg.setAttribute('class', 'pm-leader');
-		svg.setAttribute('aria-hidden', 'true');
+		// Leader line + dot live in one shared layer under every face (see `leaders`), so no line can
+		// ever be drawn on top of a person.
 		const line = document.createElementNS(SVG_NS, 'line');
 		const dot = document.createElementNS(SVG_NS, 'circle');
 		dot.setAttribute('r', '3.5');
-		svg.append(line, dot);
+		leaders.append(line, dot);
 
 		// Markers duplicate the directory, which is the accessible equivalent: keep them out of the tab order.
 		const face = document.createElement('button');
@@ -115,7 +115,7 @@ import { url } from '../lib/url';
 			toggle(p.id, true);
 		});
 
-		root.append(svg, face);
+		root.append(face);
 		const marker = new lib.Marker({ element: root }).setLngLat(p.coords).addTo(map);
 		return { marker, root, face, line, dot, dx: 0, dy: 0 };
 	}
@@ -178,6 +178,8 @@ import { url } from '../lib/url';
 		for (const [id, m] of markers) {
 			const on = !filterIds || filterIds.has(id);
 			m.root.hidden = !on;
+			m.line.style.display = on ? '' : 'none';
+			m.dot.style.display = on ? '' : 'none';
 			if (!on) continue;
 			const pt = map.project(people.get(id)!.coords);
 			shown.push({ id, m, x: pt.x, y: pt.y });
@@ -190,8 +192,14 @@ import { url } from '../lib/url';
 			m.face.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
 			// A leader line from the true spot to a face that has been moved away from it.
 			const moved = Math.hypot(x, y) > 3;
-			m.line.setAttribute('x2', x.toFixed(1));
-			m.line.setAttribute('y2', y.toFixed(1));
+			const px = shown[i].x;
+			const py = shown[i].y;
+			m.line.setAttribute('x1', px.toFixed(1));
+			m.line.setAttribute('y1', py.toFixed(1));
+			m.line.setAttribute('x2', (px + x).toFixed(1));
+			m.line.setAttribute('y2', (py + y).toFixed(1));
+			m.dot.setAttribute('cx', px.toFixed(1));
+			m.dot.setAttribute('cy', py.toFixed(1));
 			m.line.style.display = moved ? '' : 'none';
 			m.dot.style.display = moved ? '' : 'none';
 			m.root.classList.toggle('pm-moved', moved);
@@ -337,6 +345,11 @@ import { url } from '../lib/url';
 					for (const p of people.values()) b.extend(p.coords);
 					map.fitBounds(b, { padding: 70, maxZoom: 4, animate: false });
 				}
+				// Added before any marker, so it sits beneath all of them.
+				leaders = document.createElementNS(SVG_NS, 'svg');
+				leaders.setAttribute('class', 'pm-leaders');
+				leaders.setAttribute('aria-hidden', 'true');
+				map.getCanvasContainer().append(leaders);
 				for (const p of people.values()) markers.set(p.id, makeMarker(p));
 				map.on('move', scheduleLayout);
 				map.on('resize', scheduleLayout);
@@ -440,21 +453,21 @@ import { url } from '../lib/url';
 		width: 80%;
 		height: 80%;
 	}
-	/* Thin line and dot from a pushed-aside face back to the person's true location. */
-	:global(.pm-leader) {
+	/* Thin lines and dots from pushed-aside faces back to their true locations: one layer that sits
+	   beneath every face. */
+	:global(.pm-leaders) {
 		position: absolute;
-		left: 0;
-		top: 0;
-		width: 1px;
-		height: 1px;
+		inset: 0;
+		width: 100%;
+		height: 100%;
 		overflow: visible;
 		pointer-events: none;
 	}
-	:global(.pm-leader line) {
+	:global(.pm-leaders line) {
 		stroke: rgba(27, 26, 46, 0.45);
 		stroke-width: 1.5;
 	}
-	:global(.pm-leader circle) {
+	:global(.pm-leaders circle) {
 		fill: var(--accent);
 		stroke: #fff;
 		stroke-width: 1.5;
