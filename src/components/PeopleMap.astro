@@ -43,7 +43,7 @@ import { url } from '../lib/url';
 	const CLUSTER_MAX_ZOOM = 5;
 	const MAX_GROUP = 5; // up to this many people are shown as a row of faces; more as a hex grid
 	const HEX_FACE = 34; // px, diameter of a face in a hex grid
-	const HEX_SPACING = 38; // px between neighbouring face centres
+	const HEX_SPACING = 19; // px between neighbouring face centres: faces overlap by half a step
 	const SILHOUETTE =
 		'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg>';
 
@@ -168,6 +168,7 @@ import { url } from '../lib/url';
 			const face = miniEl(p);
 			face.style.left = `${D * (q + r / 2) - HEX_FACE / 2}px`;
 			face.style.top = `${D * (Math.sqrt(3) / 2) * r - HEX_FACE / 2}px`;
+			face.style.setProperty('--z', String(ids.length - i)); // inner faces sit on top of outer ones
 			el.append(face);
 		});
 		return el;
@@ -554,6 +555,7 @@ import { url } from '../lib/url';
 	}
 	:global(.pm-hex .pm-mini) {
 		position: absolute;
+		z-index: var(--z, 1);
 		margin: 0;
 		border-width: 2px;
 		box-shadow: 0 1px 3px rgba(27, 26, 46, 0.4);
@@ -561,6 +563,10 @@ import { url } from '../lib/url';
 	:global(.pm-mini:hover) {
 		border-color: var(--pink);
 		z-index: 2;
+	}
+	:global(.pm-hex .pm-mini:hover),
+	:global(.pm-hex .pm-mini.is-selected) {
+		z-index: 999;
 	}
 	:global(.pm-pin.is-selected),
 	:global(.pm-mini.is-selected) {
