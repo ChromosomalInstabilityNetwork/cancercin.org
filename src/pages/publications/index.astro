@@ -138,7 +138,13 @@ const years = [...new Set(rows.map((p) => parts(p).y).filter(Boolean))].sort().r
 					(!text || r.dataset.text!.includes(text)) &&
 					(!year.value || r.dataset.year === year.value);
 				if (ok) matches++;
-				r.hidden = !ok || matches > limit;
+				const show = ok && matches <= limit;
+				// Rows that appear (scrolled into the next page, or newly matching) fade in quickly.
+				if (show && r.hidden) {
+					r.classList.add('fade-in');
+					r.addEventListener('animationend', () => r.classList.remove('fade-in'), { once: true });
+				}
+				r.hidden = !show;
 			}
 			const shown = Math.min(matches, limit);
 			count.textContent = `Showing ${shown} of ${matches} publication${matches === 1 ? '' : 's'}`;
@@ -284,6 +290,19 @@ const years = [...new Set(rows.map((p) => parts(p).y).filter(Boolean))].sort().r
 	}
 	tbody tr:hover {
 		background: #faf9fc;
+	}
+	@keyframes row-fade {
+		from {
+			opacity: 0;
+			transform: translateY(6px);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+	tr.fade-in {
+		animation: row-fade 0.25s ease-out both;
 	}
 	.more {
 		height: 1px;
