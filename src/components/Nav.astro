@@ -40,14 +40,20 @@ const activeGroup = groupFor(path)?.label;
 				{NAV.map((item, i) =>
 					isGroup(item) ? (
 						<li class="has-menu" data-group>
+							<a
+								class="group-link"
+								href={url(item.children[0].href)}
+								data-current={activeGroup === item.label ? 'true' : undefined}
+							>
+								{item.label}
+							</a>
 							<button
 								class="group-btn"
 								type="button"
 								aria-expanded="false"
 								aria-controls={`menu-${i}`}
-								data-current={activeGroup === item.label ? 'true' : undefined}
+								aria-label={`${item.label} pages`}
 							>
-								{item.label}
 								<svg
 									width="12"
 									height="12"
@@ -204,12 +210,24 @@ const activeGroup = groupFor(path)?.label;
 		color: var(--accent);
 	}
 	.link[aria-current='page'],
-	.group-btn[data-current='true'] {
+	.group-link[data-current='true'] {
 		color: var(--ink);
 		text-decoration: underline;
 		text-decoration-color: var(--accent);
 		text-decoration-thickness: 3px;
 		text-underline-offset: 8px;
+	}
+	/* A top-level group is a link to its landing page, with a small button beside it for the pages menu
+	   (the menu also opens on hover). */
+	.has-menu {
+		display: flex;
+		align-items: center;
+	}
+	.group-link {
+		padding-right: 4px;
+	}
+	.group-btn {
+		padding: 0 12px 0 2px;
 	}
 	.group-btn svg {
 		transition: transform 0.15s;
@@ -305,7 +323,8 @@ const activeGroup = groupFor(path)?.label;
 			min-height: 52px;
 		}
 		/* Groups are shown expanded inside the mobile menu. */
-		.group-btn {
+		.group-btn,
+		.group-link {
 			display: none;
 		}
 		.group-label {
