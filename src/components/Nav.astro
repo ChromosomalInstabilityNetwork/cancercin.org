@@ -18,9 +18,9 @@ const activeGroup = groupFor(path)?.label;
 			type="button"
 			aria-expanded="false"
 			aria-controls="site-menu"
+			aria-label="Open menu"
 			data-nav-toggle
 		>
-			<span class="visually-hidden">Menu</span>
 			<svg
 				width="24"
 				height="24"
@@ -31,7 +31,8 @@ const activeGroup = groupFor(path)?.label;
 				stroke-width="2"
 				stroke-linecap="round"
 			>
-				<path d="M3 6h18M3 12h18M3 18h18"></path>
+				<path class="ham" d="M3 6h18M3 12h18M3 18h18"></path>
+				<path class="close" d="M5 5l14 14M19 5L5 19"></path>
 			</svg>
 		</button>
 		<nav id="site-menu" aria-label="Main" data-nav-menu>
@@ -116,10 +117,20 @@ const activeGroup = groupFor(path)?.label;
 	});
 
 	if (toggle && menu) {
+		// On narrow screens the menu is a full-page overlay: the button becomes an X, the page behind
+		// it is locked and made inert.
+		const behind = document.querySelectorAll<HTMLElement>('main, footer, .skip-link');
 		const set = (open: boolean) => {
 			toggle.setAttribute('aria-expanded', String(open));
+			toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
 			menu.toggleAttribute('data-open', open);
+			document.documentElement.classList.toggle('nav-open', open);
+			for (const el of behind) el.toggleAttribute('inert', open);
 		};
+		// Growing back to the desktop layout closes the overlay.
+		window.matchMedia('(min-width: 901px)').addEventListener('change', (e) => {
+			if (e.matches) set(false);
+		});
 		toggle.addEventListener('click', () => set(toggle.getAttribute('aria-expanded') !== 'true'));
 		document.addEventListener('keydown', (e) => {
 			if (e.key !== 'Escape') return;
@@ -249,30 +260,49 @@ const activeGroup = groupFor(path)?.label;
 		color: var(--ink);
 		cursor: pointer;
 	}
+	.toggle .close {
+		display: none;
+	}
+	.toggle[aria-expanded='true'] .ham {
+		display: none;
+	}
+	.toggle[aria-expanded='true'] .close {
+		display: inline;
+	}
 	@media (max-width: 900px) {
 		.toggle {
 			display: inline-flex;
 		}
+		/* The logo and button stay above the overlay. */
+		.brand,
+		.toggle {
+			position: relative;
+			z-index: 2;
+		}
+		/* Full-page menu. */
 		nav {
 			display: none;
-			position: absolute;
-			top: 100%;
-			left: 0;
-			right: 0;
+			position: fixed;
+			inset: 0;
+			z-index: 1;
+			overflow-y: auto;
 			background: var(--bg);
-			border-bottom: 1px solid var(--border);
-			padding: 8px var(--pad-x) 16px;
+			padding: 88px var(--pad-x) 40px;
 		}
 		nav[data-open] {
 			display: block;
 		}
 		.top {
 			flex-direction: column;
-			gap: 0;
+			gap: 8px;
 		}
 		nav a {
 			width: 100%;
 			padding: 0;
+			font-family: var(--font-display);
+			font-size: 1.5rem;
+			font-weight: 600;
+			min-height: 52px;
 		}
 		/* Groups are shown expanded inside the mobile menu. */
 		.group-btn {
@@ -280,7 +310,7 @@ const activeGroup = groupFor(path)?.label;
 		}
 		.group-label {
 			display: block;
-			margin-top: 12px;
+			margin-top: 20px;
 			font-size: 13px;
 			font-weight: 600;
 			text-transform: uppercase;
@@ -291,16 +321,21 @@ const activeGroup = groupFor(path)?.label;
 			display: block;
 			position: static;
 			min-width: 0;
-			padding: 0 0 0 12px;
+			padding: 0;
 			border: 0;
 			box-shadow: none;
 		}
 		.menu a {
 			padding: 0;
 			border-radius: 0;
+			font-size: 1.25rem;
+			font-weight: 500;
 		}
 		.menu a:hover {
 			background: none;
 		}
+	}
+	:global(html.nav-open) {
+		overflow: hidden;
 	}
 </style>
