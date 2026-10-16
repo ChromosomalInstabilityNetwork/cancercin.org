@@ -41,7 +41,9 @@ import { url } from '../lib/url';
 	const cards = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-person-id]'));
 	const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 	const CLUSTER_MAX_ZOOM = 5;
-	const MAX_GROUP = 5; // up to this many people are shown as a row of faces; more become a count
+	const MAX_GROUP = 5; // up to this many people are shown as a row of faces; more as a hex grid
+	const HEX_FACE = 34; // px, diameter of a face in a hex grid
+	const HEX_SPACING = 38; // px between neighbouring face centres
 	const SILHOUETTE =
 		'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4 21c0-4.4 3.6-7.5 8-7.5s8 3.1 8 7.5z"/></svg>';
 
@@ -111,35 +113,62 @@ import { url } from '../lib/url';
 		el.className = 'pm-group';
 		for (const id of ids) {
 			const p = people.get(id);
-			if (!p) continue;
-			const b = document.createElement('button');
-			b.type = 'button';
-			b.className = 'pm-mini';
-			b.dataset.person = id;
-			b.append(avatar(p));
-			hideFromAT(b);
-			b.addEventListener('click', (e) => {
-				e.stopPropagation();
-				toggle(id, true);
-			});
-			el.append(b);
+			if (p) el.append(miniEl(p));
 		}
 		return el;
 	}
 
-	function countEl(n: number, clusterId?: number, coords?: [number, number]) {
-		const el = document.createElement('button');
-		el.type = 'button';
-		el.className = 'pm-count';
-		el.textContent = String(n);
-		hideFromAT(el);
-		el.addEventListener('click', async (e) => {
+	function miniEl(p: Person) {
+		const b = document.createElement('button');
+		b.type = 'button';
+		b.className = 'pm-mini';
+		b.dataset.person = p.id;
+		b.append(avatar(p));
+		hideFromAT(b);
+		b.addEventListener('click', (e) => {
 			e.stopPropagation();
-			if (clusterId === undefined || !coords) return;
-			const zoom = await map.getSource('people').getClusterExpansionZoom(clusterId);
-			const t = { center: coords, zoom };
-			if (reduceMotion.matches) map.jumpTo(t);
-			else map.easeTo(t);
+			toggle(p.id, true);
+		});
+		return b;
+	}
+
+	/**
+	 * Many people at once: pack their faces in a hex grid centred on the cluster's point. Zooming in
+	 * pulls the cluster apart and each face moves to their real position.
+	 */
+	function hexEl(ids: string[]) {
+		const el = document.createElement('div');
+		el.className = 'pm-hex'; // zero-sized and centred on the point; faces are placed around it
+		const D = HEX_SPACING;
+		const dirs = [
+			[1, 0],
+			[1, -1],
+			[0, -1],
+			[-1, 0],
+			[-1, 1],
+			[0, 1],
+		];
+		// Spiral out from the centre, ring by ring (axial hex coordinates).
+		const cells: [number, number][] = [[0, 0]];
+		for (let ring = 1; cells.length < ids.length; ring++) {
+			let q = -ring;
+			let r = ring;
+			for (const [dq, dr] of dirs) {
+				for (let k = 0; k < ring; k++) {
+					cells.push([q, r]);
+					q += dq;
+					r += dr;
+				}
+			}
+		}
+		ids.forEach((id, i) => {
+			const p = people.get(id);
+			if (!p) return;
+			const [q, r] = cells[i];
+			const face = miniEl(p);
+			face.style.left = `${D * (q + r / 2) - HEX_FACE / 2}px`;
+			face.style.top = `${D * (Math.sqrt(3) / 2) * r - HEX_FACE / 2}px`;
+			el.append(face);
 		});
 		return el;
 	}
@@ -173,10 +202,8 @@ import { url } from '../lib/url';
 					const ids = await leaves(pr.cluster_id, n);
 					want.set(`g:${[...ids].sort().join(',')}`, { coords, make: () => groupEl(ids) });
 				} else {
-					want.set(`c:${pr.cluster_id}:${n}`, {
-						coords,
-						make: () => countEl(n, pr.cluster_id, coords),
-					});
+					const ids = await leaves(pr.cluster_id, n);
+					want.set(`h:${[...ids].sort().join(',')}`, { coords, make: () => hexEl(ids) });
 				}
 			} else {
 				if (seen.has(pr.id)) continue;
@@ -195,7 +222,7 @@ import { url } from '../lib/url';
 			} else if (ids.length <= MAX_GROUP) {
 				want.set(`g:${[...ids].sort().join(',')}`, { coords, make: () => groupEl(ids) });
 			} else {
-				want.set(`s:${ids.length}:${coords}`, { coords, make: () => countEl(ids.length) });
+				want.set(`h:${[...ids].sort().join(',')}`, { coords, make: () => hexEl(ids) });
 			}
 		}
 		if (token !== renderToken) return; // a newer render superseded this one
@@ -484,8 +511,7 @@ import { url } from '../lib/url';
 		height: 80%;
 	}
 	:global(.pm-pin),
-	:global(.pm-mini),
-	:global(.pm-count) {
+	:global(.pm-mini) {
 		padding: 0;
 		font: inherit;
 		cursor: pointer;
@@ -521,17 +547,20 @@ import { url } from '../lib/url';
 		background: #fff;
 		box-shadow: none;
 	}
+	:global(.pm-hex) {
+		position: relative;
+		width: 0;
+		height: 0;
+	}
+	:global(.pm-hex .pm-mini) {
+		position: absolute;
+		margin: 0;
+		border-width: 2px;
+		box-shadow: 0 1px 3px rgba(27, 26, 46, 0.4);
+	}
 	:global(.pm-mini:hover) {
 		border-color: var(--pink);
 		z-index: 2;
-	}
-	:global(.pm-count) {
-		width: 44px;
-		height: 44px;
-		color: #fff;
-		background: var(--accent);
-		font-size: 15px;
-		font-weight: 600;
 	}
 	:global(.pm-pin.is-selected),
 	:global(.pm-mini.is-selected) {
