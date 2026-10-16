@@ -69,16 +69,29 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 				<ul class="directory" aria-label="Directory" data-directory>
 					{people.map((p) => (
 						<li class="person" id={p.id}>
-							<button type="button" class="select" data-person-id={p.id} aria-pressed="false">
+							<div class="row">
 								<span class="pic">
 									<PersonAvatar name={p.data.name} photo={p.data.photo} />
 								</span>
 								<span class="text">
-									<span class="name">{p.data.name}</span>
+									<span class="name">
+										{p.data.website ? (
+											<a
+												class="name-link"
+												href={p.data.website}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{p.data.name}
+											</a>
+										) : (
+											p.data.name
+										)}
+									</span>
 									{p.data.institution && <span class="inst">{p.data.institution}</span>}
 									{p.data.address && <span class="addr">{p.data.address}</span>}
 								</span>
-							</button>
+							</div>
 							<div class="links">
 								<SocialLinks
 									name={p.data.name}
@@ -88,6 +101,13 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 									linkedin={p.data.linkedin}
 								/>
 							</div>
+							<button
+								type="button"
+								class="select"
+								data-person-id={p.id}
+								aria-pressed="false"
+								aria-label={`${p.data.name}: show on map`}
+							></button>
 						</li>
 					))}
 				</ul>
@@ -296,6 +316,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		padding: 0;
 	}
 	.person {
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		gap: 2px;
@@ -306,19 +327,34 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		border-left-color: var(--accent);
 		background: #f8f4f8;
 	}
-	.select {
+	.row {
 		display: flex;
 		align-items: center;
 		gap: 14px;
-		width: 100%;
 		min-height: 44px;
+	}
+	/* The whole row selects the person on the map; the name and link icons sit above it. */
+	.select {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
 		padding: 0;
-		text-align: left;
-		font: inherit;
-		color: var(--ink);
 		background: none;
 		border: 0;
 		cursor: pointer;
+	}
+	.name-link,
+	.links {
+		position: relative;
+		z-index: 2;
+	}
+	.name-link {
+		color: inherit;
+		text-decoration: none;
+	}
+	.name-link:hover {
+		color: var(--accent);
+		text-decoration: underline;
 	}
 	.pic {
 		flex: none;
@@ -336,7 +372,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		font-size: 1.0625rem;
 		font-weight: 600;
 	}
-	.select[aria-pressed='true'] .name {
+	.person:has(.select[aria-pressed='true']) .name {
 		color: var(--accent);
 	}
 	.inst {

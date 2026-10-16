@@ -16,13 +16,14 @@ opened and checked.
 
 ## What to edit
 
-| To change…                | Edit…                                                              |
-| ------------------------- | ------------------------------------------------------------------ |
-| A person in the directory | [`src/content/people.yaml`](src/content/people.yaml)               |
-| An event                  | add or edit a file in [`src/content/events/`](src/content/events/) |
-| A news item               | add or edit a file in [`src/content/news/`](src/content/news/)     |
-| A publication             | automatic: fetched from PubMed on each deploy (see the README)     |
-| A method or dataset       | [`src/content/resources.yaml`](src/content/resources.yaml)         |
+| To change…                | Edit…                                                                              |
+| ------------------------- | ---------------------------------------------------------------------------------- |
+| A person in the directory | [`src/content/people.yaml`](src/content/people.yaml)                               |
+| An event                  | add or edit a file in [`src/content/events/`](src/content/events/)                 |
+| A working group           | add or edit a file in [`src/content/working-groups/`](src/content/working-groups/) |
+| A news item               | add or edit a file in [`src/content/news/`](src/content/news/)                     |
+| A publication             | automatic: fetched from PubMed on each deploy (see the README)                     |
+| A method or dataset       | [`src/content/resources.yaml`](src/content/resources.yaml)                         |
 
 The README has the full list of fields for each. Page text for the About and Challenges & Roadmap
 pages is in `src/pages/about/` and `src/data/`.

@@ -20,10 +20,11 @@ export const isGroup = (item: NavItem): item is NavGroup => 'children' in item;
 
 export const NAV: NavItem[] = [
 	{
-		label: 'About',
+		label: 'About iCIN',
 		children: [
 			{ label: 'About the Network', href: 'about/' },
 			{ label: 'Challenges & Roadmap', href: 'about/challenges-and-roadmap/' },
+			{ label: 'Working Groups', href: 'about/working-groups/' },
 		],
 	},
 	{ label: 'People', href: 'people/' },

@@ -54,7 +54,7 @@ data are bracketed placeholders (`[Name 1]`) and should be replaced with real, v
 ```
 
 People without an address have no pin. The directory and the home-page "Our community" bubbles
-both come from this file.
+both come from this file. If a person has a `website`, their name in the directory links to it.
 
 **Event**: a Markdown file in `src/content/events/`. The body is the description.
 
@@ -88,6 +88,19 @@ listed, set `PUBMED_QUERY`, for example to restrict to consortium authors.
 
 **Resource**: add to `src/content/resources.yaml` (`kind` = `method` | `data`, `title`, `category`,
 `description`, `url`, `host` = `github` | `website` | `repository`, `label` for the button text).
+
+**Working group**: a Markdown file in `src/content/working-groups/`. The body is the description and
+`members` lists person `id`s from `people.yaml`, in display order (a misspelt id fails the build).
+
+```md
+---
+title: 'CIN Measurement Working Group'
+order: 1 # position on the page
+members: [pippa-f-cosper, teresa-davoli]
+---
+
+What the group is working on.
+```
 
 **Navigation** (and the footer site map and section side-menus) come from one list in
 [`src/lib/site.ts`](src/lib/site.ts).

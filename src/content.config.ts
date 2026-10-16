@@ -81,4 +81,21 @@ const resources = defineCollection({
 	}),
 });
 
-export const collections = { people, events, news, publications, resources };
+// A team collaborating on one problem or challenge. The Markdown body is the description.
+const workingGroups = defineCollection({
+	loader: glob({ pattern: '**/*.md', base: 'src/content/working-groups' }),
+	schema: z.object({
+		title: z.string(),
+		order: z.number().default(0),
+		members: z.array(z.string()), // ids from people.yaml, in display order
+	}),
+});
+
+export const collections = {
+	workingGroups,
+	people,
+	events,
+	news,
+	publications,
+	resources,
+};

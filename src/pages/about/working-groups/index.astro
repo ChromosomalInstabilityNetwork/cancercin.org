@@ -1,0 +1,112 @@
+---
+import { getCollection, render } from 'astro:content';
+import SectionLayout from '../../../layouts/SectionLayout.astro';
+import PersonAvatar from '../../../components/PersonAvatar.astro';
+import { url } from '../../../lib/url';
+
+const groups = (await getCollection('workingGroups')).sort(
+	(a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
+);
+const people = new Map((await getCollection('people')).map((p) => [p.id, p]));
+
+const entries = await Promise.all(
+	groups.map(async (g) => {
+		const { Content } = await render(g);
+		const members = g.data.members.map((id) => {
+			const person = people.get(id);
+			if (!person) throw new Error(`Working group "${g.id}" lists unknown person "${id}"`);
+			return person;
+		});
+		return { group: g, Content, members };
+	}),
+);
+---
+
+<SectionLayout
+	title="Working Groups"
+	description="Teams across the International CIN Network collaborating on individual problems and challenges."
+>
+	<p class="intro">
+		Teams across the network collaborating to tackle individual problems and challenges in CIN
+		research.
+	</p>
+
+	{entries.map(({ group, Content, members }) => (
+		<section class="block group" id={group.id} aria-labelledby={`h-${group.id}`}>
+			<h2 id={`h-${group.id}`}>{group.data.title}</h2>
+			<div class="desc">
+				<Content />
+			</div>
+			<ul class="members" aria-label={`Members of the ${group.data.title}`}>
+				{members.map((m) => (
+					<li>
+						<a class="member" href={url(`people/#${m.id}`)}>
+							<span class="face">
+								<PersonAvatar name={m.data.name} photo={m.data.photo} />
+							</span>
+							<span class="who">{m.data.name}</span>
+							{m.data.institution && <span class="inst">{m.data.institution}</span>}
+						</a>
+					</li>
+				))}
+			</ul>
+		</section>
+	))}
+</SectionLayout>
+
+<style>
+	.intro {
+		max-width: 62ch;
+		color: var(--muted);
+		margin: 0 0 32px;
+	}
+	.desc {
+		max-width: 62ch;
+	}
+	.members {
+		list-style: none;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 24px;
+		margin: 24px 0 0;
+		padding: 0;
+	}
+	.member {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+		width: 156px;
+		text-align: center;
+		color: var(--ink);
+		text-decoration: none;
+	}
+	.face {
+		width: 72px;
+		height: 72px;
+		margin-bottom: 4px;
+		border-radius: 50%;
+		transition: transform 0.15s;
+	}
+	.member:hover .face,
+	.member:focus-visible .face {
+		transform: scale(1.06);
+	}
+	.who {
+		font-family: var(--font-display);
+		font-weight: 600;
+		line-height: 1.25;
+	}
+	.member:hover .who {
+		color: var(--accent);
+	}
+	.inst {
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		font-size: 13px;
+		line-height: 1.35;
+		color: var(--muted);
+	}
+</style>
