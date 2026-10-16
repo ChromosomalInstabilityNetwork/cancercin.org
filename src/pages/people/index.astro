@@ -214,7 +214,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		min-height: 520px;
 		/* Align with the site container. Set here (not on the column) so it never changes when the
 		   column is resized by showing or hiding the map. */
-		padding-left: max(var(--pad-x), calc((100% - var(--max-width)) / 2));
+		padding-left: var(--gutter);
 	}
 	.left {
 		min-height: 0;
@@ -319,7 +319,7 @@ const addBody = 'Name:\nInstitution:\nAddress:\n';
 		overflow: visible;
 	}
 	[data-map='hidden'] {
-		padding-right: max(var(--pad-x), calc((100% - var(--max-width)) / 2));
+		padding-right: var(--gutter);
 	}
 	[data-map='hidden'] .left-inner {
 		padding-right: 0;

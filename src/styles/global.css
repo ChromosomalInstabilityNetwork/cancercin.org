@@ -28,6 +28,12 @@
 	--radius-pill: 999px;
 
 	--max-width: 1280px;
+	/* Left/right inset of the container's content, for full-bleed layouts that must line up with it
+	   (use only where % resolves against the full page width). */
+	--gutter: max(
+		var(--pad-x),
+		calc((100% - var(--max-width) - 2 * var(--pad-x)) / 4 + var(--pad-x))
+	);
 	--pad-x: clamp(8px, 1.5625vw, 20px);
 	--section-y: clamp(48px, 8vw, 96px);
 
@@ -113,7 +119,9 @@ svg {
 
 .container {
 	width: 100%;
-	max-width: calc(var(--max-width) + 2 * var(--pad-x));
+	/* The side margin that appears on wide screens is half what a plain max-width would leave:
+	   the container is the average of the full width and the old maximum. */
+	max-width: calc((100% + var(--max-width) + 2 * var(--pad-x)) / 2);
 	margin-inline: auto;
 	padding-inline: var(--pad-x);
 }
