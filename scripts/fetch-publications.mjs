@@ -9,8 +9,10 @@
  * hand-curated and kept as is. Bracketed placeholder rows are dropped once real results arrive.
  *
  * Environment (all optional):
- *   PUBMED_QUERY   PubMed search term (default: "chromosomal instability" OR "tumor evolution" OR
- *                  ("aneuploidy" AND "cancer"), in title/abstract)
+ *   PUBMED_QUERY   PubMed search term (default: any of "chromosomal instability", "tumor evolution",
+ *                  "tumour evolution", "aneuploidy" AND "cancer", "replication stress",
+ *                  "chromosome mis-segregation", "chromosome missegregation",
+ *                  "DNA damage response", in title/abstract)
  *   PUBS_MAX       maximum number of most-recent results to keep (default 200)
  *   PUBS_OUT       output file (default src/content/publications.yaml)
  *   NCBI_API_KEY   raises the NCBI rate limit from 3 to 10 requests/second
@@ -26,6 +28,10 @@ const QUERY =
 		'"tumor evolution"[Title/Abstract]',
 		'"tumour evolution"[Title/Abstract]',
 		'("aneuploidy"[Title/Abstract] AND "cancer"[Title/Abstract])',
+		'"replication stress"[Title/Abstract]',
+		'"chromosome mis-segregation"[Title/Abstract]',
+		'"chromosome missegregation"[Title/Abstract]',
+		'"DNA damage response"[Title/Abstract]',
 	].join(' OR ');
 const MAX = parseInt(process.env.PUBS_MAX || '200', 10);
 const OUT = process.env.PUBS_OUT || 'src/content/publications.yaml';
