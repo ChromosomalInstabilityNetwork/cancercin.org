@@ -83,7 +83,9 @@ locally). It searches PubMed titles and abstracts for any of: `"chromosomal inst
 (or `"tumour evolution"`), `"aneuploidy"` together with `"cancer"`, `"replication stress"`,
 `"chromosome mis-segregation"` (also spelt `"missegregation"`) and `"DNA damage response"`. It keeps the 200 newest results and rewrites `src/content/publications.yaml`. Entries whose `id` starts with `pmid-` are
 generated and replaced each run. Each gets a `date` (`YYYY-MM-DD`, or `YYYY-MM` / `YYYY` when PubMed only knows part of it): the electronic publication date when PubMed has one, otherwise the issue date, which can lie in the future for upcoming issues; any other entry is hand-curated and kept. If PubMed is unreachable the
-existing file is kept, so the build never breaks. Each entry also records which of the keywords it matched
+existing file is kept, so the build never breaks. The keywords are listed in
+[`src/data/publication-keywords.json`](src/data/publication-keywords.json) (edit that file to change them; the
+page's "Keywords used" pills come from it too). Each entry also records which of the keywords it matched
 (`keywords`), shown in the Keyword column. The Publications page shows the first 40 rows and loads more as
 you scroll; the full table is in the page, so it still works without JavaScript. Settings (environment variables): `PUBMED_QUERY`
 (search term), `PUBS_MAX` (default 200), `NCBI_API_KEY` (a repository secret; raises the rate limit)

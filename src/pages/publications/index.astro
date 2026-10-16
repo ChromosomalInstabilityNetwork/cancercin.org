@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
+import keywords from '../../data/publication-keywords.json';
 
 const all = await getCollection('publications');
 
@@ -37,6 +38,12 @@ const years = [...new Set(rows.map((p) => parts(p).y).filter(Boolean))].sort().r
 	<div class="container top">
 		<div class="intro">
 			<p>Recent publications on chromosomal instability, updated automatically from PubMed.</p>
+			<p class="used">
+				<span>Keywords used:</span>
+				{keywords.map((k) => (
+					<span class="chip">{k.label}</span>
+				))}
+			</p>
 		</div>
 	</div>
 
@@ -182,6 +189,16 @@ const years = [...new Set(rows.map((p) => parts(p).y).filter(Boolean))].sort().r
 		font-size: 1.0625rem;
 		max-width: 52ch;
 		margin: 0;
+	}
+	.intro .used {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 6px;
+		max-width: none;
+		margin-top: 12px;
+		font-size: 0.9375rem;
+		color: var(--muted);
 	}
 	.library {
 		padding-block: 32px var(--section-y);

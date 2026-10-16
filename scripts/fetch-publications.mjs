@@ -19,25 +19,11 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { parse, stringify } from 'yaml';
 
-// Each keyword is searched in titles and abstracts. `label` is what the Keyword column shows.
-const KEYWORDS = [
-	{ label: 'chromosomal instability', query: '"chromosomal instability"[Title/Abstract]' },
-	{
-		label: 'tumor evolution',
-		query: '("tumor evolution"[Title/Abstract] OR "tumour evolution"[Title/Abstract])',
-	},
-	{
-		label: 'cancer aneuploidy',
-		query: '("aneuploidy"[Title/Abstract] AND "cancer"[Title/Abstract])',
-	},
-	{ label: 'replication stress', query: '"replication stress"[Title/Abstract]' },
-	{
-		label: 'chromosome mis-segregation',
-		query:
-			'("chromosome mis-segregation"[Title/Abstract] OR "chromosome missegregation"[Title/Abstract])',
-	},
-	{ label: 'DNA damage response', query: '"DNA damage response"[Title/Abstract]' },
-];
+// Each keyword is searched in titles and abstracts. `label` is what the Keyword column and the
+// Publications page show; the list lives in a JSON file so the page and this script share it.
+const KEYWORDS = JSON.parse(
+	readFileSync(new URL('../src/data/publication-keywords.json', import.meta.url), 'utf8'),
+);
 // A PUBMED_QUERY override replaces the whole search; the Keyword column is then left empty.
 const QUERY = process.env.PUBMED_QUERY || KEYWORDS.map((k) => k.query).join(' OR ');
 const MAX = parseInt(process.env.PUBS_MAX || '200', 10);

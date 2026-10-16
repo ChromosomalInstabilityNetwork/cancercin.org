@@ -1,0 +1,26 @@
+[
+	{
+		"label": "chromosomal instability",
+		"query": "\"chromosomal instability\"[Title/Abstract]"
+	},
+	{
+		"label": "tumor evolution",
+		"query": "(\"tumor evolution\"[Title/Abstract] OR \"tumour evolution\"[Title/Abstract])"
+	},
+	{
+		"label": "cancer aneuploidy",
+		"query": "(\"aneuploidy\"[Title/Abstract] AND \"cancer\"[Title/Abstract])"
+	},
+	{
+		"label": "replication stress",
+		"query": "\"replication stress\"[Title/Abstract]"
+	},
+	{
+		"label": "chromosome mis-segregation",
+		"query": "(\"chromosome mis-segregation\"[Title/Abstract] OR \"chromosome missegregation\"[Title/Abstract])"
+	},
+	{
+		"label": "DNA damage response",
+		"query": "\"DNA damage response\"[Title/Abstract]"
+	}
+]
