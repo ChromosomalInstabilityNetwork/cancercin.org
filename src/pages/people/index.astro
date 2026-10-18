@@ -211,6 +211,7 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 	.people {
 		display: grid;
 		grid-template-columns: minmax(380px, 1fr) 2fr;
+		height: calc(100vh - 72px); /* fallback for browsers without dvh */
 		height: calc(100dvh - 72px);
 		min-height: 520px;
 		/* Align with the site container. Set here (not on the column) so it never changes when the
@@ -422,6 +423,7 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 			position: sticky;
 			top: 72px;
 			z-index: 5;
+			height: 30vh;
 			height: 30dvh;
 			min-height: 200px;
 		}
