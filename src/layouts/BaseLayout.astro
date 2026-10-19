@@ -19,7 +19,11 @@ const ogImage = new URL(url('og.png'), Astro.site);
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- minimum-scale=1 stops iOS Safari from zooming the page out to fit anything wider than the screen -->
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, minimum-scale=1, shrink-to-fit=no"
+		/>
 		<meta name="generator" content={Astro.generator} />
 		<link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
 		<link rel="icon" href={url('favicon.ico')} sizes="any" />
@@ -51,5 +55,51 @@ const ogImage = new URL(url('og.png'), Astro.site);
 			<slot />
 		</main>
 		<Footer />
+		<script is:inline>
+			// Add ?debug to any URL to show how wide the browser thinks the page is (for diagnosing devices).
+			if (location.search.includes('debug')) {
+				addEventListener('load', function () {
+					const wide = [].slice
+						.call(document.querySelectorAll('body *'))
+						.map(function (e) {
+							return [e, e.getBoundingClientRect().right];
+						})
+						.sort(function (a, b) {
+							return b[1] - a[1];
+						})
+						.slice(0, 3)
+						.map(function (x) {
+							return (
+								x[0].tagName.toLowerCase() +
+								'.' +
+								String(
+									x[0].className && x[0].className.baseVal !== undefined
+										? x[0].className.baseVal
+										: x[0].className,
+								).slice(0, 24) +
+								' right=' +
+								Math.round(x[1])
+							);
+						});
+					const vv = window.visualViewport;
+					const box = document.createElement('pre');
+					box.style.cssText =
+						'position:fixed;left:0;bottom:0;right:0;z-index:99999;margin:0;padding:8px;background:#000;color:#0f0;font:12px/1.3 monospace;white-space:pre-wrap';
+					box.textContent = [
+						'innerWidth ' + innerWidth + '  clientWidth ' + document.documentElement.clientWidth,
+						'scrollWidth ' +
+							document.documentElement.scrollWidth +
+							'  body ' +
+							document.body.scrollWidth,
+						'visualViewport ' + (vv ? vv.width + ' scale ' + vv.scale : 'n/a'),
+						'max-width:900px matches: ' + matchMedia('(max-width: 900px)').matches,
+						'DPR ' + devicePixelRatio + '  screen ' + screen.width + 'x' + screen.height,
+						'widest: ' + wide.join(' | '),
+						'UA ' + navigator.userAgent,
+					].join('\n');
+					document.body.appendChild(box);
+				});
+			}
+		</script>
 	</body>
 </html>

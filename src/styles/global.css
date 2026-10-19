@@ -50,8 +50,16 @@
 }
 
 html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
 	scroll-behavior: smooth;
 	scroll-padding-top: 88px;
+}
+
+/* Nothing should ever make the page scroll sideways (iOS Safari zooms out to fit it). */
+html,
+body {
+	overflow-x: clip;
 }
 
 body {
