@@ -206,13 +206,13 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 </script>
 
 <style>
-	/* One viewport tall below the 72px nav. The whole left column scrolls; the map is fixed and runs
+	/* One viewport tall below the top bar. The whole left column scrolls; the map is fixed and runs
 	   edge to edge, from the nav to the footer and out to the right edge of the page. */
 	.people {
 		display: grid;
 		grid-template-columns: minmax(380px, 1fr) 2fr;
-		height: calc(100vh - 72px); /* fallback for browsers without dvh */
-		height: calc(100dvh - 72px);
+		height: calc(100vh - var(--nav-h)); /* fallback for browsers without dvh */
+		height: calc(100dvh - var(--nav-h));
 		min-height: 520px;
 		/* Align with the site container. Set here (not on the column) so it never changes when the
 		   column is resized by showing or hiding the map. */
@@ -399,11 +399,11 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 		color: var(--accent);
 	}
 	.inst {
-		font-size: 14px;
+		font-size: 0.875rem;
 		font-weight: 500;
 	}
 	.addr {
-		font-size: 13px;
+		font-size: 0.8125rem;
 		color: var(--muted);
 	}
 	.links {
@@ -421,7 +421,7 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 		.map {
 			order: -1;
 			position: sticky;
-			top: 72px;
+			top: var(--nav-h);
 			z-index: 5;
 			height: 30vh;
 			height: 30dvh;

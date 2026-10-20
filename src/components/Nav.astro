@@ -169,14 +169,14 @@ const activeGroup = groupFor(path)?.label;
 		align-items: center;
 		justify-content: space-between;
 		gap: 24px;
-		min-height: 72px;
+		min-height: var(--nav-h);
 		position: relative;
 	}
 	.brand {
 		color: var(--ink);
 		display: inline-flex;
 		align-items: center;
-		height: 56px;
+		height: var(--logo-h);
 	}
 	ul {
 		list-style: none;
@@ -290,6 +290,12 @@ const activeGroup = groupFor(path)?.label;
 	@media (max-width: 900px) {
 		.toggle {
 			display: inline-flex;
+			min-width: 52px;
+			min-height: 52px;
+		}
+		.toggle svg {
+			width: 30px;
+			height: 30px;
 		}
 		/* The logo and button stay above the overlay. */
 		.brand,
@@ -305,7 +311,7 @@ const activeGroup = groupFor(path)?.label;
 			z-index: 1;
 			overflow-y: auto;
 			background: var(--bg);
-			padding: 88px 20px 40px;
+			padding: calc(var(--nav-h) + 16px) 20px 40px;
 		}
 		nav[data-open] {
 			display: block;
@@ -333,7 +339,7 @@ const activeGroup = groupFor(path)?.label;
 		.group-label {
 			display: block;
 			margin-top: 20px;
-			font-size: 13px;
+			font-size: 0.8125rem;
 			font-weight: 600;
 			text-transform: uppercase;
 			letter-spacing: 0.12em;
