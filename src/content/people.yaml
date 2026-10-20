@@ -36,6 +36,7 @@
   city: 'Vancouver'
   state: 'BC'
   country: 'Canada'
+  website: 'https://pathology.ubc.ca/2022/12/01/samuel-aparicio/'
   show_on_map: true
   lat: 49.26259
   lng: -123.11935
@@ -79,6 +80,7 @@
     Cambridge Institute'
   city: 'Cambridge'
   country: 'UK'
+  website: 'https://www.cruk.cam.ac.uk/research-groups/brenton-group'
   show_on_map: true
   lat: 52.17842
   lng: 0.13545
@@ -90,6 +92,7 @@
   website: 'https://www.paediatrics.ox.ac.uk/research/little-princess-trust-professor-of-paediatric-oncology'
   x: 'https://x.com/isidrolauscher'
   linkedin: 'https://www.linkedin.com/in/isidro-cort%C3%A9s-ciriano-7a700335/'
+  bluesky: 'https://bsky.app/profile/isidrolauscher.bsky.social'
   show_on_map: true
   lat: 52.0785
   lng: 0.18494
@@ -98,6 +101,7 @@
   institution: 'Spanish National Cancer Research Centre (CNIO)'
   city: 'Madrid'
   country: 'Spain'
+  website: 'https://www.cnio.es/en/personas/felipe-cortes-2/'
   show_on_map: true
   lat: 40.47669
   lng: -3.69609
@@ -107,6 +111,7 @@
   city: 'Stanford'
   state: 'CA'
   country: 'USA'
+  website: 'https://med.stanford.edu/curtislab/'
   show_on_map: true
   lat: 37.43275
   lng: -122.1658
@@ -116,6 +121,7 @@
   city: 'New York'
   state: 'NY'
   country: 'USA'
+  website: 'https://www.davolilab.com'
   show_on_map: true
   lat: 40.74101
   lng: -73.97448
@@ -134,6 +140,7 @@
     University of Edinburgh; CRUK Scotland Centre'
   city: 'Edinburgh'
   country: 'UK'
+  website: 'https://www.ed.ac.uk/profile/ailith-ewing'
   show_on_map: true
   lat: 55.96322
   lng: -3.23218
@@ -153,6 +160,7 @@
   institution: 'Early Cancer Institute, Dept. of Oncology, University of Cambridge'
   city: 'Cambridge'
   country: 'UK'
+  website: 'https://www.earlycancer.cam.ac.uk/professor-rebecca-fitzgerald'
   show_on_map: true
   lat: 52.17369
   lng: 0.13791
@@ -174,6 +182,7 @@
   institution: 'Institute of Cancer Research (ICR)'
   city: 'London'
   country: 'UK'
+  website: 'https://www.icr.ac.uk/our-research/researchers-and-teams/professor-trevor-graham'
   show_on_map: true
   lat: 51.34518
   lng: -0.19465
@@ -183,6 +192,7 @@
   city: 'New York'
   state: 'NY'
   country: 'USA'
+  website: 'https://www.mskilab.org'
   show_on_map: true
   lat: 40.74207
   lng: -73.97434
@@ -192,6 +202,7 @@
     University of Edinburgh'
   city: 'Edinburgh'
   country: 'UK'
+  website: 'https://www.ed.ac.uk/profile/andrew-jackson'
   show_on_map: true
   lat: 55.96322
   lng: -3.23218
@@ -201,6 +212,7 @@
     University of Cambridge'
   city: 'Cambridge'
   country: 'UK'
+  website: 'https://www.stevejacksonlab.org/'
   show_on_map: true
   lat: 52.17842
   lng: 0.13545
@@ -209,6 +221,7 @@
   institution: 'European Molecular Biology Laboratory (EMBL)'
   city: 'Heidelberg'
   country: 'Germany'
+  website: 'https://www.embl.org/groups/korbel/'
   show_on_map: true
   lat: 49.38375
   lng: 8.71005
@@ -305,6 +318,7 @@
   city: 'New York'
   state: 'NY'
   country: 'USA'
+  website: 'https://www.mskcc.org/research-areas/labs/sohrab-shah'
   show_on_map: true
   lat: 40.76144
   lng: -73.96222
@@ -325,6 +339,7 @@
   institution: 'Weizmann Institute of Science'
   city: 'Rehovot'
   country: 'Israel'
+  website: 'https://www.weizmann.ac.il/Biomolecular_Sciences/shoshani/group'
   show_on_map: true
   lat: 31.89525
   lng: 34.81056
@@ -333,6 +348,7 @@
   institution: 'Computational Biology Research Centre, Human Technopole'
   city: 'Milan'
   country: 'Italy'
+  website: 'https://www.sottorivalab.org/'
   show_on_map: true
   lat: 45.51928
   lng: 9.1063
@@ -355,6 +371,9 @@
   city: 'Houston'
   state: 'TX'
   country: 'USA'
+  website: 'https://odin.mdacc.tmc.edu/~wwang7/index.html'
+  x: 'https://x.com/WenyiWang4'
+  linkedin: 'https://www.linkedin.com/in/wwang2'
   show_on_map: true
   lat: 29.70767
   lng: -95.39784
@@ -377,6 +396,9 @@
     University of London'
   city: 'London'
   country: 'UK'
+  website: 'https://mcclellandlab.com'
+  linkedin: 'https://www.linkedin.com/in/sarah-mcclelland-8a2b683'
+  bluesky: 'https://bsky.app/profile/mcclellandlab.bsky.social'
   show_on_map: true
   lat: 51.5209
   lng: -0.09887
@@ -386,22 +408,43 @@
     Cambridge Institute'
   city: 'Cambridge'
   country: 'UK'
+  website: 'https://www.markowetzlab.cam'
+  x: 'https://x.com/markowetzlab'
+  linkedin: 'https://www.linkedin.com/in/markowetz'
   show_on_map: true
   lat: 52.17842
   lng: 0.13545
 - id: floris-barthel
   name: 'Floris Barthel'
+  institution: 'Translational Genomics Research Institute (TGen)'
+  city: 'Phoenix'
+  state: 'AZ'
+  country: 'USA'
   website: 'https://www.barthel-lab.org/'
   x: 'https://x.com/florisbarthel'
   linkedin: 'https://www.linkedin.com/in/florisbarthel/'
   bluesky: 'https://bsky.app/profile/florisbarthel.bsky.social'
   show_on_map: true
+  lat: 33.45297
+  lng: -112.06718
 - id: barbara-hernando
   name: 'Barbara Hernando'
+  institution: 'Computational Oncology Group, Spanish National Cancer Research Centre (CNIO)'
+  city: 'Madrid'
+  country: 'Spain'
   x: 'https://x.com/BHFHeptathlon'
   linkedin: 'https://www.linkedin.com/in/barbarahernando'
   bluesky: 'https://bsky.app/profile/bhernando.bsky.social'
   show_on_map: true
+  lat: 40.47669
+  lng: -3.69609
 - id: andrew-lynch
   name: 'Andrew Lynch'
+  institution: 'Van Loo Laboratory, Dept. of Genetics, The University of Texas MD
+    Anderson Cancer Center'
+  city: 'Houston'
+  state: 'TX'
+  country: 'USA'
   show_on_map: true
+  lat: 29.70767
+  lng: -95.39784
