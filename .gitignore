@@ -41,5 +41,5 @@ CLAUDE.md
 claude.md
 .claude/
 
-# Generated from src/content/people.tsv by scripts/build-people.mjs
-src/content/people.yaml
+# Generated from src/content/people.yaml by scripts/build-people.mjs
+src/content/people.built.yaml

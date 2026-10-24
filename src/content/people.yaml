@@ -1,0 +1,317 @@
+# Directory of iCIN members. Edit this file to add or change people.
+# Only list people who have agreed. Locations are city / state (if any) / country: no street addresses.
+# Links (website, x, linkedin, bluesky) are optional full URLs and show as icons under the person.
+# photo is the headshot's filename in src/img/people (if omitted, a file named after the person is used).
+#
+# Do not add id, lat, lng or show_on_map here: scripts/build-people.mjs adds them when it builds
+# people.built.yaml (the file the site reads) before dev/build. To override one, set it here.
+
+- name: Pippa F. Cosper
+  institution: Dept. of Radiation Medicine, University of Wisconsin School of Medicine and Public Health; University of Wisconsin Carbone Cancer Center
+  city: Madison
+  state: WI
+  country: USA
+  website: https://radmed.wisc.edu/2026/05/14/the-cosper-lab-kedar-copy/
+  x: https://x.com/pipcosper
+  linkedin: https://www.linkedin.com/in/pippa-cosper-m-d-ph-d-30373360/
+  photo: pippa-cosper.png
+- name: Sarah J. Aitken
+  institution: Center of Molecular and Cellular Oncology, Yale Cancer Center; Dept. of Pathology, Yale University School of Medicine
+  city: New Haven
+  state: CT
+  country: USA
+  website: https://www.aitkenlab.org
+  linkedin: https://www.linkedin.com/in/sarah-j-aitken
+  bluesky: https://bsky.app/profile/s-j-aitken.bsky.social
+  photo: sarah-aitken.png
+- name: Sam Aparicio
+  institution: Dept. of Pathology and Laboratory Medicine, University of British Columbia; BC Cancer
+  city: Vancouver
+  state: BC
+  country: Canada
+  website: https://pathology.ubc.ca/2022/12/01/samuel-aparicio/
+  photo: sam-aparicio.png
+- name: Samuel Bakhoum
+  institution: Volastra Therapeutics Inc.; Dept. of Radiation Oncology, Geisel School of Medicine at Dartmouth
+  city: New York
+  state: NY
+  country: USA
+  website: https://www.volastratx.com/our-team/samuel-bakhoum/
+  x: https://x.com/Samuel_Bakhoum
+  linkedin: https://www.linkedin.com/in/samuel-bakhoum
+  photo: samuel-bakhoum.png
+- name: Francisco M. Barriga
+  institution: Systems Oncology Program, Vall d'Hebron Institute of Oncology (VHIO)
+  city: Barcelona
+  country: Spain
+  website: https://barrigalab.net/
+  linkedin: https://www.linkedin.com/in/francisco-barriga-02878072/
+  photo: francisco-barriga.png
+- name: Uri Ben-David
+  institution: Tel Aviv University
+  city: Tel Aviv
+  country: Israel
+  website: https://www.bendavidlab.com
+  x: https://x.com/BenDavidLab
+  linkedin: https://www.linkedin.com/in/uri-ben-david-a0089417/
+  photo: uri-ben-david.png
+- name: James D. Brenton
+  institution: Dept. of Oncology, University of Cambridge; Cancer Research UK Cambridge Institute
+  city: Cambridge
+  country: UK
+  website: https://www.cruk.cam.ac.uk/research-groups/brenton-group
+  photo: james-brenton.png
+- name: Isidro Cortes-Ciriano
+  institution: EMBL-EBI; Wellcome Sanger Institute
+  city: Hinxton
+  country: UK
+  website: https://www.paediatrics.ox.ac.uk/research/little-princess-trust-professor-of-paediatric-oncology
+  x: https://x.com/isidrolauscher
+  linkedin: https://www.linkedin.com/in/isidro-cort%C3%A9s-ciriano-7a700335/
+  bluesky: https://bsky.app/profile/isidrolauscher.bsky.social
+- name: Felipe Cortés-Ledesma
+  institution: Spanish National Cancer Research Centre (CNIO)
+  city: Madrid
+  country: Spain
+  website: https://www.cnio.es/en/personas/felipe-cortes-2/
+  photo: felipe-cortes-ledesma.png
+- name: Christina Curtis
+  institution: Stanford University
+  city: Stanford
+  state: CA
+  country: USA
+  website: https://med.stanford.edu/curtislab/
+  photo: christina-curtis.png
+- name: Teresa Davoli
+  institution: NYU Langone Health
+  city: New York
+  state: NY
+  country: USA
+  website: https://www.davolilab.com
+  photo: teresa-davoli.png
+- name: Aurélie Ernst
+  institution: German Cancer Research Center (DKFZ); German Cancer Consortium (DKTK)
+  city: Heidelberg
+  country: Germany
+  website: https://www.dkfz.de/en/genome-instability-in-tumors
+  photo: aurelie-ernst.png
+- name: Ailith Ewing
+  institution: MRC Human Genetics Unit, Institute of Genetics and Cancer, University of Edinburgh; CRUK Scotland Centre
+  city: Edinburgh
+  country: UK
+  website: https://www.ed.ac.uk/profile/ailith-ewing
+- name: Daniele Fachinetti
+  institution: Institut Curie
+  city: Paris
+  country: France
+  website: https://institut-curie.org/team/fachinetti
+  linkedin: https://www.linkedin.com/in/daniele-fachinetti-73085134/
+  bluesky: https://bsky.app/profile/dfachinetti.bsky.social
+  photo: daniele-fachinetti.png
+- name: Rebecca C. Fitzgerald
+  institution: Early Cancer Institute, Dept. of Oncology, University of Cambridge
+  city: Cambridge
+  country: UK
+  website: https://www.earlycancer.cam.ac.uk/professor-rebecca-fitzgerald
+  photo: rebecca-fitzgerald.png
+- name: Floris Foijer
+  institution: European Research Institute for the Biology of Ageing, University of Groningen / UMCG
+  city: Groningen
+  country: Netherlands
+  website: https://eriba.umcg.nl/groups/genomic-instability-in-development-and-disease/
+  x: https://x.com/Foijer_lab
+  linkedin: https://www.linkedin.com/in/floris-foijer-04b530/
+  bluesky: https://bsky.app/profile/foijer-lab.bsky.social
+  photo: floris-foijer.png
+- name: Trevor A. Graham
+  institution: Institute of Cancer Research (ICR)
+  city: London
+  country: UK
+  website: https://www.icr.ac.uk/our-research/researchers-and-teams/professor-trevor-graham
+- name: Marcin Imielinski
+  institution: NYU Grossman School of Medicine; New York Genome Center
+  city: New York
+  state: NY
+  country: USA
+  website: https://www.mskilab.org
+  photo: marcin-imielinski.png
+- name: Andrew P. Jackson
+  institution: MRC Human Genetics Unit, Institute of Genetics and Cancer, University of Edinburgh
+  city: Edinburgh
+  country: UK
+  website: https://www.ed.ac.uk/profile/andrew-jackson
+  photo: andrew-jackson.png
+- name: Stephen P. Jackson
+  institution: Cancer Research UK Cambridge Institute and Dept. of Biochemistry, University of Cambridge
+  city: Cambridge
+  country: UK
+  website: https://www.stevejacksonlab.org/
+  photo: stephen-jackson.png
+- name: Jan Oliver Korbel
+  institution: European Molecular Biology Laboratory (EMBL)
+  city: Heidelberg
+  country: Germany
+  website: https://www.embl.org/groups/korbel/
+  photo: jan-korbel.png
+- name: John Maciejowski
+  institution: Memorial Sloan Kettering Cancer Center
+  city: New York
+  state: NY
+  country: USA
+  website: https://maciejowskilab.org/
+  linkedin: https://www.linkedin.com/in/john-maciejowski-b776808/
+  photo: john-maciejowski.png
+- name: Geoff Macintyre
+  institution: Spanish National Cancer Research Centre (CNIO)
+  city: Madrid
+  country: Spain
+  website: https://macintyrelab.org
+  x: https://x.com/gjmacintyre
+  linkedin: https://www.linkedin.com/in/gjmacintyre/
+  bluesky: https://bsky.app/profile/gmaci.bsky.social
+- name: David Pellman
+  institution: Dept. of Cell Biology, Harvard Medical School; Dept. of Pediatric Oncology, Dana-Farber Cancer Institute; Howard Hughes Medical Institute
+  city: Boston
+  state: MA
+  country: USA
+  website: https://labs.dana-farber.org/pellmanlab/
+  photo: david-pellman.png
+- name: Eva Petermann
+  institution: Dept. of Cancer and Genomic Sciences, University of Birmingham; Birmingham Centre for Genome Biology
+  city: Birmingham
+  country: UK
+  website: https://www.evapetermann.org/
+  linkedin: https://www.linkedin.com/in/eva-petermann-996985134/
+  bluesky: https://bsky.app/profile/petermannlab.bsky.social
+  photo: eva-petermann.png
+- name: Nischalan Pillay
+  institution: Dept. of Research Pathology, UCL Cancer Institute; Royal National Orthopaedic Hospital NHS Trust
+  city: London
+  country: UK
+  website: https://www.sarcoma-research.com/
+  linkedin: https://www.linkedin.com/in/nischalan-pillay-681663340
+- name: Stefano Santaguida
+  institution: Dept. of Experimental Oncology, European Institute of Oncology IRCCS; Dept. of Oncology and Hemato-Oncology, University of Milan
+  city: Milan
+  country: Italy
+  website: https://www.santaguidalab.org
+  x: https://x.com/SteSantaguida
+  linkedin: https://www.linkedin.com/in/stefano-santaguida-phd-7a98b5ba
+  bluesky: https://bsky.app/profile/stesantaguida.bsky.social
+- name: Roland Schwarz
+  institution: Institute for Computational Cancer Biology, University of Cologne
+  city: Cologne
+  country: Germany
+- name: Christine Sers
+  institution: Charité – Universitätsmedizin Berlin
+  city: Berlin
+  country: Germany
+  website: https://pathologie-ccm.charite.de/en/research/research_group_sers_molecular_tumor_pathology/
+  photo: christine-sers.png
+- name: Sohrab Shah
+  institution: Memorial Sloan Kettering Cancer Center
+  city: New York
+  state: NY
+  country: USA
+  website: https://www.mskcc.org/research-areas/labs/sohrab-shah
+  photo: sohrab-shah.png
+- name: Jason M. Sheltzer
+  institution: Stanford Cancer Institute, Stanford University
+  city: Stanford
+  state: CA
+  country: USA
+  website: https://sheltzerlab.org/
+  x: https://x.com/JSheltzer
+  linkedin: https://www.linkedin.com/in/jason-sheltzer-ba0086234/
+  photo: jason-sheltzer.png
+- name: Ofer Shoshani
+  institution: Weizmann Institute of Science
+  city: Rehovot
+  country: Israel
+  website: https://www.weizmann.ac.il/Biomolecular_Sciences/shoshani/group
+  photo: ofer-shoshani.png
+- name: Andrea Sottoriva
+  institution: Computational Biology Research Centre, Human Technopole
+  city: Milan
+  country: Italy
+  website: https://www.sottorivalab.org/
+  photo: andrea-sottoriva.png
+- name: Roel G.W. Verhaak
+  institution: Dept. of Neurosurgery, Yale University
+  city: New Haven
+  state: CT
+  country: USA
+  website: https://www.verhaaklab.org
+  linkedin: https://www.linkedin.com/in/roel-verhaak-3619829/
+  bluesky: https://bsky.app/profile/roelverhaak.bsky.social
+- name: Wenyi Wang
+  institution: Dept. of Bioinformatics and Computational Biology, The University of Texas MD Anderson Cancer Center
+  city: Houston
+  state: TX
+  country: USA
+  website: https://odin.mdacc.tmc.edu/~wwang7/index.html
+  x: https://x.com/WenyiWang4
+  linkedin: https://www.linkedin.com/in/wwang2
+  photo: wenyi-wang.png
+- name: Peter Van Loo
+  institution: Dept. of Genetics and Dept. of Genomic Medicine, The University of Texas MD Anderson Cancer Center
+  city: Houston
+  state: TX
+  country: USA
+  website: https://www.mdanderson.org/research/departments-labs-institutes/labs/van-loo-laboratory.html
+  x: https://x.com/VanLooLab
+  linkedin: https://www.linkedin.com/in/peter-van-loo-a4788094/
+  photo: peter-van-loo.png
+- name: Sarah E. McClelland
+  institution: Centre for Cancer Evolution, Barts Cancer Institute, Queen Mary University of London
+  city: London
+  country: UK
+  website: https://mcclellandlab.com
+  linkedin: https://www.linkedin.com/in/sarah-mcclelland-8a2b683
+  bluesky: https://bsky.app/profile/mcclellandlab.bsky.social
+- name: Florian Markowetz
+  institution: Dept. of Oncology, University of Cambridge; Cancer Research UK Cambridge Institute
+  city: Cambridge
+  country: UK
+  website: https://www.markowetzlab.cam
+  x: https://x.com/markowetzlab
+  linkedin: https://www.linkedin.com/in/markowetz
+  photo: florian-markowetz.png
+- name: Barbara Hernando
+  institution: Spanish National Cancer Research Centre (CNIO)
+  city: Madrid
+  country: Spain
+  x: https://x.com/BHFHeptathlon
+  linkedin: https://www.linkedin.com/in/barbarahernando
+  bluesky: https://bsky.app/profile/bhernando.bsky.social
+- name: Andrew Lynch
+  institution: Dept. of Genetics, The University of Texas MD Anderson Cancer Center
+  city: Houston
+  state: TX
+  country: USA
+- name: Floris Barthel
+  institution: Bioinnovation and Genome Sciences Division, The Translational Genomics Research Institute (TGen)
+  city: Phoenix
+  state: AZ
+  country: USA
+  website: https://www.barthel-lab.org/
+  x: https://x.com/florisbarthel
+  linkedin: https://www.linkedin.com/in/florisbarthel/
+  bluesky: https://bsky.app/profile/florisbarthel.bsky.social
+  photo: floris-barthel.png
+- name: Emma Watson
+  institution: Department of Systems Biology, University of Massachusetts Chan Medical School & Howard Hughes Medical Institute
+  city: Worcester
+  state: MA
+  country: USA
+  website: https://www.watsonlabs.org/
+  x: https://x.com/game_of_chroms
+  linkedin: https://www.linkedin.com/in/emma-v-watson-404b4a99/
+  bluesky: https://bsky.app/profile/game-of-chroms.bsky.social
+- name: Eileen Parkes
+  institution: Department of Oncology, University of Oxford
+  city: Oxford
+  country: UK
+  website: https://www.oncology.ox.ac.uk/research/research-groups/parkes-group
+  bluesky: https://bsky.app/profile/eileenparkes.bsky.social
+  photo: eileen-parkes.png

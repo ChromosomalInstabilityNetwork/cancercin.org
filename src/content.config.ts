@@ -4,7 +4,7 @@ import { z } from 'astro/zod';
 
 // Placeholder entries leave dates/links unset; real entries should fill them in.
 const people = defineCollection({
-	loader: file('src/content/people.yaml'),
+	loader: file('src/content/people.built.yaml'),
 	schema: z.object({
 		publish: z.boolean().default(true), // false hides the entry from the site
 		name: z.string(),

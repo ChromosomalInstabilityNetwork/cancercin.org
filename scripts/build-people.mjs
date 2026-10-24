@@ -1,30 +1,30 @@
 #!/usr/bin/env node
 /**
- * Build src/content/people.yaml (generated, not committed) from src/content/people.tsv.
+ * Build src/content/people.built.yaml (generated, not committed) from src/content/people.yaml.
  *
  *   node scripts/build-people.mjs [--geocode]
  *
- * people.tsv holds only what people provide: name, institution, city, state, country and links.
- * Everything else is derived here:
+ * people.yaml holds only what people provide: name, institution, city, state, country, links and
+ * (optionally) a photo filename. The built file adds everything else:
  * - id: slug of the name ("Pippa F. Cosper" -> pippa-f-cosper); working groups refer to it.
- * - photo: the file in src/img/people named after the person (jane-doe.png), if there is one.
+ * - photo: the `photo` given in people.yaml, else the file in src/img/people named after the person.
  * - show_on_map: true.
  * - lat/lng: looked up in .geocode-cache.json by institution + place. Normal builds only read the
  *   cache; `npm run geocode` (--geocode) queries Nominatim for places the cache doesn't have yet.
  *
- * Optional extra TSV columns override the derived values: id, photo, show_on_map, lat, lng.
+ * Optional id, show_on_map, lat and lng keys in people.yaml override the derived values.
  */
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
-import { stringify } from 'yaml';
+import { parse, stringify } from 'yaml';
 
-const TSV = 'src/content/people.tsv';
-const OUT = 'src/content/people.yaml';
+const SRC = 'src/content/people.yaml';
+const OUT = 'src/content/people.built.yaml';
 const PHOTOS = 'src/img/people';
 const CACHE_FILE = '.geocode-cache.json';
 const geocode = process.argv.includes('--geocode');
 
-const HEADER = `# GENERATED from people.tsv by scripts/build-people.mjs (runs before dev/build). Do not edit.
-# Edit people.tsv instead; id, photo, show_on_map, lat and lng are filled in automatically.
+const HEADER = `# GENERATED from people.yaml by scripts/build-people.mjs (runs before dev/build). Do not edit.
+# Edit people.yaml instead; id, show_on_map, lat and lng are filled in automatically.
 `;
 
 const slug = (s) =>
@@ -35,17 +35,7 @@ const slug = (s) =>
 		.replace(/[^a-z0-9]+/g, '-')
 		.replace(/^-|-$/g, '');
 
-function readTsv() {
-	const [head, ...lines] = readFileSync(TSV, 'utf8')
-		.replace(/^\uFEFF/, '')
-		.split(/\r?\n/)
-		.filter((l) => l.trim());
-	const cols = head.split('\t').map((c) => c.trim());
-	return lines.map((l) => {
-		const cells = l.split('\t');
-		return Object.fromEntries(cols.map((c, i) => [c, (cells[i] ?? '').trim()]));
-	});
-}
+const readPeople = () => parse(readFileSync(SRC, 'utf8')) ?? [];
 
 const photoFiles = new Map(
 	existsSync(PHOTOS)
@@ -105,17 +95,17 @@ const FIELDS = ['institution', 'city', 'state', 'country', 'website', 'x', 'link
 const people = [];
 const missing = [];
 const ids = new Set();
-for (const row of readTsv()) {
+for (const row of readPeople()) {
 	if (!row.name) continue;
 	const id = row.id || slug(row.name);
-	if (ids.has(id)) throw new Error(`Duplicate person id "${id}" (${row.name}) in ${TSV}`);
+	if (ids.has(id)) throw new Error(`Duplicate person id "${id}" (${row.name}) in ${SRC}`);
 	ids.add(id);
 	const entry = { id, name: row.name };
 	for (const f of FIELDS) if (row[f]) entry[f] = row[f];
 	const photo = row.photo || findPhoto(row.name);
 	if (photo) entry.photo = photo;
-	entry.show_on_map = row.show_on_map ? row.show_on_map.toLowerCase() !== 'false' : true;
-	if (row.lat && row.lng) {
+	entry.show_on_map = row.show_on_map ?? true;
+	if (row.lat !== undefined && row.lng !== undefined) {
 		entry.lat = +row.lat;
 		entry.lng = +row.lng;
 	} else {
