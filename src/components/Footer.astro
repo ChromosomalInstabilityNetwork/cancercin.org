@@ -1,7 +1,7 @@
 ---
 import { url } from '../lib/url';
 import Logo from './Logo.astro';
-import { SITE_NAME, SITE_DOMAIN, NAV, isGroup, type NavLink } from '../lib/site';
+import { SITE_NAME, NAV, isGroup, type NavLink } from '../lib/site';
 
 // One footer column per nav group; standalone nav links share a "Community" column.
 const columns: { heading: string; links: NavLink[] }[] = [];
@@ -36,7 +36,11 @@ columns.push({ heading: 'Community', links: community });
 		</div>
 		<hr />
 		<p class="legal">
-			{SITE_NAME} · {SITE_DOMAIN}
+			<span>{SITE_NAME}</span>
+			<a href={url('privacy/')}>Privacy</a>
+			<button type="button" data-consent-open>
+				Cookie settings
+			</button>
 		</p>
 	</div>
 </footer>
@@ -96,8 +100,27 @@ columns.push({ heading: 'Community', links: community });
 		margin: 32px 0 20px;
 	}
 	.legal {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 4px 24px;
 		margin: 0;
 		font-size: 0.9375rem;
+	}
+	.legal button {
+		min-height: 44px;
+		padding: 0;
+		font: inherit;
+		color: var(--on-dark);
+		background: none;
+		border: 0;
+		cursor: pointer;
+	}
+	.legal button:hover {
+		color: var(--on-dark-strong);
+		text-decoration: underline;
+		text-decoration-color: var(--pink);
+		text-underline-offset: 4px;
 	}
 	@media (max-width: 900px) {
 		.top {

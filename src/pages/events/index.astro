@@ -39,21 +39,25 @@ const CHANNEL_URL = 'https://www.youtube.com/@CINlectures';
 
 	<section class="block">
 		<h2>Upcoming events</h2>
-		<div class="stack">
-			{upcoming.map((e) => (
-				<EventCard
-					title={e.data.title}
-					start={e.data.start}
-					end={e.data.end}
-					location={e.data.location}
-					link={e.data.link}
-					image={e.data.image}
-					imageAlt={e.data.image_alt}
-				>
-					<p>{e.body}</p>
-				</EventCard>
-			))}
-		</div>
+		{upcoming.length ? (
+			<div class="stack">
+				{upcoming.map((e) => (
+					<EventCard
+						title={e.data.title}
+						start={e.data.start}
+						end={e.data.end}
+						location={e.data.location}
+						link={e.data.link}
+						image={e.data.image}
+						imageAlt={e.data.image_alt}
+					>
+						<p>{e.body}</p>
+					</EventCard>
+				))}
+			</div>
+		) : (
+			<p>No upcoming events.</p>
+		)}
 	</section>
 
 	<section class="block">

@@ -1,0 +1,50 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { SITE_DESCRIPTION } from '../lib/site';
+
+/**
+ * Standard template for stand-alone text pages (Privacy, policies, and the like): a title and a
+ * centred column two thirds of the page wide, with no side menu. For pages that belong to a nav
+ * group, use SectionLayout instead.
+ *
+ * Content goes in the default slot. Wrap each part in <section class="block"> with an <h2>.
+ */
+interface Props {
+	title: string;
+	/** Page <title>; defaults to `title`. */
+	pageTitle?: string;
+	description?: string;
+}
+const { title, pageTitle, description = SITE_DESCRIPTION } = Astro.props;
+---
+
+<BaseLayout title={pageTitle ?? title} description={description}>
+	<div class="container page">
+		<div class="column">
+			<h1>{title}</h1>
+			<slot />
+		</div>
+	</div>
+</BaseLayout>
+
+<style>
+	.page {
+		padding-block: clamp(32px, 5vw, 56px) var(--section-y);
+	}
+	.column {
+		width: 67%;
+		margin-inline: auto;
+	}
+	h1 {
+		margin: 0 0 clamp(24px, 4vw, 40px);
+		font-size: var(--fs-h1);
+	}
+	.column :global(.block + .block) {
+		margin-top: clamp(40px, 6vw, 72px);
+	}
+	@media (max-width: 900px) {
+		.column {
+			width: 100%;
+		}
+	}
+</style>

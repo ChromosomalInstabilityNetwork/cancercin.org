@@ -40,3 +40,6 @@ dist/
 CLAUDE.md
 claude.md
 .claude/
+
+# Generated from src/content/people.tsv by scripts/build-people.mjs
+src/content/people.yaml

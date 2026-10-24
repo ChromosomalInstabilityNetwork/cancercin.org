@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getPublished } from '../lib/content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Card from '../components/Card.astro';
 import EventCard from '../components/EventCard.astro';
@@ -12,7 +12,7 @@ import { url } from '../lib/url';
 
 const { upcoming } = await getEvents();
 const news = await getNews();
-const people = (await getCollection('people')).sort((a, b) =>
+const people = (await getPublished('people')).sort((a, b) =>
 	a.data.name.localeCompare(b.data.name, undefined, { numeric: true }),
 );
 ---
@@ -87,21 +87,25 @@ const people = (await getCollection('people')).sort((a, b) =>
 					<h3>Upcoming events</h3>
 					<a href={url('events/')}>Events calendar →</a>
 				</div>
-				<div class="stack">
-					{upcoming.slice(0, 3).map((e) => (
-						<EventCard
-							title={e.data.title}
-							start={e.data.start}
-							end={e.data.end}
-							location={e.data.location}
-							link={e.data.link}
-							image={e.data.image}
-							imageAlt={e.data.image_alt}
-						>
-							<p>{e.body}</p>
-						</EventCard>
-					))}
-				</div>
+				{upcoming.length ? (
+					<div class="stack">
+						{upcoming.slice(0, 3).map((e) => (
+							<EventCard
+								title={e.data.title}
+								start={e.data.start}
+								end={e.data.end}
+								location={e.data.location}
+								link={e.data.link}
+								image={e.data.image}
+								imageAlt={e.data.image_alt}
+							>
+								<p>{e.body}</p>
+							</EventCard>
+						))}
+					</div>
+				) : (
+					<p>No upcoming events.</p>
+				)}
 			</div>
 		</div>
 	</section>

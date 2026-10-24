@@ -1,11 +1,12 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
+import { getPublished } from '../../lib/content';
 import SectionLayout from '../../layouts/SectionLayout.astro';
 import PillButton from '../../components/PillButton.astro';
 import { url } from '../../lib/url';
 
 export async function getStaticPaths() {
-	const news = await getCollection('news');
+	const news = await getPublished('news');
 	return news.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
 }
 

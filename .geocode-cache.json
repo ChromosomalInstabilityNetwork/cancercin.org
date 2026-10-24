@@ -1,0 +1,152 @@
+{
+  "nominatim:University of Wisconsin School of Medicine and Public Health, Madison, WI, USA": {
+    "lat": 43.07469,
+    "lng": -89.38417,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Yale Cancer Center, New Haven, CT, USA": {
+    "lat": 41.30496,
+    "lng": -72.93128,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:University of British Columbia, Vancouver, BC, Canada": {
+    "lat": 49.26259,
+    "lng": -123.11935,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Volastra Therapeutics Inc., New York, NY, USA": {
+    "lat": 40.71273,
+    "lng": -74.00602,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Vall d'Hebron Institute of Oncology (VHIO), Barcelona, Spain": {
+    "lat": 41.42873,
+    "lng": 2.13749,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Tel Aviv University, Tel Aviv, Israel": {
+    "lat": 32.10917,
+    "lng": 34.81112,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:University of Cambridge, Cambridge, UK": {
+    "lat": 52.17842,
+    "lng": 0.13545,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:EMBL-EBI, Hinxton, UK": {
+    "lat": 52.0785,
+    "lng": 0.18494,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Spanish National Cancer Research Centre (CNIO), Madrid, Spain": {
+    "lat": 40.47669,
+    "lng": -3.69609,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Stanford University, Stanford, CA, USA": {
+    "lat": 37.43275,
+    "lng": -122.1658,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:NYU Langone Health, New York, NY, USA": {
+    "lat": 40.74101,
+    "lng": -73.97448,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:German Cancer Research Center (DKFZ), Heidelberg, Germany": {
+    "lat": 49.42137,
+    "lng": 8.67556,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:University of Edinburgh, Edinburgh, UK": {
+    "lat": 55.96322,
+    "lng": -3.23218,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Institut Curie, Paris, France": {
+    "lat": 48.8435,
+    "lng": 2.34479,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:University of Groningen / UMCG, Groningen, Netherlands": {
+    "lat": 53.22429,
+    "lng": 6.571,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Institute of Cancer Research (ICR), London, UK": {
+    "lat": 51.34518,
+    "lng": -0.19465,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:NYU Grossman School of Medicine, New York, NY, USA": {
+    "lat": 40.74207,
+    "lng": -73.97434,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:European Molecular Biology Laboratory (EMBL), Heidelberg, Germany": {
+    "lat": 49.38375,
+    "lng": 8.71005,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Memorial Sloan Kettering Cancer Center, New York, NY, USA": {
+    "lat": 40.76444,
+    "lng": -73.95695,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Harvard Medical School, Boston, MA, USA": {
+    "lat": 42.33757,
+    "lng": -71.10787,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:University of Birmingham, Birmingham, UK": {
+    "lat": 52.47099,
+    "lng": -1.92259,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:UCL Cancer Institute, London, UK": {
+    "lat": 51.52386,
+    "lng": -0.13413,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:European Institute of Oncology IRCCS, Milan, Italy": {
+    "lat": 45.44179,
+    "lng": 9.20314,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:University of Cologne, Cologne, Germany": {
+    "lat": 50.93836,
+    "lng": 6.95997,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Charit\u00e9 \u2013 Universit\u00e4tsmedizin Berlin, Berlin, Germany": {
+    "lat": 52.52585,
+    "lng": 13.37776,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Weizmann Institute of Science, Rehovot, Israel": {
+    "lat": 31.89525,
+    "lng": 34.81056,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Human Technopole, Milan, Italy": {
+    "lat": 45.51928,
+    "lng": 9.1063,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Yale University, New Haven, CT, USA": {
+    "lat": 41.303,
+    "lng": -72.93324,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:The University of Texas MD Anderson Cancer Center, Houston, TX, USA": {
+    "lat": 29.70767,
+    "lng": -95.39784,
+    "display": "seeded from previous people.yaml"
+  },
+  "nominatim:Queen Mary University of London, London, UK": {
+    "lat": 51.5209,
+    "lng": -0.09887,
+    "display": "seeded from previous people.yaml"
+  }
+}

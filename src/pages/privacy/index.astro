@@ -1,0 +1,178 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { CONTACT_EMAIL, SITE_NAME } from '../../lib/site';
+---
+
+<PageLayout
+	title="Privacy"
+	description="How the International CIN Network website handles personal data and cookies."
+>
+	<p class="updated">Last updated: 23 October 2026</p>
+
+	<section class="block">
+		<h2>Who we are</h2>
+		<p>
+			This website is run by the {SITE_NAME} (iCIN), an informal, unincorporated network of
+			researchers. You can contact us about privacy at{' '}
+			<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+		</p>
+	</section>
+
+	<section class="block">
+		<h2>What we collect, and why</h2>
+		<p>
+			We do not ask you to create an account or fill in forms on this site. We collect personal data
+			in two ways:
+		</p>
+		<ul>
+			<li>
+				<strong>Analytics (only if you consent).</strong> If you accept analytics, Cloudflare Web
+				Analytics records which pages you visit, how you arrived, your approximate location, and
+				your browser and device type. It does not use cookies and does not track you across sites.
+				We use this to understand and improve the site. Our legal basis is your consent (Article
+				6(1)(a) GDPR).
+			</li>
+			<li>
+				<strong>Map tiles.</strong> The map on the People page loads its background from OpenFreeMap
+				(tiles.openfreemap.org). Your browser sends your IP address to that service to fetch the
+				map; see the{' '}
+				<a href="https://openfreemap.org/privacy/" target="_blank" rel="noopener noreferrer">
+					OpenFreeMap privacy policy<span class="visually-hidden"> (opens in a new tab)</span>
+				</a>
+				. Our legal basis is our legitimate interest in showing the map (Article 6(1)(f)).
+			</li>
+			<li>
+				<strong>Hosting.</strong> The site is hosted on GitHub Pages, which logs technical data such
+				as IP addresses when pages are requested, to deliver and secure the service.
+			</li>
+			<li>
+				<strong>Emails you send us.</strong> If you write to {CONTACT_EMAIL}, we use your message
+				and address only to reply.
+			</li>
+		</ul>
+		<p>Fonts are served from this site, not from a third party.</p>
+	</section>
+
+	<section class="block">
+		<h2>Cookies and your choices</h2>
+		<p>
+			This site does not set any cookies. Analytics is off until you accept it. The first time you
+			visit, a banner lets you accept or reject it with equal ease. Your choice is saved on your
+			device (in local storage, not in a cookie) and we ask again after 12 months.
+		</p>
+		<p>
+			You can change your mind at any time:
+			<button type="button" class="linklike" data-consent-open>
+				open cookie settings
+			</button>
+			. If you withdraw consent, analytics stops loading.
+		</p>
+		<div class="table-wrap">
+			<table>
+				<caption class="visually-hidden">
+					Cookies and similar technologies used on this site
+				</caption>
+				<thead>
+					<tr>
+						<th scope="col">Name</th>
+						<th scope="col">Provider</th>
+						<th scope="col">Purpose</th>
+						<th scope="col">Duration</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>icin-consent (local storage)</td>
+						<td>This site</td>
+						<td>Remembers your cookie choice</td>
+						<td>12 months</td>
+					</tr>
+					<tr>
+						<td>None</td>
+						<td>Cloudflare Web Analytics</td>
+						<td>Page-view statistics, without cookies (loaded only with your consent)</td>
+						<td>—</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<section class="block">
+		<h2>Who receives your data</h2>
+		<p>
+			Cloudflare, Inc., OpenFreeMap and GitHub, Inc. process data on our behalf or as independent
+			providers as described above. Some of them are based in the United States; where that applies,
+			transfers rely on the EU–US Data Privacy Framework or standard contractual clauses. We do not
+			sell your data.
+		</p>
+	</section>
+
+	<section class="block">
+		<h2>How long we keep it</h2>
+		<p>
+			Analytics data is kept only as long as Cloudflare retains data. Server logs are kept by GitHub
+			according to its own policy. Emails are kept only as long as needed to answer you.
+		</p>
+	</section>
+
+	<section class="block">
+		<h2>Your rights</h2>
+		<p>
+			Under the GDPR you can ask us for access to your personal data, and for it to be corrected,
+			erased or restricted. You can object to processing based on legitimate interest, ask for data
+			portability, and withdraw consent at any time without affecting earlier processing. Write to{' '}
+			<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. You also have the right to complain
+			to your data protection authority.
+		</p>
+	</section>
+
+	<section class="block">
+		<h2>Changes</h2>
+		<p>We will update this page if our practices change, and show the date above.</p>
+	</section>
+</PageLayout>
+
+<style>
+	.updated {
+		color: var(--muted);
+	}
+	ul {
+		padding-left: 1.25rem;
+	}
+	li {
+		margin-bottom: 10px;
+	}
+	.linklike {
+		padding: 0;
+		font: inherit;
+		color: var(--accent);
+		background: none;
+		border: 0;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+		cursor: pointer;
+	}
+	.table-wrap {
+		overflow-x: auto;
+	}
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.9375rem;
+	}
+	th {
+		text-align: left;
+		padding: 10px 12px;
+		font-size: 0.8125rem;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--muted);
+		border-bottom: 2px solid var(--ink);
+	}
+	td {
+		padding: 12px;
+		vertical-align: top;
+		border-bottom: 1px solid var(--border);
+	}
+</style>

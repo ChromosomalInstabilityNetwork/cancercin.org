@@ -1,10 +1,11 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { type CollectionEntry } from 'astro:content';
+import { getPublished } from './content';
 
 type EventEntry = CollectionEntry<'events'>;
 
 /** Split events into upcoming/past at build time. Undated events count as upcoming. */
 export async function getEvents(): Promise<{ upcoming: EventEntry[]; past: EventEntry[] }> {
-	const all = await getCollection('events');
+	const all = await getPublished('events');
 	const now = new Date();
 	const startOfToday = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
 	const endOf = (e: EventEntry) => (e.data.end ?? e.data.start)?.getTime();
@@ -22,7 +23,7 @@ export async function getEvents(): Promise<{ upcoming: EventEntry[]; past: Event
 }
 
 export async function getNews() {
-	const all = await getCollection('news');
+	const all = await getPublished('news');
 	return all.sort(
 		(a, b) => (b.data.date?.getTime() ?? Infinity) - (a.data.date?.getTime() ?? Infinity),
 	);

@@ -1,0 +1,138 @@
+---
+import { getPublished } from '../../../lib/content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import { url } from '../../../lib/url';
+
+export async function getStaticPaths() {
+	const all = await getPublished('resources');
+	return all
+		.filter((r) => r.data.kind === 'data')
+		.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { title, category, description, accession, accession_url, submitter, objects } = entry.data;
+---
+
+<BaseLayout title={title} description={description}>
+	<PageHeader title={title} />
+
+	<div class="container page">
+		<p class="crumb">
+			<a href={url('resources/')}>← Resources</a>
+		</p>
+
+		<div class="cols">
+			<div class="main">
+				<section class="panel">
+					<h2>Project description</h2>
+					<p>{description ?? '[Project description]'}</p>
+				</section>
+
+				<section class="panel">
+					<h2>Data objects</h2>
+					{objects.length ? (
+						<ul class="objects">
+							{objects.map((o) => (
+								<li>
+									{o.url ? (
+										<a href={o.url} target="_blank" rel="noopener noreferrer">
+											{o.name}
+											<span class="visually-hidden"> (opens in a new tab)</span>
+										</a>
+									) : (
+										<span>{o.name}</span>
+									)}
+									{o.description && <span class="note">{o.description}</span>}
+								</li>
+							))}
+						</ul>
+					) : (
+						<p class="none">No data objects listed yet.</p>
+					)}
+				</section>
+			</div>
+
+			<aside class="panel side">
+				<dl>
+					<dt>Submitter / provider</dt>
+					<dd>{submitter ?? '—'}</dd>
+					<dt>Type</dt>
+					<dd>{category}</dd>
+					<dt>Accession</dt>
+					<dd>{accession_url ? <a href={accession_url}>{accession}</a> : (accession ?? '—')}</dd>
+				</dl>
+			</aside>
+		</div>
+	</div>
+</BaseLayout>
+
+<style>
+	.page {
+		padding-block: 16px var(--section-y);
+	}
+	.crumb {
+		margin: 0 0 20px;
+	}
+	.cols {
+		display: grid;
+		grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+		gap: 24px;
+		align-items: start;
+	}
+	.main {
+		display: grid;
+		gap: 24px;
+	}
+	.panel {
+		padding: 24px 28px;
+		background: #fff;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-card);
+	}
+	.panel h2 {
+		margin: 0 0 12px;
+		font-size: 1.25rem;
+	}
+	.panel p {
+		margin: 0;
+	}
+	dt {
+		font-size: 0.8125rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--muted);
+	}
+	dd {
+		margin: 2px 0 16px;
+	}
+	dd:last-child {
+		margin-bottom: 0;
+	}
+	.objects {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.objects li {
+		display: flex;
+		flex-direction: column;
+		padding: 10px 0;
+		border-bottom: 1px solid var(--border);
+	}
+	.objects li:last-child {
+		border-bottom: 0;
+	}
+	.note,
+	.none {
+		color: var(--muted);
+		font-size: 0.9375rem;
+	}
+	@media (max-width: 800px) {
+		.cols {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

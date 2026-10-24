@@ -1,21 +1,28 @@
 ---
-import { url } from '../lib/url';
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+// Headshots live in src/img/people; `photo` is the filename (e.g. jane-doe.png).
+const photos = import.meta.glob<{ default: ImageMetadata }>('../img/people/*.{png,jpg,jpeg,webp}', {
+	eager: true,
+});
 
 interface Props {
 	name: string;
-	photo?: string;
+	photo?: string; // filename in src/img/people
 	class?: string;
 }
 const { name, photo, class: className } = Astro.props;
+const src = photo ? photos[`../img/people/${photo}`]?.default : undefined;
 ---
 
-{photo ? (
-	<img
+{src ? (
+	<Image
 		class:list={['avatar', className]}
-		src={url(photo)}
+		src={src}
 		alt=""
-		width="96"
-		height="96"
+		width={192}
+		height={192}
 		loading="lazy"
 		data-name={name}
 	/>

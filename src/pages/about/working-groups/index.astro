@@ -1,13 +1,14 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
+import { getPublished } from '../../../lib/content';
 import SectionLayout from '../../../layouts/SectionLayout.astro';
 import PersonAvatar from '../../../components/PersonAvatar.astro';
 import SocialLinks from '../../../components/SocialLinks.astro';
 
-const groups = (await getCollection('workingGroups')).sort(
+const groups = (await getPublished('workingGroups')).sort(
 	(a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
 );
-const people = new Map((await getCollection('people')).map((p) => [p.id, p]));
+const people = new Map((await getPublished('people')).map((p) => [p.id, p]));
 
 const entries = await Promise.all(
 	groups.map(async (g) => {

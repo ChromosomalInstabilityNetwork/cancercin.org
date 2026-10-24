@@ -1,43 +1,43 @@
-# PLACEHOLDER entries. Add url only once verified.
+# PLACEHOLDER entries. Add links only once verified.
+# Methods: repo and publication are optional URLs (an icon is shown for each one that is set).
+# Data: accession (+ accession_url), submitter, description and objects (links to individual data
+# objects) appear on the dataset's own page.
 - id: method-1
   kind: method
   title: '[Method name]'
-  category: '[Category]'
-  host: github
-  label: 'github.com/[org]/[repo]'
-  description: '[One or two sentences on what the method does and who it is for.]'
+  category: '[Type]'
+  # repo: 'https://github.com/[org]/[repo]'
+  # publication: 'https://doi.org/[doi]'
 - id: method-2
   kind: method
   title: '[Method name]'
-  category: '[Category]'
-  host: github
-  label: 'github.com/[org]/[repo]'
-  description: '[One or two sentences on what the method does and who it is for.]'
+  category: '[Type]'
 - id: method-3
   kind: method
   title: '[Method or protocol name]'
-  category: '[Category]'
-  host: website
-  label: '[Link to protocol or documentation]'
-  description: '[One or two sentences on what the method does and who it is for.]'
+  category: '[Type]'
 - id: data-1
   kind: data
-  title: '[Dataset name]'
+  title: '[Project name]'
   category: '[Data type]'
-  host: repository
-  label: '[Link to data repository]'
-  description: '[One or two sentences on what the dataset contains, such as single-cell genomics or imaging.]'
+  accession: '[Accession]'
+  # accession_url: 'https://...'
+  submitter: '[Submitter / provider]'
+  description: '[One or two sentences on what the project contains, such as single-cell genomics or imaging.]'
+  objects:
+    - name: '[Data object name]'
+      # url: 'https://...'
 - id: data-2
   kind: data
-  title: '[Dataset name]'
+  title: '[Project name]'
   category: '[Data type]'
-  host: repository
-  label: '[Link to data repository]'
-  description: '[One or two sentences on what the dataset contains.]'
+  accession: '[Accession]'
+  submitter: '[Submitter / provider]'
+  description: '[One or two sentences on what the project contains.]'
 - id: data-3
   kind: data
-  title: '[Dataset name]'
+  title: '[Project name]'
   category: '[Data type]'
-  host: repository
-  label: '[Link to data repository]'
-  description: '[One or two sentences on what the dataset contains.]'
+  accession: '[Accession]'
+  submitter: '[Submitter / provider]'
+  description: '[One or two sentences on what the project contains.]'

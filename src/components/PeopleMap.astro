@@ -61,6 +61,7 @@ import { url } from '../lib/url';
 	let selected: string | null = null;
 	let map: any;
 	let popup: any;
+	let hoverPopup: any;
 	let lib: typeof import('maplibre-gl');
 	let filterIds: Set<string> | null = null;
 	let hoverId: string | null = null;
@@ -112,7 +113,10 @@ import { url } from '../lib/url';
 		label.className = 'pm-label';
 		label.textContent = p.name;
 		face.append(label);
+		face.addEventListener('pointerenter', () => showHoverPopup(p.id));
+		face.addEventListener('pointerleave', hideHoverPopup);
 		face.addEventListener('click', (e) => {
+			hideHoverPopup();
 			e.stopPropagation();
 			toggle(p.id, true);
 		});
@@ -223,6 +227,28 @@ import { url } from '../lib/url';
 		}
 	}
 
+	function popupContent(p: Person) {
+		const el = document.createElement('div');
+		el.className = 'pm-pop';
+		const name = document.createElement('strong');
+		name.textContent = p.name;
+		el.append(name);
+		for (const [text, cls] of [
+			[p.institution, ''],
+			[p.location, 'pm-pop-addr'],
+		]) {
+			if (!text) continue;
+			const d = document.createElement('div');
+			d.textContent = text;
+			if (cls) d.className = cls;
+			el.append(d);
+		}
+		// Reuse the directory's link icons so the callout always matches the list.
+		const links = document.querySelector(`#${CSS.escape(p.id)} .links .social`);
+		if (links) el.append(links.cloneNode(true));
+		return el;
+	}
+
 	function setSelected(id: string | null, opts: { scroll?: boolean } = {}) {
 		popup?.remove();
 		selected = id;
@@ -248,30 +274,37 @@ import { url } from '../lib/url';
 		if (reduceMotion.matches) map.jumpTo(target);
 		else map.flyTo({ ...target, speed: 0.8, essential: false });
 
-		const el = document.createElement('div');
-		el.className = 'pm-pop';
-		const name = document.createElement('strong');
-		name.textContent = p.name;
-		el.append(name);
-		for (const [text, cls] of [
-			[p.institution, ''],
-			[p.location, 'pm-pop-addr'],
-		]) {
-			if (!text) continue;
-			const d = document.createElement('div');
-			d.textContent = text;
-			if (cls) d.className = cls;
-			el.append(d);
-		}
-		// Reuse the directory's link icons so the callout always matches the list.
-		const links = document.querySelector(`#${CSS.escape(id)} .links .social`);
-		if (links) el.append(links.cloneNode(true));
+		const el = popupContent(p);
 		popup = new lib.Popup({ offset: 0, maxWidth: '280px', closeButton: false })
 			.setLngLat(p.coords)
 			.setDOMContent(el)
 			.addTo(map);
 		const m = markers.get(id);
 		if (m) positionPopup(m);
+	}
+
+	/** Hovering a face previews the same details as selecting it, without moving the map. */
+	function showHoverPopup(id: string) {
+		hideHoverPopup();
+		const p = people.get(id);
+		const m = markers.get(id);
+		if (!p || !m || id === selected) return;
+		hoverPopup = new lib.Popup({
+			className: 'pm-hover-pop',
+			offset: [m.dx, m.dy - faceSize() / 2 - 8],
+			maxWidth: '280px',
+			closeButton: false,
+			closeOnClick: false,
+			focusAfterOpen: false, // otherwise the first link gets a focus ring
+		})
+			.setLngLat(p.coords)
+			.setDOMContent(popupContent(p))
+			.addTo(map);
+	}
+
+	function hideHoverPopup() {
+		hoverPopup?.remove();
+		hoverPopup = null;
 	}
 
 	function setHover(id: string | null) {
@@ -530,6 +563,10 @@ import { url } from '../lib/url';
 		display: block;
 	}
 
+	:global(.pm-hover-pop) {
+		pointer-events: none;
+		z-index: 5;
+	}
 	:global(.maplibregl-popup-content) {
 		font-family: var(--font-body);
 		font-size: 0.875rem;

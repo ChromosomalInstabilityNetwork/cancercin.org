@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getPublished } from '../../lib/content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Card from '../../components/Card.astro';
 import PeopleMap from '../../components/PeopleMap.astro';
@@ -8,7 +8,7 @@ import SocialLinks from '../../components/SocialLinks.astro';
 import { mailto, CONTACT_EMAIL } from '../../lib/site';
 import { locationText } from '../../lib/people';
 
-const people = (await getCollection('people')).sort((a, b) =>
+const people = (await getPublished('people')).sort((a, b) =>
 	a.data.name.localeCompare(b.data.name, undefined, { numeric: true }),
 );
 const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and country:\n';

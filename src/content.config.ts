@@ -6,6 +6,7 @@ import { z } from 'astro/zod';
 const people = defineCollection({
 	loader: file('src/content/people.yaml'),
 	schema: z.object({
+		publish: z.boolean().default(true), // false hides the entry from the site
 		name: z.string(),
 		institution: z.string().optional(),
 		city: z.string().optional(),
@@ -13,7 +14,7 @@ const people = defineCollection({
 		country: z.string().optional(),
 		lat: z.number().min(-90).max(90).optional(),
 		lng: z.number().min(-180).max(180).optional(),
-		photo: z.string().optional(), // path under public/, e.g. people/jane-doe.jpg
+		photo: z.string().optional(), // filename in src/img/people, e.g. jane-doe.png
 		// Optional links, shown as icons under the person (full URLs).
 		website: z.url().optional(),
 		x: z.url().optional(),
@@ -26,6 +27,7 @@ const people = defineCollection({
 const events = defineCollection({
 	loader: glob({ pattern: '**/*.md', base: 'src/content/events' }),
 	schema: z.object({
+		publish: z.boolean().default(true), // false hides the entry from the site
 		title: z.string(),
 		start: z.coerce.date().optional(), // unset = date to be announced (shown as upcoming)
 		end: z.coerce.date().optional(),
@@ -40,6 +42,7 @@ const events = defineCollection({
 const news = defineCollection({
 	loader: glob({ pattern: '**/*.md', base: 'src/content/news' }),
 	schema: z.object({
+		publish: z.boolean().default(true), // false hides the entry from the site
 		title: z.string(),
 		date: z.coerce.date().optional(),
 		summary: z.string(),
@@ -52,6 +55,7 @@ const news = defineCollection({
 const publications = defineCollection({
 	loader: file('src/content/publications.yaml'),
 	schema: z.object({
+		publish: z.boolean().default(true), // false hides the entry from the site
 		title: z.string(),
 		authors: z.string(),
 		journal: z.string(),
@@ -69,16 +73,27 @@ const publications = defineCollection({
 	}),
 });
 
+// Methods and datasets, listed as tables on the Resources page. Datasets also get their own page.
 const resources = defineCollection({
 	loader: file('src/content/resources.yaml'),
 	schema: z.object({
+		publish: z.boolean().default(true), // false hides the entry from the site
 		kind: z.enum(['method', 'data']),
-		title: z.string(),
-		category: z.string(),
-		description: z.string(),
-		url: z.url().optional(),
-		host: z.enum(['github', 'website', 'repository']),
-		label: z.string().optional(), // text shown on the link button
+		title: z.string(), // method name, or data project name
+		category: z.string(), // shown in the Type column
+		description: z.string().optional(), // data project description
+		// Methods: link to the code repository and/or the publication.
+		repo: z.url().optional(),
+		publication: z.url().optional(),
+		// Data: accession (optionally linked), who provided it, and links to the individual data objects.
+		accession: z.string().optional(),
+		accession_url: z.url().optional(),
+		submitter: z.string().optional(),
+		objects: z
+			.array(
+				z.object({ name: z.string(), url: z.url().optional(), description: z.string().optional() }),
+			)
+			.default([]),
 	}),
 });
 
@@ -86,6 +101,7 @@ const resources = defineCollection({
 const workingGroups = defineCollection({
 	loader: glob({ pattern: '**/*.md', base: 'src/content/working-groups' }),
 	schema: z.object({
+		publish: z.boolean().default(true), // false hides the entry from the site
 		title: z.string(),
 		order: z.number().default(0),
 		members: z.array(z.string()), // ids from people.yaml, in display order
