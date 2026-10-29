@@ -4,40 +4,112 @@
 # objects) appear on the dataset's own page.
 - id: method-1
   kind: method
-  title: '[Method name]'
-  category: '[Type]'
-  # repo: 'https://github.com/[org]/[repo]'
-  # publication: 'https://doi.org/[doi]'
+  title: 'GISTIC'
+  category: 'CNA Drivers'
+  repo: 'https://github.com/broadinstitute/gistic2'
+  publication: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC3218867/'
 - id: method-2
   kind: method
-  title: '[Method name]'
-  category: '[Type]'
+  title: 'BISCUT'
+  category: 'CNA Drivers'
+  repo: 'https://github.com/beroukhim-lab/BISCUT-py3'
+  publication: 'https://pubmed.ncbi.nlm.nih.gov/37380777/'
 - id: method-3
   kind: method
-  title: '[Method or protocol name]'
-  category: '[Type]'
-- id: data-1
-  kind: data
-  title: '[Project name]'
-  category: '[Data type]'
-  accession: '[Accession]'
-  # accession_url: 'https://...'
-  submitter: '[Submitter / provider]'
-  description: '[One or two sentences on what the project contains, such as single-cell genomics or imaging.]'
-  objects:
-    - name: '[Data object name]'
-      # url: 'https://...'
-- id: data-2
-  kind: data
-  title: '[Project name]'
-  category: '[Data type]'
-  accession: '[Accession]'
-  submitter: '[Submitter / provider]'
-  description: '[One or two sentences on what the project contains.]'
-- id: data-3
-  kind: data
-  title: '[Project name]'
-  category: '[Data type]'
-  accession: '[Accession]'
-  submitter: '[Submitter / provider]'
-  description: '[One or two sentences on what the project contains.]'
+  title: 'SPICE'
+  category: 'CNA Drivers'
+  repo: 'https://github.com/schwarzlab-ccb/spice'
+  publication: 'https://doi.org/10.64898/2026.03.01.708809'
+- id: method-4
+  kind: method
+  title: 'MEDICC2'
+  category: 'CNA, Phylogeny'
+  repo: 'https://bitbucket.org/schwarzlab/medicc2/src/master/'
+  publication: 'https://link.springer.com/article/10.1186/s13059-022-02794-9'
+- id: method-5
+  kind: method
+  title: 'SCEVAN'
+  category: 'CNA Calling, scRNAseq'
+  repo: 'https://github.com/AntonioDeFalco/SCEVAN'
+  publication: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9968345/'
+- id: method-6
+  kind: method
+  title: 'epiAneuFinder'
+  category: 'CNA Calling, ATACseq'
+  repo: 'https://github.com/colomemaria/epiAneufinder'
+  publication: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10511508/'
+- id: method-7
+  kind: method
+  title: 'GRITIC'
+  category: 'CNA, Evolution'
+  repo: 'https://github.com/VanLoo-lab/gritic'
+  publication: 'https://pubmed.ncbi.nlm.nih.gov/38943574/'
+- id: method-8
+  kind: method
+  title: 'ASCETS'
+  category: 'CNA Calling, targeted sequencing'
+  repo: 'https://github.com/beroukhim-lab/ascets'
+  publication: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC8388019/'
+- id: method-9
+  kind: method
+  title: 'HMMCopy'
+  category: 'CNA Calling'
+  repo: 'https://github.com/oicr-gsi/hmmcopy'
+  publication: 'https://bioconductor.org/packages/3.23/bioc/vignettes/HMMcopy/inst/doc/HMMcopy.pdf'
+- id: method-10
+  kind: method
+  title: 'ichorCNA'
+  category: 'CNA Calling, ctDNA'
+  repo: 'https://github.com/broadinstitute/ichorCNA'
+  publication: 'https://pubmed.ncbi.nlm.nih.gov/29109393/'
+- id: method-11
+  kind: method
+  title: 'AneuFinder'
+  category: 'CNA Calling, scDNAseq'
+  repo: 'https://github.com/ataudt/aneufinder'
+- id: method-12
+  kind: method
+  title: 'Karyoscope'
+  category: 'Sequence Annotation'
+  repo: 'https://github.com/barthel-lab/KaryoScope'
+  publication: 'https://doi.org/10.64898/2026.05.15.725544'
+- id: method-13
+  kind: method
+  title: 'AmpliconArchitect'
+  category: 'ecDNA'
+  repo: 'https://github.com/AmpliconSuite/AmpliconSuite-pipeline'
+  publication: 'https://pubmed.ncbi.nlm.nih.gov/30674876/'
+- id: method-14
+  kind: method
+  title: 'MAGIC'
+  category: 'AI, Microscopy'
+  repo: 'https://git.embl.de/cosenza/magic_tools'
+  publication: 'https://pubmed.ncbi.nlm.nih.gov/41162705/'
+- id: method-15
+  kind: method
+  title: 'CINFER'
+  category: 'CIN Measurement, Simulation, scDNAseq'
+  repo: 'https://github.com/Burkard-Lab/CINFER'
+  publication: 'https://pubmed.ncbi.nlm.nih.gov/35380536/'
+- id: method-16
+  kind: method
+  title: 'CINNER'
+  category: 'CIN Measurement, Simulation, scDNAseq'
+  repo: 'https://github.com/dinhngockhanh/CINner'
+  publication: 'https://pubmed.ncbi.nlm.nih.gov/39085295/'
+- id: method-17
+  kind: method
+  title: 'CINsim'
+  category: 'CIN Measurement, Simulation, scDNAseq'
+  publication: 'https://doi.org/10.1101/2023.02.14.528596'
+- id: method-18
+  kind: method
+  title: 'ASCAT'
+  category: 'CNA Calling'
+  repo: 'https://github.com/VanLoo-lab/ascat'
+  publication: 'https://pubmed.ncbi.nlm.nih.gov/20837533/'
+- id: method-19
+  kind: method
+  title: 'ASCAT.sc'
+  category: 'CNA Calling, scDNAseq'
+  repo: 'https://github.com/VanLoo-lab/ASCAT.sc'
