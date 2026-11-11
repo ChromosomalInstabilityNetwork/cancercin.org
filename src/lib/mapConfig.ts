@@ -6,5 +6,5 @@
 const key = import.meta.env.PUBLIC_MAP_KEY ?? '';
 
 export const MAP_STYLE_URL = (
-	import.meta.env.PUBLIC_MAP_STYLE_URL ?? 'https://tiles.openfreemap.org/styles/positron'
+	import.meta.env.PUBLIC_MAP_STYLE_URL || 'https://tiles.openfreemap.org/styles/positron'
 ).replace('{key}', key);

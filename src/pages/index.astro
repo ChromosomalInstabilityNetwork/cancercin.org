@@ -3,6 +3,7 @@ import { getPublished } from '../lib/content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Card from '../components/Card.astro';
 import EventCard from '../components/EventCard.astro';
+import JoinForm from '../components/JoinForm.astro';
 import NewsCard from '../components/NewsCard.astro';
 import PersonAvatar from '../components/PersonAvatar.astro';
 import PillButton from '../components/PillButton.astro';
@@ -133,6 +134,9 @@ const people = (await getPublished('people')).sort((a, b) =>
 					</li>
 				))}
 			</ul>
+			<div class="join">
+				<JoinForm />
+			</div>
 		</div>
 	</section>
 </BaseLayout>
@@ -272,6 +276,9 @@ const people = (await getPublished('people')).sort((a, b) =>
 		gap: 12px;
 		margin: 0;
 		padding: 0;
+	}
+	.join {
+		margin-top: 20px;
 	}
 	.bubble {
 		position: relative;

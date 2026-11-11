@@ -38,6 +38,12 @@ jobs:
           # Custom domain: set SITE_URL only (e.g. https://cancercin.org).
           SITE_URL: ${{ vars.SITE_URL }}
           BASE_PATH: ${{ vars.BASE_PATH }}
+          # The People directory and map are built from Airtable.
+          AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+          AIRTABLE_BASE_ID: ${{ vars.AIRTABLE_BASE_ID }}
+          AIRTABLE_TABLE: ${{ vars.AIRTABLE_TABLE }}
+          # Contact email for Nominatim, which places new members on the map.
+          GEOCODE_CONTACT: ${{ vars.GEOCODE_CONTACT }}
 
   deploy:
     needs: build

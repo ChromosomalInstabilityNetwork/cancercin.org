@@ -24,7 +24,6 @@ npm run preview   # serve dist/ locally
 | `npm run check`      | `astro check` (types and Astro diagnostics)                        |
 | `npm run test:links` | Fails on broken internal links, assets and `#fragments` in `dist/` |
 | `npm run test:a11y`  | axe-core (WCAG A/AA) on every built page; needs `CHROME_PATH`      |
-| `npm run geocode`    | Fills in missing map coordinates for people (see below)            |
 | `npm run og`         | Regenerates `public/og.png`; needs `CHROME_PATH`                   |
 
 `test:links` and `test:a11y` read the built `dist/`, so run `npm run build` first with the same
@@ -36,26 +35,8 @@ All collections are defined (and validated) in [`src/content.config.ts`](src/con
 field that is missing or the wrong type fails the build with a clear message. Entries in the seed
 data are bracketed placeholders (`[Name 1]`) and should be replaced with real, verified content.
 
-**Person**: add to `src/content/people.yaml` (only `id` and `name` are required):
-
-```yaml
-- id: jane-doe # unique, URL-safe; also the #anchor used by links from the home page
-  name: 'Jane Doe'
-  institution: 'Example University'
-  city: 'City' # location is city / state / country; no street addresses
-  state: 'State' # optional, where it applies
-  country: 'Country'
-  photo: people/jane-doe.jpg # optional; file in public/people/
-  website: 'https://…' # optional links, shown as icons under the person (full URLs)
-  bluesky: 'https://bsky.app/profile/jane.bsky.social'
-  x: 'https://x.com/jane'
-  linkedin: 'https://www.linkedin.com/in/jane'
-  show_on_map: true # false = listed, but no pin
-  # lat / lng are filled in by `npm run geocode`, or set by hand (never overwritten)
-```
-
-People without a city and country have no pin. The directory and the home-page "Our community" bubbles
-both come from this file. If a person has a `website`, their name in the directory links to it.
+**People** come from Airtable, not from a file in this repository: see
+[People directory (Airtable)](#people-directory-airtable).
 
 **Event**: a Markdown file in `src/content/events/`. The body is the description.
 
@@ -96,13 +77,13 @@ listed, set `PUBMED_QUERY`, for example to restrict to consortium authors.
 `description`, `url`, `host` = `github` | `website` | `repository`, `label` for the button text).
 
 **Working group**: a Markdown file in `src/content/working-groups/`. The body is the description and
-`members` lists person `id`s from `people.yaml`, in display order (a misspelt id fails the build).
+`members` lists person `id`s (see [People directory](#people-directory-airtable)), in display order (a misspelt id fails the build).
 
 ```md
 ---
 title: 'CIN Measurement Working Group'
 order: 1 # position on the page
-members: [pippa-f-cosper, teresa-davoli]
+members: [pippa-cosper, teresa-davoli]
 ---
 
 What the group is working on.
@@ -122,25 +103,19 @@ scheduled GitHub Action rebuilds and redeploys it every day (05:15 UTC, see
 
 The People page shows a directory plus a [MapLibre GL JS](https://maplibre.org) map. MapLibre is
 loaded only on that page, when the map nears the viewport. The directory is plain HTML and works
-without JavaScript. Pins come from `/people.geojson`, built from people who have coordinates and
-`show_on_map: true`. Everyone is drawn as a face at their true location; faces that would overlap are pushed
+without JavaScript. Pins come from `/people.geojson`, built from listed members who have Mapped checked and
+coordinates. Everyone is drawn as a face at their true location; faces that would overlap are pushed
 apart (with a thin line back to the true spot) by a small collision pass in
 [`PeopleMap.astro`](src/components/PeopleMap.astro), recomputed as you pan and zoom.
 
-**Geocoding** is run by hand, locally; never in CI and never in a visitor's browser:
-
-```sh
-GEOCODE_CONTACT=you@example.org npm run geocode            # writes people.yaml
-GEOCODE_CONTACT=you@example.org node scripts/geocode.mjs --dry-run
-```
-
-It only fills in people with no `lat`/`lng`, so coordinates you set by hand are never overwritten. It
-uses [Nominatim](https://nominatim.org/release-docs/latest/api/Search/) at one request per second
-(its usage policy), caches results in `.geocode-cache.json` (commit it so re-runs never re-query), and
-prints a table of query, coordinates and matched place so you can spot bad matches. To use a
-different provider, replace the `provider` object in `scripts/geocode.mjs`; read any API key from an
-environment variable and never commit it. It looks people up by institution, city, state and country; no street addresses are stored.
-Get consent before publishing names and locations.
+**Geocoding** turns a member's Affiliation and Location into coordinates with
+[Nominatim](https://nominatim.org/release-docs/latest/api/Search/). Results are cached in
+`.geocode-cache.json`; a build only queries Nominatim for places the cache does not have, at one
+request per second (its usage policy), and only when `GEOCODE_CONTACT` is set. The deploy workflow
+sets it, so a newly approved member gets a pin on the next build. Its lookups are not saved, so to
+check a match and stop it being looked up again, run `npm run people` locally with `GEOCODE_CONTACT`
+in `.env` and commit `.geocode-cache.json` (edit `lat`/`lng` there to correct a bad match). A member
+whose place cannot be found is listed without a pin, and the build log names them.
 
 **Changing the map style or provider:** the style URL is in
 [`src/lib/mapConfig.ts`](src/lib/mapConfig.ts); the style is used as published, with no recolouring. The
@@ -148,17 +123,62 @@ default is OpenFreeMap's Positron (no key). Set `PUBLIC_MAP_STYLE_URL` (and `PUB
 `{key}`) to switch; a client-side key is public by design, so restrict it to your domain with the
 provider. Keep the attribution visible. Check the provider's current terms before relying on it.
 
+## People directory (Airtable)
+
+The directory, the map and the home-page "Our community" bubbles are built from the **Members** table
+of an Airtable base. People apply with the "Join the network" form, on its own page at `/join/` and as a slide-in panel
+on the home and People pages ([`JoinForm.astro`](src/components/JoinForm.astro)), which adds a row to that table. Before every
+dev server start and build, [`scripts/build-people.mjs`](scripts/build-people.mjs) fetches the table
+through [`scripts/airtable.mjs`](scripts/airtable.mjs) and writes `src/content/people.built.yaml`
+(generated, not committed), which the site reads. The build fails, rather than publishing an empty
+directory, if a variable is missing, the request fails or no member is approved.
+
+**Setup.** Create an Airtable [personal access token](https://airtable.com/create/tokens) with the
+`data.records:read` scope and access to the base. Under **Settings → Secrets and variables →
+Actions** add the secret `AIRTABLE_TOKEN` and the variables `AIRTABLE_BASE_ID` (starts with `app`),
+`AIRTABLE_TABLE` (`Members`) and `GEOCODE_CONTACT` (a contact email, sent to Nominatim). Locally,
+put the same four in `.env`. The token is read only by the build script and never reaches the site.
+
+**Fields**, looked up by name: Name, Role, Affiliation, Location, Group Website, Bluesky, Twitter,
+LinkedIn, Headshot, and the checkboxes below. Role is shown under the name (except "Other"). Group Website is where the person's name links to.
+Bluesky, Twitter and LinkedIn take a handle or a full profile URL and become the icons under the
+person. Empty
+fields are left out, and a value that is not a usable link is skipped with a warning in the build
+log. Email and Mailing List are never requested from Airtable, so they cannot appear on the site.
+
+**Approval** is three checkboxes on the member's row. Changes go live with the next deploy (daily, or
+run the workflow by hand).
+
+| Checkbox          | Effect                                                                     |
+| ----------------- | -------------------------------------------------------------------------- |
+| Approved          | Set by a maintainer. Nothing about a member is published without it.       |
+| List In Directory | The member's choice to be listed. Needed, with Approved, to appear at all. |
+| Mapped            | Adds a pin on the map for a listed member (needs a Location).              |
+
+**Headshots.** An image (PNG, JPEG or WebP) attached to the Headshot field is downloaded during the
+build to `src/img/people/airtable/` (not committed; Airtable's attachment links expire, so they are
+never used on the site) and takes priority. Without one, the file in `src/img/people/` named after
+the person is used (`first-last.png` or the full slug of the name), and otherwise a placeholder
+avatar. The build log lists who is using a file from the repository.
+
+Working groups refer to people by `id`, the slug of the Name ("Jan Oliver Korbel" → `jan-oliver-korbel`),
+so renaming a member in Airtable means updating their working groups.
+
 ## Environment variables
 
-See [`.env.example`](.env.example).
+For local use, set these in a `.env` file in the repository root (not committed). Variables
+prefixed `PUBLIC_` are embedded in the built site.
 
-| Variable               | Used by      | Purpose                                                   |
-| ---------------------- | ------------ | --------------------------------------------------------- |
-| `SITE_URL`             | build        | Public origin (canonical URLs, sitemap, social images)    |
-| `BASE_PATH`            | build        | Sub-path for a project page (`/repo`); unset for a domain |
-| `PUBLIC_MAP_STYLE_URL` | build        | Alternative MapLibre style URL                            |
-| `PUBLIC_MAP_KEY`       | build        | Public, domain-restricted key substituted for `{key}`     |
-| `GEOCODE_CONTACT`      | geocode only | Contact email for Nominatim's User-Agent                  |
+| Variable               | Used by | Purpose                                                   |
+| ---------------------- | ------- | --------------------------------------------------------- |
+| `SITE_URL`             | build   | Public origin (canonical URLs, sitemap, social images)    |
+| `BASE_PATH`            | build   | Sub-path for a project page (`/repo`); unset for a domain |
+| `PUBLIC_MAP_STYLE_URL` | build   | Alternative MapLibre style URL                            |
+| `PUBLIC_MAP_KEY`       | build   | Public, domain-restricted key substituted for `{key}`     |
+| `AIRTABLE_TOKEN`       | build   | Secret Airtable token that reads the Members table        |
+| `AIRTABLE_BASE_ID`     | build   | Airtable base id (`app…`)                                 |
+| `AIRTABLE_TABLE`       | build   | Airtable table name (`Members`)                           |
+| `GEOCODE_CONTACT`      | build   | Contact email for Nominatim; enables geocoding            |
 
 All internal links and assets go through `url()` in [`src/lib/url.ts`](src/lib/url.ts), so the site
 works under any base path.
@@ -169,7 +189,8 @@ Pushes to `main` (and the daily schedule) run [`deploy.yml`](.github/workflows/d
 builds with `withastro/action` and publishes with `actions/deploy-pages`.
 
 **One-time setup:** in the GitHub repository go to **Settings → Pages → Source** and choose
-**GitHub Actions**. Under **Settings → Secrets and variables → Actions → Variables** set:
+**GitHub Actions**. Under **Settings → Secrets and variables → Actions → Variables** set the
+following, plus the [Airtable secret and variables](#people-directory-airtable):
 
 | Hosting                                  | `SITE_URL`                 | `BASE_PATH` |
 | ---------------------------------------- | -------------------------- | ----------- |
@@ -199,6 +220,5 @@ immediately.
 
 ## Not built yet
 
-The mailing-list signup form (plan Phase 5) is not implemented. The "Would you like to be added?"
-card on the People page uses a plain `mailto:` link. The featured consortium Perspective on the
+The mailing-list signup form (plan Phase 5) is not implemented. The featured consortium Perspective on the
 Publications page was removed for now (its placeholder entry is still in `publications.yaml`).

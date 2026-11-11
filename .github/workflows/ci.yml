@@ -16,6 +16,10 @@ jobs:
       # Build under a sub-path so a broken base-path link fails the checks.
       BASE_PATH: /ci-base
       SITE_URL: https://example.org
+      # The People directory is built from Airtable.
+      AIRTABLE_TOKEN: ${{ secrets.AIRTABLE_TOKEN }}
+      AIRTABLE_BASE_ID: ${{ vars.AIRTABLE_BASE_ID }}
+      AIRTABLE_TABLE: ${{ vars.AIRTABLE_TABLE }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

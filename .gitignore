@@ -31,7 +31,6 @@ dist/
 # Env
 .env
 .env.*
-!.env.example
 
 # OS
 .DS_Store
@@ -41,5 +40,9 @@ CLAUDE.md
 claude.md
 .claude/
 
-# Generated from src/content/people.yaml by scripts/build-people.mjs
+# Generated from Airtable by scripts/build-people.mjs
 src/content/people.built.yaml
+src/img/people/airtable/
+
+# IDE
+./vscode/

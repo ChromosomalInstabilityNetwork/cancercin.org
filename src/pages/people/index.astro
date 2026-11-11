@@ -1,17 +1,15 @@
 ---
 import { getPublished } from '../../lib/content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Card from '../../components/Card.astro';
+import JoinForm from '../../components/JoinForm.astro';
 import PeopleMap from '../../components/PeopleMap.astro';
 import PersonAvatar from '../../components/PersonAvatar.astro';
 import SocialLinks from '../../components/SocialLinks.astro';
-import { mailto, CONTACT_EMAIL } from '../../lib/site';
-import { locationText } from '../../lib/people';
 
 const people = (await getPublished('people')).sort((a, b) =>
 	a.data.name.localeCompare(b.data.name, undefined, { numeric: true }),
 );
-const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and country:\n';
+const roles = [...new Set(people.flatMap((p) => p.data.role ?? []))].sort();
 ---
 
 <BaseLayout
@@ -44,12 +42,6 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 		<div class="left" data-scroll>
 			<div class="left-inner">
 				<h1>People</h1>
-				<Card class="add" title="Would you like to be added?" headingLevel="h2">
-					<p>
-						Email your name, institution, and location (city and country) to{' '}
-						<a href={mailto('Add me to the CIN people directory', addBody)}>{CONTACT_EMAIL}</a>.
-					</p>
-				</Card>
 				<div class="controls">
 					<div class="search">
 						<label for="people-search" class="visually-hidden">
@@ -63,14 +55,28 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 							spellcheck="false"
 						/>
 					</div>
+					{roles.length > 1 && (
+						<div class="role-filter">
+							<label for="people-role" class="visually-hidden">
+								Filter by role
+							</label>
+							<select id="people-role">
+								<option value="">All roles</option>
+								{roles.map((r) => (
+									<option value={r}>{r}</option>
+								))}
+							</select>
+						</div>
+					)}
 				</div>
+				<JoinForm />
 				<p class="visually-hidden" id="people-count" aria-live="polite"></p>
 				<p class="none" id="people-none" hidden>
 					No one matches your search.
 				</p>
 				<ul class="directory" aria-label="Directory" data-directory>
 					{people.map((p) => (
-						<li class="person" id={p.id}>
+						<li class="person" id={p.id} data-role={p.data.role}>
 							<div class="row">
 								<span class="pic">
 									<PersonAvatar name={p.data.name} photo={p.data.photo} />
@@ -90,8 +96,9 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 											p.data.name
 										)}
 									</span>
+									{p.data.role && <span class="role">{p.data.role}</span>}
 									{p.data.institution && <span class="inst">{p.data.institution}</span>}
-									{locationText(p.data) && <span class="addr">{locationText(p.data)}</span>}
+									{p.data.location && <span class="addr">{p.data.location}</span>}
 								</span>
 							</div>
 							<div class="links">
@@ -124,6 +131,7 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 <script>
 	const root = document.querySelector<HTMLElement>('[data-people-root]')!;
 	const input = document.querySelector<HTMLInputElement>('#people-search')!;
+	const role = document.querySelector<HTMLSelectElement>('#people-role');
 	const toggle = document.querySelector<HTMLButtonElement>('#map-toggle')!;
 	const pane = document.querySelector<HTMLElement>('#people-map-pane')!;
 	const count = document.querySelector<HTMLElement>('#people-count')!;
@@ -166,7 +174,8 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 		flip(() => {
 			for (const li of items) {
 				const hay = haystack.get(li)!;
-				const ok = terms.every((t) => hay.includes(t));
+				const ok =
+					terms.every((t) => hay.includes(t)) && (!role?.value || li.dataset.role === role.value);
 				li.hidden = !ok;
 				if (ok) {
 					shown++;
@@ -175,12 +184,14 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 			}
 		});
 		none.hidden = shown > 0;
-		count.textContent = terms.length ? `${shown} of ${items.length} people` : '';
+		const filtered = terms.length > 0 || !!role?.value;
+		count.textContent = filtered ? `${shown} of ${items.length} people` : '';
 		window.dispatchEvent(
-			new CustomEvent('people:filter', { detail: { ids: terms.length ? ids : null } }),
+			new CustomEvent('people:filter', { detail: { ids: filtered ? ids : null } }),
 		);
 	}
 	input.addEventListener('input', applyFilter);
+	role?.addEventListener('change', applyFilter);
 
 	// Hide / show the map. Hidden, the directory becomes a multi-column list.
 	toggle.hidden = false;
@@ -233,18 +244,6 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 		margin: 0;
 		font-size: var(--fs-h1);
 	}
-	.left :global(.add) {
-		max-width: 560px;
-		padding: 14px 18px;
-	}
-	.left :global(.add h2) {
-		font-size: 1rem;
-		margin-bottom: 4px;
-	}
-	.left :global(.add p) {
-		font-size: 0.9375rem;
-		margin-bottom: 0;
-	}
 	.map {
 		min-height: 0;
 		transition: opacity 0.18s;
@@ -258,7 +257,8 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 	.search {
 		flex: 1;
 	}
-	.search input {
+	.search input,
+	.role-filter select {
 		width: 100%;
 		min-height: 44px;
 		padding: 0 14px;
@@ -402,6 +402,7 @@ const addBody = 'Name:\nInstitution:\nCity, state/province (if applicable) and c
 		font-size: 0.875rem;
 		font-weight: 500;
 	}
+	.role,
 	.addr {
 		font-size: 0.8125rem;
 		color: var(--muted);

@@ -2,9 +2,9 @@
 title: 'CIN Measurement Working Group'
 order: 1
 members:
-  - pippa-f-cosper
+  - pippa-cosper
   - teresa-davoli
-  - sarah-e-mcclelland
+  - sarah-mcclelland
   - peter-van-loo
   - sohrab-shah
   - eileen-parkes

@@ -1,0 +1,27 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { JOIN_FORM_URL } from '../../lib/site';
+---
+
+<PageLayout
+	title="Join the network"
+	description="Apply to join the International CIN Network and be listed in its directory."
+>
+	<iframe title="Join the network" src={JOIN_FORM_URL}></iframe>
+</PageLayout>
+
+<style>
+	iframe {
+		display: block;
+		width: 100%;
+		height: 1000px;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-card);
+	}
+	/* Airtable embeds do not resize to their content, and the form is longer in a narrow column. */
+	@media (max-width: 900px) {
+		iframe {
+			height: 1300px;
+		}
+	}
+</style>

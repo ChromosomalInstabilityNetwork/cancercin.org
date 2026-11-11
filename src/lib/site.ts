@@ -2,6 +2,8 @@ export const SITE_NAME = 'International CIN Network';
 export const SITE_SHORT = 'iCIN';
 export const SITE_DOMAIN = 'CancerCIN.org';
 export const CONTACT_EMAIL = 'contact@cancercin.org';
+// Airtable membership form (embed URL), shown on the Join page and in the JoinForm panel.
+export const JOIN_FORM_URL = 'https://airtable.com/embed/appRpaVvWxV5x6vIQ/pagdjtbuKe00lnnyh/form';
 export const SITE_DESCRIPTION =
 	'The International CIN Network (iCIN): a community of cancer-research laboratories studying chromosomal instability (CIN).';
 
@@ -39,6 +41,5 @@ export const NAV: NavItem[] = [
 	{ label: 'Resources', href: 'resources/' },
 ];
 
-export const mailto = (subject: string, body?: string) =>
-	`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}` +
-	(body ? `&body=${encodeURIComponent(body)}` : '');
+export const mailto = (subject: string) =>
+	`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`;

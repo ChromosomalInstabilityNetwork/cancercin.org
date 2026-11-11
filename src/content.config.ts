@@ -8,13 +8,12 @@ const people = defineCollection({
 	schema: z.object({
 		publish: z.boolean().default(true), // false hides the entry from the site
 		name: z.string(),
+		role: z.string().optional(), // e.g. Group Leader
 		institution: z.string().optional(),
-		city: z.string().optional(),
-		state: z.string().optional(), // state or province, where it applies
-		country: z.string().optional(),
+		location: z.string().optional(), // city, state or province and country; no street addresses
 		lat: z.number().min(-90).max(90).optional(),
 		lng: z.number().min(-180).max(180).optional(),
-		photo: z.string().optional(), // filename in src/img/people, e.g. jane-doe.png
+		photo: z.string().optional(), // file in src/img/people, e.g. jane-doe.png
 		// Optional links, shown as icons under the person (full URLs).
 		website: z.url().optional(),
 		x: z.url().optional(),
@@ -104,7 +103,7 @@ const workingGroups = defineCollection({
 		publish: z.boolean().default(true), // false hides the entry from the site
 		title: z.string(),
 		order: z.number().default(0),
-		members: z.array(z.string()), // ids from people.yaml, in display order
+		members: z.array(z.string()), // person ids (slug of the name), in display order
 	}),
 });
 

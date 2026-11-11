@@ -1,0 +1,159 @@
+---
+// Airtable membership form, in a panel that slides in from the right. The iframe gets its src the first time the panel opens, so nothing loads from Airtable before then.
+import { JOIN_FORM_URL } from '../lib/site';
+---
+
+<p class="join">
+	Want to be added?{' '}
+	<button
+		type="button"
+		class="open"
+		aria-haspopup="dialog"
+		aria-expanded="false"
+		aria-controls="join-form"
+		data-join-open
+	>
+		Join the Network
+	</button>
+	.
+</p>
+<dialog class="panel" id="join-form" aria-labelledby="join-title">
+	<header>
+		<h2 id="join-title">Join the network</h2>
+		<button type="button" class="close" aria-label="Close" title="Close" data-join-close>
+			<svg
+				viewBox="0 0 24 24"
+				aria-hidden="true"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+			>
+				<path d="M6 6l12 12M18 6 6 18"></path>
+			</svg>
+		</button>
+	</header>
+	<iframe title="Join the network" data-src={JOIN_FORM_URL}></iframe>
+</dialog>
+
+<script>
+	const open = document.querySelector<HTMLButtonElement>('[data-join-open]')!;
+	const panel = document.querySelector<HTMLDialogElement>('#join-form')!;
+	const frame = panel.querySelector('iframe')!;
+
+	open.addEventListener('click', () => {
+		if (!frame.src) frame.src = frame.dataset.src!;
+		panel.showModal();
+		open.setAttribute('aria-expanded', 'true');
+	});
+	// Slide out, then close. Escape, the close button and a click on the backdrop all end up here.
+	function close() {
+		panel.classList.add('closing');
+		panel.addEventListener(
+			'animationend',
+			() => {
+				panel.classList.remove('closing');
+				panel.close();
+			},
+			{ once: true },
+		);
+	}
+	panel.querySelector('[data-join-close]')!.addEventListener('click', close);
+	panel.addEventListener('click', (e) => e.target === panel && close());
+	panel.addEventListener('cancel', (e) => {
+		e.preventDefault();
+		close();
+	});
+	panel.addEventListener('close', () => open.setAttribute('aria-expanded', 'false'));
+</script>
+
+<style>
+	.join {
+		margin: 0;
+		font-size: 0.9375rem;
+	}
+	.open {
+		padding: 0;
+		font: inherit;
+		color: var(--accent);
+		text-decoration: underline;
+		background: none;
+		border: 0;
+		cursor: pointer;
+	}
+	.panel {
+		position: fixed;
+		inset: 0 0 0 auto;
+		width: min(560px, 100%);
+		max-width: none;
+		height: 100%;
+		max-height: none;
+		margin: 0;
+		padding: 0;
+		color: var(--ink);
+		background: var(--card);
+		border: 0;
+		border-left: 1px solid var(--border);
+		box-shadow: -4px 0 24px rgba(27, 26, 46, 0.25);
+	}
+	.panel[open] {
+		display: flex;
+		flex-direction: column;
+		animation: slide-in 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+	}
+	.panel.closing {
+		animation: slide-out 0.2s ease-in forwards;
+	}
+	.panel::backdrop {
+		background: rgba(27, 26, 46, 0.5);
+	}
+	@keyframes slide-in {
+		from {
+			transform: translateX(100%);
+		}
+	}
+	@keyframes slide-out {
+		to {
+			transform: translateX(100%);
+		}
+	}
+	header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		padding: 12px 16px 12px 24px;
+		border-bottom: 1px solid var(--border);
+	}
+	h2 {
+		margin: 0;
+	}
+	.close {
+		display: grid;
+		place-items: center;
+		flex: none;
+		width: 44px;
+		height: 44px;
+		padding: 0;
+		color: var(--ink);
+		background: none;
+		border: 0;
+		border-radius: 50%;
+		cursor: pointer;
+	}
+	.close:hover {
+		color: var(--accent);
+		background: #f1eff6;
+	}
+	.close svg {
+		width: 22px;
+		height: 22px;
+	}
+	/* Fills the panel; the Airtable form scrolls inside it. */
+	iframe {
+		flex: 1;
+		width: 100%;
+		min-height: 0;
+		border: 0;
+	}
+</style>

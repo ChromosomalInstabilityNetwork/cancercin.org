@@ -1,12 +1,14 @@
 import { getPublished } from '../lib/content';
 import type { APIRoute } from 'astro';
 import { getImage } from 'astro:assets';
-import { locationText } from '../lib/people';
 
 // Only people with coordinates who have not opted out of the map.
-const photos = import.meta.glob<{ default: ImageMetadata }>('../img/people/*.{png,jpg,jpeg,webp}', {
-	eager: true,
-});
+const photos = import.meta.glob<{ default: ImageMetadata }>(
+	'../img/people/**/*.{png,jpg,jpeg,webp}',
+	{
+		eager: true,
+	},
+);
 
 async function photoUrl(photo?: string): Promise<string> {
 	const src = photo ? photos[`../img/people/${photo}`]?.default : undefined;
@@ -26,7 +28,7 @@ export const GET: APIRoute = async () => {
 				id: p.id,
 				name: p.data.name,
 				institution: p.data.institution ?? '',
-				location: locationText(p.data),
+				location: p.data.location ?? '',
 				photo: await photoUrl(p.data.photo),
 			},
 		})),

@@ -163,5 +163,10 @@
     "lat": 51.75148,
     "lng": -1.21544,
     "display": "added manually"
+  },
+  "nominatim:MD Anderson, Houston, TX, USA": {
+    "lat": 29.70767,
+    "lng": -95.39784,
+    "display": "University of Texas MD Anderson Cancer Center, 1515, Holcombe Boulevard, Texas Medical Center, Houston, Harris County, Texas, 77030, United States"
   }
 }

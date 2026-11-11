@@ -1,30 +1,27 @@
 #!/usr/bin/env node
 /**
- * Build src/content/people.built.yaml (generated, not committed) from src/content/people.yaml.
+ * Build src/content/people.built.yaml (generated, not committed) from the Airtable Members table.
  *
- *   node scripts/build-people.mjs [--geocode]
+ *   node scripts/build-people.mjs
  *
- * people.yaml holds only what people provide: name, institution, city, state, country, links and
- * (optionally) a photo filename. The built file adds everything else:
- * - id: slug of the name ("Pippa F. Cosper" -> pippa-f-cosper); working groups refer to it.
- * - photo: the `photo` given in people.yaml, else the file in src/img/people named after the person.
- * - show_on_map: true.
- * - lat/lng: looked up in .geocode-cache.json by institution + place. Normal builds only read the
- *   cache; `npm run geocode` (--geocode) queries Nominatim for places the cache doesn't have yet.
- *
- * Optional id, show_on_map, lat and lng keys in people.yaml override the derived values.
+ * scripts/airtable.mjs fetches the approved members. This script adds everything else:
+ * - id: slug of the name ("Jan Oliver Korbel" -> jan-oliver-korbel); working groups refer to it.
+ * - photo: the Airtable headshot, downloaded to src/img/people/airtable (not committed), else the
+ *   file in src/img/people named after the person.
+ * - lat/lng: looked up in .geocode-cache.json by affiliation + location. Places the cache doesn't
+ *   have yet are looked up with Nominatim when GEOCODE_CONTACT is set.
  */
-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
-import { parse, stringify } from 'yaml';
+import { readFileSync, writeFileSync, existsSync, readdirSync, rmSync, mkdirSync } from 'node:fs';
+import { stringify } from 'yaml';
+import { fetchMembers } from './airtable.mjs';
 
-const SRC = 'src/content/people.yaml';
 const OUT = 'src/content/people.built.yaml';
 const PHOTOS = 'src/img/people';
+const DOWNLOADS = 'airtable'; // folder in PHOTOS for headshots downloaded from Airtable
 const CACHE_FILE = '.geocode-cache.json';
-const geocode = process.argv.includes('--geocode');
+const CONTACT = process.env.GEOCODE_CONTACT;
 
-const HEADER = `# GENERATED from people.yaml by scripts/build-people.mjs (runs before dev/build). Do not edit.
-# Edit people.yaml instead; id, show_on_map, lat and lng are filled in automatically.
+const HEADER = `# GENERATED from Airtable by scripts/build-people.mjs (runs before dev/build). Do not edit.
 `;
 
 const slug = (s) =>
@@ -34,8 +31,6 @@ const slug = (s) =>
 		.toLowerCase()
 		.replace(/[^a-z0-9]+/g, '-')
 		.replace(/^-|-$/g, '');
-
-const readPeople = () => parse(readFileSync(SRC, 'utf8')) ?? [];
 
 const photoFiles = new Map(
 	existsSync(PHOTOS)
@@ -50,12 +45,20 @@ function findPhoto(name) {
 	for (const t of tries) if (photoFiles.has(t)) return photoFiles.get(t);
 }
 
+/** Save a member's Airtable headshot as <id>.<ext>; returns its path within PHOTOS. */
+async function downloadPhoto(id, { url, ext }) {
+	const res = await fetch(url);
+	if (!res.ok) throw new Error(`HTTP ${res.status}`);
+	const file = `${DOWNLOADS}/${id}.${ext}`;
+	writeFileSync(`${PHOTOS}/${file}`, Buffer.from(await res.arrayBuffer()));
+	return file;
+}
+
 /** Queries to try, most specific first: institution + place, then just the place. */
 function queriesFor(p) {
-	const place = [p.city, p.state, p.country].filter(Boolean).join(', ');
-	if (!place) return [];
+	if (!p.location) return [];
 	const institution = p.institution?.split(';')[0].split(',').pop()?.trim();
-	return [institution ? `${institution}, ${place}` : '', place].filter(Boolean);
+	return [institution ? `${institution}, ${p.location}` : '', p.location].filter(Boolean);
 }
 
 const cache = existsSync(CACHE_FILE) ? JSON.parse(readFileSync(CACHE_FILE, 'utf8')) : {};
@@ -63,12 +66,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let queried = false;
 
 async function nominatim(query) {
-	const contact = process.env.GEOCODE_CONTACT;
-	if (!contact) throw new Error('Set GEOCODE_CONTACT to a contact email for the User-Agent.');
 	const u = new URL('https://nominatim.openstreetmap.org/search');
 	u.search = new URLSearchParams({ q: query, format: 'jsonv2', limit: '1' });
 	const res = await fetch(u, {
-		headers: { 'User-Agent': `cancercin.org-geocoder/1.0 (${contact})` },
+		headers: { 'User-Agent': `cancercin.org-geocoder/1.0 (${CONTACT})` },
 	});
 	if (!res.ok) throw new Error(`Nominatim HTTP ${res.status}`);
 	const [hit] = await res.json();
@@ -80,10 +81,15 @@ async function nominatim(query) {
 async function locate(p) {
 	for (const q of queriesFor(p)) {
 		const key = `nominatim:${q}`;
-		if (!(key in cache) && geocode) {
+		if (!(key in cache) && CONTACT) {
 			if (queried) await sleep(1100); // usage policy: max 1 request/second
 			queried = true;
-			cache[key] = await nominatim(q);
+			try {
+				cache[key] = await nominatim(q);
+			} catch (err) {
+				console.warn(`Could not geocode ${q}: ${err.message}`);
+				continue;
+			}
 			writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2) + '\n');
 			console.log(`geocoded ${q}: ${cache[key]?.display ?? 'NO MATCH'}`);
 		}
@@ -91,37 +97,54 @@ async function locate(p) {
 	}
 }
 
-const FIELDS = ['institution', 'city', 'state', 'country', 'website', 'x', 'linkedin', 'bluesky'];
+const members = await fetchMembers().catch((err) => {
+	console.error(err.message);
+	process.exit(1);
+});
+rmSync(`${PHOTOS}/${DOWNLOADS}`, { recursive: true, force: true });
+mkdirSync(`${PHOTOS}/${DOWNLOADS}`, { recursive: true });
+
 const people = [];
-const missing = [];
+const repoPhoto = [];
+const unmapped = [];
 const ids = new Set();
-for (const row of readPeople()) {
-	if (!row.name) continue;
-	const id = row.id || slug(row.name);
-	if (ids.has(id)) throw new Error(`Duplicate person id "${id}" (${row.name}) in ${SRC}`);
+for (const { headshot, ...member } of members) {
+	const id = slug(member.name);
+	if (ids.has(id)) throw new Error(`Duplicate person id "${id}" (${member.name}) in Airtable`);
 	ids.add(id);
-	const entry = { id, name: row.name };
-	for (const f of FIELDS) if (row[f]) entry[f] = row[f];
-	const photo = row.photo || findPhoto(row.name);
-	if (photo) entry.photo = photo;
-	entry.show_on_map = row.show_on_map ?? true;
-	if (row.lat !== undefined && row.lng !== undefined) {
-		entry.lat = +row.lat;
-		entry.lng = +row.lng;
-	} else {
-		const hit = await locate(row);
+	const entry = { id, ...member };
+	if (headshot) {
+		try {
+			entry.photo = await downloadPhoto(id, headshot);
+		} catch (err) {
+			console.warn(`Could not download the Airtable headshot of ${member.name}: ${err.message}`);
+		}
+	}
+	if (!entry.photo) {
+		const photo = findPhoto(member.name);
+		if (photo) {
+			entry.photo = photo;
+			repoPhoto.push(member.name);
+		}
+	}
+	if (member.show_on_map) {
+		const hit = await locate(member);
 		if (hit) {
 			entry.lat = hit.lat;
 			entry.lng = hit.lng;
-		} else if (queriesFor(row).length) missing.push(row.name);
+		} else unmapped.push(member.name);
 	}
 	people.push(entry);
 }
 
 writeFileSync(OUT, HEADER + '\n' + stringify(people, { lineWidth: 0 }));
-console.log(`people.yaml: ${people.length} people`);
-if (missing.length) {
+console.log(`Airtable: ${people.length} people`);
+if (repoPhoto.length) {
+	console.log(`Headshot from ${PHOTOS} (none in Airtable): ${repoPhoto.join(', ')}`);
+}
+if (unmapped.length) {
 	console.warn(
-		`No coordinates yet for ${missing.join(', ')}: they won't appear on the map. Run \`GEOCODE_CONTACT=you@example.org npm run geocode\`.`,
+		`No coordinates for ${unmapped.join(', ')}: they won't appear on the map.` +
+			(CONTACT ? '' : ' Set GEOCODE_CONTACT to look them up.'),
 	);
 }

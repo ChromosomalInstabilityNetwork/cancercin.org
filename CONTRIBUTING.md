@@ -18,7 +18,7 @@ opened and checked.
 
 | To change…                | Edit…                                                                              |
 | ------------------------- | ---------------------------------------------------------------------------------- |
-| A person in the directory | [`src/content/people.yaml`](src/content/people.yaml)                               |
+| A person in the directory | the Airtable Members table (see the README)                                        |
 | An event                  | add or edit a file in [`src/content/events/`](src/content/events/)                 |
 | A working group           | add or edit a file in [`src/content/working-groups/`](src/content/working-groups/) |
 | A news item               | add or edit a file in [`src/content/news/`](src/content/news/)                     |
@@ -30,15 +30,13 @@ pages is in `src/pages/about/` and `src/data/`.
 
 ### Adding yourself to the directory
 
-Add an entry to `people.yaml` with your name, institution, and city, state or province (if applicable) and
-country. Please don't add street addresses. Only add people who have agreed to be listed. Set `show_on_map: false` to appear in the
-directory without a pin on the map. Leave `lat` and `lng` out; a maintainer will run the geocoder. You can also add `website`, `bluesky`, `x` and `linkedin` (full URLs); they show as small icons under your name.
+Use the **Join the network** form on the People page. Give your location as city, state or province (if applicable) and
+country; please don't add street addresses. You choose there whether to be listed in the directory and shown on the map, and can add a website, Bluesky and Twitter/X handles, LinkedIn and a headshot. A maintainer approves each entry before it appears.
 
 ### Images
 
-Put image files under `public/` (for example `public/people/jane-doe.jpg`,
-`public/images/news/launch.jpg`) and refer to them without the `public/` prefix
-(`photo: people/jane-doe.jpg`). Please keep them small (about 200 px square is plenty for
+Put image files under `public/` (for example `public/images/news/launch.jpg`) and refer to them
+without the `public/` prefix (`image: images/news/launch.jpg`). Headshots are uploaded with the Join form. Please keep them small (about 200 px square is plenty for
 thumbnails and portraits) and include `image_alt` text when a picture carries meaning.
 
 ## For developers

@@ -109,10 +109,6 @@ import { url } from '../lib/url';
 		face.setAttribute('aria-hidden', 'true');
 		face.dataset.person = p.id;
 		face.append(avatar(p));
-		const label = document.createElement('span');
-		label.className = 'pm-label';
-		label.textContent = p.name;
-		face.append(label);
 		face.addEventListener('pointerenter', () => showHoverPopup(p.id));
 		face.addEventListener('pointerleave', hideHoverPopup);
 		face.addEventListener('click', (e) => {
@@ -249,6 +245,33 @@ import { url } from '../lib/url';
 		return el;
 	}
 
+	/** The default view: everyone on the map. */
+	function fitEveryone(animate: boolean) {
+		if (!people.size) return;
+		const b = new lib.LngLatBounds();
+		for (const p of people.values()) b.extend(p.coords);
+		map.fitBounds(b, { padding: 70, maxZoom: 4, animate });
+	}
+
+	/** Button under the zoom buttons: clears the selection and returns to the default view. */
+	function resetControl() {
+		const group = document.createElement('div');
+		group.className = 'maplibregl-ctrl maplibregl-ctrl-group';
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.className = 'pm-reset';
+		button.title = 'Reset map view';
+		button.setAttribute('aria-label', button.title);
+		button.innerHTML =
+			'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+		button.addEventListener('click', () => {
+			setSelected(null);
+			fitEveryone(!reduceMotion.matches);
+		});
+		group.append(button);
+		return group;
+	}
+
 	function setSelected(id: string | null, opts: { scroll?: boolean } = {}) {
 		popup?.remove();
 		selected = id;
@@ -367,6 +390,7 @@ import { url } from '../lib/url';
 			});
 			map.touchZoomRotate.disableRotation();
 			map.addControl(new lib.NavigationControl({ showCompass: false }), 'top-right');
+			map.addControl({ onAdd: resetControl, onRemove: () => {} }, 'top-right');
 
 			const timer = window.setTimeout(() => {
 				status.hidden = false;
@@ -377,11 +401,7 @@ import { url } from '../lib/url';
 				window.clearTimeout(timer);
 				status.hidden = true;
 				map.resize();
-				if (people.size) {
-					const b = new lib.LngLatBounds();
-					for (const p of people.values()) b.extend(p.coords);
-					map.fitBounds(b, { padding: 70, maxZoom: 4, animate: false });
-				}
+				fitEveryone(false);
 				// Added before any marker, so it sits beneath all of them.
 				leaders = document.createElementNS(SVG_NS, 'svg');
 				leaders.setAttribute('class', 'pm-leaders');
@@ -544,24 +564,6 @@ import { url } from '../lib/url';
 			0 0 0 3px rgba(138, 47, 115, 0.35),
 			0 2px 8px rgba(27, 26, 46, 0.5);
 	}
-	:global(.pm-label) {
-		position: absolute;
-		top: calc(100% + 6px);
-		left: 50%;
-		transform: translateX(-50%);
-		display: none;
-		padding: 3px 10px;
-		white-space: nowrap;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: #fff;
-		background: var(--ink);
-		border-radius: 999px;
-		pointer-events: none;
-	}
-	:global(.pm-hovered .pm-label) {
-		display: block;
-	}
 
 	:global(.pm-hover-pop) {
 		pointer-events: none;
@@ -605,6 +607,15 @@ import { url } from '../lib/url';
 	:global(.pm-pop .social svg) {
 		width: 16px;
 		height: 16px;
+	}
+	:global(.pm-reset) {
+		display: grid;
+		place-items: center;
+		color: #333;
+	}
+	:global(.pm-reset svg) {
+		width: 17px;
+		height: 17px;
 	}
 	:global(.maplibregl-ctrl-attrib) {
 		font-size: 0.75rem;
