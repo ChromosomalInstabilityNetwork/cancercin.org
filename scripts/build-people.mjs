@@ -5,7 +5,7 @@
  *   node scripts/build-people.mjs
  *
  * scripts/airtable.mjs fetches the approved members. This script adds everything else:
- * - id: slug of the name ("Jan Oliver Korbel" -> jan-oliver-korbel); working groups refer to it.
+ * - id: slug of the name ("Jane Q. Doe" -> jane-q-doe); working groups refer to it.
  * - photo: the Airtable headshot, downloaded to src/img/people/airtable (not committed), else the
  *   file in src/img/people named after the person.
  * - lat/lng: looked up in .geocode-cache.json by affiliation + location. Places the cache doesn't

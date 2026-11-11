@@ -279,6 +279,8 @@ import { url } from '../lib/url';
 		markState();
 		if (!id) return;
 
+		// The directory only shows its first rows until scrolled; make sure this person's row is shown.
+		window.dispatchEvent(new CustomEvent('people:reveal', { detail: { id } }));
 		const card = cards.find((c) => c.dataset.personId === id);
 		if (opts.scroll && card && scroller) {
 			const l = scroller.getBoundingClientRect();

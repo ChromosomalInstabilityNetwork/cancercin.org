@@ -49,6 +49,7 @@ const roles = [...new Set(people.flatMap((p) => p.data.role ?? []))].sort();
 						</label>
 						<input
 							id="people-search"
+							class="control"
 							type="search"
 							placeholder="Search people"
 							autocomplete="off"
@@ -60,8 +61,8 @@ const roles = [...new Set(people.flatMap((p) => p.data.role ?? []))].sort();
 							<label for="people-role" class="visually-hidden">
 								Filter by role
 							</label>
-							<select id="people-role">
-								<option value="">All roles</option>
+							<select id="people-role" class="control">
+								<option value="">All Members</option>
 								{roles.map((r) => (
 									<option value={r}>{r}</option>
 								))}
@@ -167,31 +168,67 @@ const roles = [...new Set(people.flatMap((p) => p.data.role ?? []))].sort();
 		}
 	}
 
-	function applyFilter() {
+	// Everyone is in the page, but only the first PAGE matches are shown; more are revealed on scroll.
+	const PAGE = 40;
+	let limit = PAGE;
+	const matched = new Map<HTMLLIElement, number>(); // position of each match, counting from 1
+
+	function applyFilter(resetLimit = true) {
+		if (resetLimit) limit = PAGE;
 		const terms = fold(input.value).split(/\s+/).filter(Boolean);
-		let shown = 0;
 		const ids: string[] = [];
+		matched.clear();
 		flip(() => {
 			for (const li of items) {
 				const hay = haystack.get(li)!;
 				const ok =
 					terms.every((t) => hay.includes(t)) && (!role?.value || li.dataset.role === role.value);
-				li.hidden = !ok;
 				if (ok) {
-					shown++;
+					matched.set(li, matched.size + 1);
 					ids.push(li.id);
 				}
+				li.hidden = !ok || matched.size > limit;
 			}
 		});
-		none.hidden = shown > 0;
+		none.hidden = matched.size > 0;
+		more.hidden = matched.size <= limit;
 		const filtered = terms.length > 0 || !!role?.value;
-		count.textContent = filtered ? `${shown} of ${items.length} people` : '';
+		count.textContent = filtered ? `${matched.size} of ${items.length} people` : '';
+		// The map shows every match, including those not revealed in the list yet.
 		window.dispatchEvent(
 			new CustomEvent('people:filter', { detail: { ids: filtered ? ids : null } }),
 		);
 	}
-	input.addEventListener('input', applyFilter);
-	role?.addEventListener('change', applyFilter);
+	input.addEventListener('input', () => applyFilter());
+	role?.addEventListener('change', () => applyFilter());
+
+	// An invisible marker under the list: scrolling it into view shows the next page.
+	const more = document.createElement('div');
+	more.style.height = '1px';
+	more.setAttribute('aria-hidden', 'true');
+	document.querySelector('[data-directory]')!.after(more);
+	new IntersectionObserver(
+		(entries) => {
+			if (entries.some((e) => e.isIntersecting) && matched.size > limit) {
+				limit += PAGE;
+				applyFilter(false);
+			}
+		},
+		{ rootMargin: '600px' },
+	).observe(more);
+
+	/** Show the list far enough to include this person (selected on the map, or linked to by #id). */
+	function reveal(id: string) {
+		const position = matched.get(document.getElementById(id) as HTMLLIElement) ?? 0;
+		if (position <= limit) return;
+		limit = Math.ceil(position / PAGE) * PAGE;
+		applyFilter(false);
+	}
+	window.addEventListener('people:reveal', (e) =>
+		reveal((e as CustomEvent<{ id: string }>).detail.id),
+	);
+	applyFilter();
+	reveal(decodeURIComponent(location.hash.slice(1)));
 
 	// Hide / show the map. Hidden, the directory becomes a multi-column list.
 	toggle.hidden = false;
@@ -257,16 +294,8 @@ const roles = [...new Set(people.flatMap((p) => p.data.role ?? []))].sort();
 	.search {
 		flex: 1;
 	}
-	.search input,
-	.role-filter select {
+	.search input {
 		width: 100%;
-		min-height: 44px;
-		padding: 0 14px;
-		font: inherit;
-		color: var(--ink);
-		background: #fff;
-		border: 1px solid #b9b5c4;
-		border-radius: 999px;
 	}
 	/* Pinned to the bottom-right corner of the viewport, so it stays put while scrolling. */
 	.map-toggle {

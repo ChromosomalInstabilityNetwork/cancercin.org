@@ -53,6 +53,7 @@ const years = [...new Set(rows.map((p) => parts(p).y).filter(Boolean))].sort().r
 				<label for="f-q">Search</label>
 				<input
 					id="f-q"
+					class="control"
 					type="search"
 					placeholder="Title, author, journal, or keyword"
 					autocomplete="off"
@@ -60,7 +61,7 @@ const years = [...new Set(rows.map((p) => parts(p).y).filter(Boolean))].sort().r
 			</div>
 			<div class="field">
 				<label for="f-year">Year</label>
-				<select id="f-year">
+				<select id="f-year" class="control">
 					<option value="">All years</option>
 					{years.map((y) => (
 						<option value={y}>{y}</option>
@@ -234,25 +235,16 @@ const years = [...new Set(rows.map((p) => parts(p).y).filter(Boolean))].sort().r
 		font-weight: 600;
 		color: var(--muted);
 	}
-	input,
-	select {
-		min-height: 44px;
-		padding: 0 12px;
-		font: inherit;
-		color: var(--ink);
-		background: #fff;
-		border: 1px solid #b9b5c4;
-		border-radius: 10px;
-	}
 	.clear {
-		min-height: 44px;
-		padding: 0 20px;
+		min-height: 40px;
+		padding: 0 16px;
 		font: inherit;
+		font-size: 0.9375rem;
 		font-weight: 600;
 		color: var(--accent);
 		background: none;
-		border: 2px solid var(--accent);
-		border-radius: var(--radius-pill);
+		border: 1px solid var(--accent);
+		border-radius: 8px;
 		cursor: pointer;
 	}
 	.count {

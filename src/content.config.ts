@@ -19,7 +19,7 @@ const people = defineCollection({
 		x: z.url().optional(),
 		linkedin: z.url().optional(),
 		bluesky: z.url().optional(),
-		show_on_map: z.boolean().default(true),
+		show_on_map: z.boolean().default(false),
 	}),
 });
 

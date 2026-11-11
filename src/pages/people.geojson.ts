@@ -2,7 +2,7 @@ import { getPublished } from '../lib/content';
 import type { APIRoute } from 'astro';
 import { getImage } from 'astro:assets';
 
-// Only people with coordinates who have not opted out of the map.
+// Only people with Mapped checked in Airtable who also have coordinates.
 const photos = import.meta.glob<{ default: ImageMetadata }>(
 	'../img/people/**/*.{png,jpg,jpeg,webp}',
 	{

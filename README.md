@@ -83,7 +83,7 @@ listed, set `PUBMED_QUERY`, for example to restrict to consortium authors.
 ---
 title: 'CIN Measurement Working Group'
 order: 1 # position on the page
-members: [pippa-cosper, teresa-davoli]
+members: [jane-doe, john-smith]
 ---
 
 What the group is working on.
@@ -103,7 +103,7 @@ scheduled GitHub Action rebuilds and redeploys it every day (05:15 UTC, see
 
 The People page shows a directory plus a [MapLibre GL JS](https://maplibre.org) map. MapLibre is
 loaded only on that page, when the map nears the viewport. The directory is plain HTML and works
-without JavaScript. Pins come from `/people.geojson`, built from listed members who have Mapped checked and
+without JavaScript; with it, the first 40 people are shown and more appear as you scroll. Pins come from `/people.geojson`, built from listed members who have Mapped checked and
 coordinates. Everyone is drawn as a face at their true location; faces that would overlap are pushed
 apart (with a thin line back to the true spot) by a small collision pass in
 [`PeopleMap.astro`](src/components/PeopleMap.astro), recomputed as you pan and zoom.
@@ -161,7 +161,7 @@ never used on the site) and takes priority. Without one, the file in `src/img/pe
 the person is used (`first-last.png` or the full slug of the name), and otherwise a placeholder
 avatar. The build log lists who is using a file from the repository.
 
-Working groups refer to people by `id`, the slug of the Name ("Jan Oliver Korbel" → `jan-oliver-korbel`),
+Working groups refer to people by `id`, the slug of the Name ("Jane Q. Doe" → `jane-q-doe`),
 so renaming a member in Airtable means updating their working groups.
 
 ## Environment variables
@@ -217,8 +217,3 @@ expensive part of the People page: in an earlier layout it cost about 1.5 s of m
 scored about 50, so re-check that page after changing the map or its position. The library is
 code-split, loaded only on that page, and started lazily; the directory beside it is usable
 immediately.
-
-## Not built yet
-
-The mailing-list signup form (plan Phase 5) is not implemented. The featured consortium Perspective on the
-Publications page was removed for now (its placeholder entry is still in `publications.yaml`).
